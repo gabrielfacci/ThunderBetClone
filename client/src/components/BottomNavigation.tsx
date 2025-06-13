@@ -36,7 +36,7 @@ export function BottomNavigation() {
         }}
       >
         <div className="px-4 max-w-md mx-auto">
-          <div className="grid grid-cols-5 h-16">
+          <div className="grid grid-cols-5 h-20">
           <button 
             className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
               activeTab === 'deposit' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
@@ -58,15 +58,15 @@ export function BottomNavigation() {
           </button>
           
           <button 
-            className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors relative -mt-2 ${
               activeTab === 'home' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab('home')}
           >
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
               activeTab === 'home' ? 'bg-yellow-500 text-black' : 'bg-transparent'
             }`}>
-              <Home className="w-5 h-5" />
+              <Home className="w-6 h-6" />
             </div>
             <span className="text-xs">{t('Home')}</span>
           </button>
