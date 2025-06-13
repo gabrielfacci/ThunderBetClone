@@ -211,7 +211,7 @@ export function Home() {
         </div>
       </header>
       {/* Banner Section */}
-      <div className="px-4 mb-4 max-w-md mx-auto pt-20">
+      <div className="px-4 mb-3 max-w-md mx-auto pt-20">
         <div className="relative overflow-hidden rounded-xl" style={{ height: '200px' }}>
           <div className={`transition-opacity duration-500 ease-in-out ${currentBanner === 0 ? 'opacity-100' : 'opacity-0'} absolute inset-0`}>
             <img 
@@ -258,8 +258,8 @@ export function Home() {
         </div>
       </div>
       {/* Winner Feed */}
-      <div className="px-4 max-w-md mx-auto">
-        <div className="bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 rounded-xl p-3 mb-3">
+      <div className="px-4 mb-4 max-w-md mx-auto">
+        <div className="bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 rounded-xl p-3">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
               <span className="text-xs font-bold text-white">
