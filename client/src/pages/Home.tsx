@@ -24,6 +24,7 @@ export function Home() {
   const [showDepositFromGame, setShowDepositFromGame] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
   const gamesPerPage = 12;
   
   // Drag/swipe functionality for categories
@@ -56,6 +57,17 @@ export function Home() {
     const timeout = setTimeout(rotateWinner, initialDelay);
     
     return () => clearTimeout(timeout);
+  }, []);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Categories mouse handlers
@@ -386,62 +398,76 @@ export function Home() {
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-8 px-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-400 text-sm">
-                      {t('Page')} {currentPage} {t('of')} {totalPages}
-                    </span>
-                    <span className="text-gray-500 text-xs">
-                      ({filteredGames.length} {t('games')})
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={handlePreviousPage}
-                      disabled={currentPage === 1}
-                      className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    
-                    {/* Page Numbers */}
-                    <div className="flex items-center space-x-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNum;
-                        if (totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (currentPage >= totalPages - 2) {
-                          pageNum = totalPages - 4 + i;
-                        } else {
-                          pageNum = currentPage - 2 + i;
-                        }
-                        
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            className={`w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 ${
-                              currentPage === pageNum
-                                ? 'bg-purple-600 text-white border border-purple-500'
-                                : 'bg-gray-800/50 text-gray-400 border border-gray-700/50 hover:text-white hover:bg-gray-700/50'
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
+                <div className="mt-6 px-2">
+                  {/* Mobile-first responsive pagination */}
+                  <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+                    {/* Page info */}
+                    <div className="flex items-center justify-center sm:justify-start space-x-2">
+                      <span className="text-gray-400 text-sm">
+                        {t('Page')} {currentPage} {t('of')} {totalPages}
+                      </span>
+                      <span className="text-gray-500 text-xs hidden sm:inline">
+                        ({filteredGames.length} {t('games')})
+                      </span>
                     </div>
                     
-                    <button
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                      className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
+                    {/* Navigation controls */}
+                    <div className="flex items-center justify-center space-x-1">
+                      <button
+                        onClick={handlePreviousPage}
+                        disabled={currentPage === 1}
+                        className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      >
+                        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
+                      
+                      {/* Page Numbers - responsive display */}
+                      <div className="flex items-center space-x-1">
+                        {Array.from({ length: Math.min(isMobile ? 3 : 5, totalPages) }, (_, i) => {
+                          let pageNum;
+                          const maxPages = isMobile ? 3 : 5;
+                          
+                          if (totalPages <= maxPages) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= Math.floor(maxPages / 2) + 1) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - Math.floor(maxPages / 2)) {
+                            pageNum = totalPages - maxPages + 1 + i;
+                          } else {
+                            pageNum = currentPage - Math.floor(maxPages / 2) + i;
+                          }
+                          
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
+                                currentPage === pageNum
+                                  ? 'bg-purple-600 text-white border border-purple-500'
+                                  : 'bg-gray-800/50 text-gray-400 border border-gray-700/50 hover:text-white hover:bg-gray-700/50'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      
+                      <button
+                        onClick={handleNextPage}
+                        disabled={currentPage === totalPages}
+                        className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      >
+                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Mobile game count */}
+                  <div className="flex justify-center mt-2 sm:hidden">
+                    <span className="text-gray-500 text-xs">
+                      {filteredGames.length} {t('games')}
+                    </span>
                   </div>
                 </div>
               )}
