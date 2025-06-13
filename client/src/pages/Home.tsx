@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -22,6 +22,18 @@ export function Home() {
   const [showInsufficientBalance, setShowInsufficientBalance] = useState(false);
   const [showDepositFromGame, setShowDepositFromGame] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
+  
+  // Drag/swipe functionality for categories
+  const categoriesRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  
+  // Drag/swipe functionality for games
+  const gamesRef = useRef<HTMLDivElement>(null);
+  const [isDraggingGames, setIsDraggingGames] = useState(false);
+  const [startXGames, setStartXGames] = useState(0);
+  const [scrollLeftGames, setScrollLeftGames] = useState(0);
 
   // Auto-rotate banners
   useEffect(() => {
@@ -38,6 +50,91 @@ export function Home() {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  // Drag/swipe handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!categoriesRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - categoriesRef.current.offsetLeft);
+    setScrollLeft(categoriesRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !categoriesRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - categoriesRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    categoriesRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  // Touch handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!categoriesRef.current) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].pageX - categoriesRef.current.offsetLeft);
+    setScrollLeft(categoriesRef.current.scrollLeft);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !categoriesRef.current) return;
+    const x = e.touches[0].pageX - categoriesRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    categoriesRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Games drag/swipe handlers
+  const handleGamesMouseDown = (e: React.MouseEvent) => {
+    if (!gamesRef.current) return;
+    setIsDraggingGames(true);
+    setStartXGames(e.pageX - gamesRef.current.offsetLeft);
+    setScrollLeftGames(gamesRef.current.scrollLeft);
+  };
+
+  const handleGamesMouseLeave = () => {
+    setIsDraggingGames(false);
+  };
+
+  const handleGamesMouseUp = () => {
+    setIsDraggingGames(false);
+  };
+
+  const handleGamesMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingGames || !gamesRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - gamesRef.current.offsetLeft;
+    const walk = (x - startXGames) * 2;
+    gamesRef.current.scrollLeft = scrollLeftGames - walk;
+  };
+
+  const handleGamesTouchStart = (e: React.TouchEvent) => {
+    if (!gamesRef.current) return;
+    setIsDraggingGames(true);
+    setStartXGames(e.touches[0].pageX - gamesRef.current.offsetLeft);
+    setScrollLeftGames(gamesRef.current.scrollLeft);
+  };
+
+  const handleGamesTouchMove = (e: React.TouchEvent) => {
+    if (!isDraggingGames || !gamesRef.current) return;
+    const x = e.touches[0].pageX - gamesRef.current.offsetLeft;
+    const walk = (x - startXGames) * 2;
+    gamesRef.current.scrollLeft = scrollLeftGames - walk;
+  };
+
+  const handleGamesTouchEnd = () => {
+    setIsDraggingGames(false);
+  };
 
   const filteredGames = games.filter(game => {
     const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -176,7 +273,18 @@ export function Home() {
       </div>
       {/* Categories */}
       <div className="px-4 mb-6">
-        <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar">
+        <div 
+          ref={categoriesRef}
+          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab"
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {categories.map((category) => {
             const getIcon = (iconName: string) => {
               switch (iconName) {
@@ -224,11 +332,22 @@ export function Home() {
       </div>
       {/* Games Grid */}
       <div className="px-4 pb-24">
-        <div className="grid grid-cols-2 gap-3">
+        <div 
+          ref={gamesRef}
+          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab"
+          style={{ cursor: isDraggingGames ? 'grabbing' : 'grab' }}
+          onMouseDown={handleGamesMouseDown}
+          onMouseLeave={handleGamesMouseLeave}
+          onMouseUp={handleGamesMouseUp}
+          onMouseMove={handleGamesMouseMove}
+          onTouchStart={handleGamesTouchStart}
+          onTouchMove={handleGamesTouchMove}
+          onTouchEnd={handleGamesTouchEnd}
+        >
           {filteredGames.map((game) => (
             <div 
               key={game.id}
-              className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer"
+              className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer flex-shrink-0 w-40"
               onClick={() => handleGameClick(game)}
             >
               <div className="relative">
@@ -240,6 +359,10 @@ export function Home() {
                 <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
                   <Heart className="w-3 h-3 text-white" />
                 </button>
+              </div>
+              <div className="p-2">
+                <h3 className="text-white text-xs font-medium truncate">{game.name}</h3>
+                <p className="text-gray-400 text-xs truncate">{game.provider}</p>
               </div>
             </div>
           ))}
