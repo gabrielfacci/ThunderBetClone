@@ -217,7 +217,7 @@ export function Home() {
       <div className="pt-20">
         {/* Banner Section */}
         <div className="px-4 mb-2 max-w-md mx-auto">
-          <div className="relative overflow-hidden" style={{ borderRadius: '20px' }}>
+          <div className="relative overflow-hidden" style={{ borderRadius: '22px' }}>
             <div 
               className="flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentBanner * 100}%)` }}
@@ -229,7 +229,7 @@ export function Home() {
                   className="w-full h-32 object-contain"
                   style={{ 
                     objectPosition: 'center',
-                    borderRadius: '20px'
+                    borderRadius: '22px'
                   }}
                 />
               </div>
@@ -240,7 +240,7 @@ export function Home() {
                   className="w-full h-32 object-contain"
                   style={{ 
                     objectPosition: 'center',
-                    borderRadius: '20px'
+                    borderRadius: '22px'
                   }}
                 />
               </div>
@@ -251,7 +251,7 @@ export function Home() {
                   className="w-full h-32 object-contain"
                   style={{ 
                     objectPosition: 'center',
-                    borderRadius: '20px'
+                    borderRadius: '22px'
                   }}
                 />
               </div>
