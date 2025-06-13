@@ -81,16 +81,12 @@ export function Home() {
     <div className="min-h-screen">
       {/* Header */}
       <header className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center">
           <img 
             src={thunderbetLogo} 
             alt="ThunderBet" 
             className="w-8 h-8 object-contain"
           />
-          <h1 className="text-base font-bold">
-            <span className="text-yellow-500">THUNDER</span>
-            <span className="text-white">BET</span>
-          </h1>
         </div>
         <div className="flex items-center space-x-3">
           <div className="bg-green-600/20 px-2 py-1 rounded-md flex items-center space-x-1 border border-green-600/30">
