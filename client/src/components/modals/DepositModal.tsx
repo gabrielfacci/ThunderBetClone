@@ -43,75 +43,64 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         
         <div className="px-4 pb-4">
           {/* Tabs */}
-          <div className="flex space-x-2 mb-6">
+          <div className="flex space-x-2 mb-4">
             <Button
               variant={activeTab === 'pix' ? 'default' : 'secondary'}
-              className={`flex-1 h-12 ${activeTab === 'pix' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+              className={`flex-1 h-10 sm:h-12 text-sm touch-manipulation ${activeTab === 'pix' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
               onClick={() => setActiveTab('pix')}
             >
-              <CreditCard className="w-4 h-4 mr-2" />
+              <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               PIX
             </Button>
             <Button
               variant={activeTab === 'history' ? 'default' : 'secondary'}
-              className={`flex-1 h-12 ${activeTab === 'history' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+              className={`flex-1 h-10 sm:h-12 text-sm touch-manipulation ${activeTab === 'history' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
               onClick={() => setActiveTab('history')}
             >
-              <History className="w-4 h-4 mr-2" />
+              <History className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               {t('History')}
             </Button>
           </div>
 
           {activeTab === 'pix' && (
             <div>
-              <h3 className="text-lg font-bold mb-1">{t('Deposit via PIX')}</h3>
-              <p className="text-sm text-gray-400 mb-4">{t('Fast, secure and available 24h')}</p>
+              <h3 className="text-base sm:text-lg font-bold mb-1">{t('Deposit via PIX')}</h3>
+              <p className="text-xs sm:text-sm text-gray-400 mb-3">{t('Fast, secure and available 24h')}</p>
               
               {/* Quick Amounts */}
-              <div className="mb-6">
-                <p className="text-sm text-green-400 mb-3 flex items-center">
-                  <DollarSign className="w-4 h-4 mr-1" />
+              <div className="mb-4">
+                <p className="text-xs sm:text-sm text-green-400 mb-2 flex items-center">
+                  <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   {t('Quick amounts')}
                 </p>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {quickAmounts.slice(0, 5).map((value) => (
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  {quickAmounts.slice(0, 6).map((value) => (
                     <Button
                       key={value}
                       variant="outline"
-                      size="sm"
-                      className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-10"
+                      className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-8 sm:h-10 text-xs sm:text-sm touch-manipulation"
                       onClick={() => handleQuickAmount(value)}
                     >
                       R$ {value}
                     </Button>
                   ))}
                 </div>
-                <div className="grid grid-cols-1 gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-10"
-                    onClick={() => handleQuickAmount(quickAmounts[5])}
-                  >
-                    R$ {quickAmounts[5]}
-                  </Button>
-                </div>
               </div>
 
               {/* Amount Input */}
-              <div className="mb-6">
-                <Label className="text-sm text-gray-400 mb-2 block">{t('Deposit amount')}</Label>
+              <div className="mb-4">
+                <Label className="text-xs sm:text-sm text-gray-400 mb-2 block">{t('Deposit amount')}</Label>
                 <Input
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="R$ 0,00"
-                  className="bg-gray-800/50 border-gray-600/50 text-white h-12 text-lg"
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-10 sm:h-12 text-base sm:text-lg touch-manipulation"
                 />
               </div>
 
               {/* Generate PIX Button */}
-              <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-12 text-base">
-                <QrCode className="w-5 h-5 mr-2" />
+              <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 sm:h-12 text-sm sm:text-base touch-manipulation">
+                <QrCode className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 {t('Generate PIX QR Code')}
               </Button>
             </div>
