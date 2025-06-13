@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Zap, RotateCcw, Share, Heart, Flame } from 'lucide-react';
+import { Search, Zap, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -150,23 +150,42 @@ export function Home() {
 
       {/* Game Categories */}
       <div className="px-4 mb-4">
-        <div className="flex space-x-2 overflow-x-auto pb-2">
-          {categories.map((category) => (
-            <Button
-              key={category.id}
-              variant="outline"
-              size="sm"
-              className={`flex flex-col items-center justify-center h-16 min-w-[80px] px-3 whitespace-nowrap transition-colors rounded-xl ${
-                selectedCategory === category.id
-                  ? 'bg-yellow-500 text-black border-yellow-500 font-bold'
-                  : 'bg-gray-800/50 text-gray-300 border-gray-600/50 hover:bg-gray-700/50'
-              }`}
-              onClick={() => setSelectedCategory(category.id)}
-            >
-              <span className="text-lg mb-1">{category.icon}</span>
-              <span className="text-xs">{t(category.name)}</span>
-            </Button>
-          ))}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4 overflow-x-auto pb-2">
+            {categories.map((category) => {
+              const getIcon = (iconName: string) => {
+                switch (iconName) {
+                  case 'flame':
+                    return <Flame className="h-6 w-6 text-orange-500" />;
+                  case 'trophy':
+                    return <Trophy className="h-6 w-6 text-yellow-500" />;
+                  case 'star':
+                    return <Star className="h-6 w-6 text-blue-500" />;
+                  case 'dice-6':
+                    return <Dice6 className="h-6 w-6 text-green-500" />;
+                  case 'diamond':
+                    return <Diamond className="h-6 w-6 text-purple-500" />;
+                  default:
+                    return <Flame className="h-6 w-6 text-orange-500" />;
+                }
+              };
+
+              return (
+                <button
+                  key={category.id}
+                  className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-all duration-200 flex-shrink-0 ${
+                    selectedCategory === category.id
+                      ? 'bg-purple-600/30 border border-purple-500/50'
+                      : 'bg-gray-800/40 hover:bg-gray-700/50'
+                  }`}
+                  onClick={() => setSelectedCategory(category.id)}
+                >
+                  {getIcon(category.icon)}
+                  <span className="text-xs text-white whitespace-nowrap">{t(category.name)}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

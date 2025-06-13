@@ -67,9 +67,9 @@ export const winners: WinnerData[] = [
 ];
 
 export const categories = [
-  { id: 'all', name: 'All', icon: '🔥' },
-  { id: 'pragmatic', name: 'Pragmatic Play', icon: '🏆' },
-  { id: 'evolution', name: 'Evolution', icon: '⭐' },
-  { id: 'relax', name: 'Relax Gaming', icon: '🎲' },
-  { id: 'jili', name: 'Jili', icon: '💎' }
+  { id: 'all', name: 'All', icon: 'flame' },
+  { id: 'pragmatic', name: 'Pragmatic Play', icon: 'trophy' },
+  { id: 'evolution', name: 'Evolution', icon: 'star' },
+  { id: 'relax', name: 'Relax Gaming', icon: 'dice-6' },
+  { id: 'jili', name: 'Jili', icon: 'diamond' }
 ];
