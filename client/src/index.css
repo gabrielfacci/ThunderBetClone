@@ -178,6 +178,30 @@
     display: none;
   }
   
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #6b7280 transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #6b7280 0%, #9ca3af 100%);
+    border-radius: 2px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #9ca3af 0%, #d1d5db 100%);
+  }
+  
   .animate-progress {
     animation: progress 3s ease-in-out infinite;
   }

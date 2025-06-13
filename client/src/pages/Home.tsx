@@ -176,7 +176,7 @@ export function Home() {
       </div>
       {/* Categories */}
       <div className="px-4 mb-6">
-        <div className="flex space-x-3 overflow-x-auto pb-2">
+        <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar">
           {categories.map((category) => {
             const getIcon = (iconName: string) => {
               switch (iconName) {
