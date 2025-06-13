@@ -181,35 +181,39 @@ export function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 text-white">
       {/* Header */}
-      <header className="px-4 pt-12 pb-4 max-w-md mx-auto">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="text-yellow-500 font-bold text-xl">
-              THUNDER
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-purple-500/20">
+        <div className="px-4 py-3 max-w-md mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="relative flex items-center gap-2 transition-all duration-700 ease-out group hover:scale-110 cursor-pointer">
+              <div className="relative transition-all duration-700 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]">
+                <div className="text-yellow-500 font-bold text-xl">
+                  THUNDER
+                </div>
+              </div>
+              <div className="text-white font-bold text-xl">
+                BET
+              </div>
             </div>
-            <div className="text-white font-bold text-xl">
-              BET
+            
+            <div className="flex items-center space-x-3">
+              <div className="bg-green-600/20 px-3 py-1 rounded-lg flex items-center space-x-2 border border-green-600/30 backdrop-blur-sm">
+                <span className="text-green-400 text-sm">💰</span>
+                <span className="text-green-400 text-sm font-medium">
+                  {formatBalance(user?.balance || 0)}
+                </span>
+              </div>
+              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <RotateCcw className="w-4 h-4 text-gray-300" />
+              </button>
+              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <Share className="w-4 h-4 text-gray-300" />
+              </button>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <div className="bg-green-600/20 px-3 py-1 rounded-lg flex items-center space-x-2 border border-green-600/30">
-              <span className="text-green-400 text-sm">💰</span>
-              <span className="text-green-400 text-sm font-medium">
-                {formatBalance(user?.balance || 0)}
-              </span>
-            </div>
-            <button className="p-2">
-              <RotateCcw className="w-4 h-4 text-gray-300" />
-            </button>
-            <button className="p-2">
-              <Share className="w-4 h-4 text-gray-300" />
-            </button>
           </div>
         </div>
       </header>
       {/* Banner Section */}
-      <div className="px-4 mb-4 max-w-md mx-auto">
+      <div className="px-4 mb-4 max-w-md mx-auto pt-20">
         <div className="relative overflow-hidden rounded-xl">
           <div 
             className="flex transition-transform duration-500 ease-in-out"
