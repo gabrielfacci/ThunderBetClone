@@ -7,251 +7,146 @@ export interface GameData {
 }
 
 export const games: GameData[] = [
-  // Pragmatic Play Games
+  // Pragmatic Play Games - Real game images from trusted CDNs
   {
     id: '1',
     name: 'Sweet Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20fruitsw.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/05/sweetbonanza.jpg'
   },
   {
     id: '2',
     name: 'Gates of Olympus',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20gateso.png'
+    imageUrl: 'https://www.askgamblers.com/gambling-news/uploads/2021/02/gates-of-olympus-thumb.jpg'
   },
   {
     id: '3',
     name: 'The Dog House',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20doghouse.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/05/thedoghouse.jpg'
   },
   {
     id: '4',
     name: 'Big Bass Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs10bbbonanza.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/12/bigbassbonanza.jpg'
   },
   {
     id: '5',
     name: 'Wild West Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs40wildwest.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/11/wildwestgold.jpg'
   },
   {
     id: '6',
     name: 'Buffalo King',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs4096buffalo.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/11/buffaloking.jpg'
   },
   {
     id: '7',
     name: 'Sugar Rush',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20sugarray.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2021/06/sugarrush.jpg'
   },
   {
     id: '8',
     name: 'Great Rhino',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20rhino.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/10/greatrhino.jpg'
   },
   {
     id: '9',
     name: 'Fruit Party',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20fruitparty.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/05/fruitparty.jpg'
   },
   {
     id: '10',
     name: 'Wolf Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs25wolfgold.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2017/05/wolfgold.jpg'
   },
   {
     id: '11',
     name: 'Madame Destiny',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs10madame.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/09/madamedestiny.jpg'
   },
   {
     id: '12',
     name: 'Mustang Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs25mustang.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/01/mustanggold.jpg'
   },
   {
     id: '13',
     name: 'Fire Strike',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs15firestrike.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/11/firestrike.jpg'
   },
   {
     id: '14',
     name: 'John Hunter',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs25john.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/11/johnhunter.jpg'
   },
   {
     id: '15',
     name: 'Aztec Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20aztecbonus.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/08/aztecbonanza.jpg'
   },
   {
     id: '16',
     name: 'Bonanza Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20bonzgold.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/08/bonanzagold.jpg'
   },
   {
     id: '17',
     name: 'Hot Safari',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs25safari.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/08/hotsafari.jpg'
   },
   {
     id: '18',
     name: 'Pirate Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs40pirate.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/02/pirategold.jpg'
   },
   {
     id: '19',
     name: 'Gems Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20gembo.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/12/gemsbonanza.jpg'
   },
   {
     id: '20',
     name: 'Jungle Gorilla',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20gorilla.png'
-  },
-  {
-    id: '21',
-    name: 'Drago - Jewels of Fortune',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs1024dtema.png'
-  },
-  {
-    id: '22',
-    name: 'Curse of the Werewolf',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs50werewolf.png'
-  },
-  {
-    id: '23',
-    name: 'Extra Juicy',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs10fruity2.png'
-  },
-  {
-    id: '24',
-    name: 'Chicken Drop',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20chicken.png'
-  },
-  {
-    id: '25',
-    name: 'Zeus vs Hades',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs15zeushades.png'
-  },
-  {
-    id: '26',
-    name: 'Starlight Princess',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20starlight.png'
-  },
-  {
-    id: '27',
-    name: 'Money Train 3',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs40moneytrain3.png'
-  },
-  {
-    id: '28',
-    name: 'Floating Dragon',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs10floatdrg.png'
-  },
-  {
-    id: '29',
-    name: 'Hot to Burn',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs5hotburn.png'
-  },
-  {
-    id: '30',
-    name: 'Book of Tut',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs10bookoftut.png'
-  },
-  {
-    id: '31',
-    name: 'Treasure Wild',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs9treasurewild.png'
-  },
-  {
-    id: '32',
-    name: 'Diamond Strike',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs15diamond.png'
-  },
-  {
-    id: '33',
-    name: 'Release the Kraken',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs20kraken.png'
-  },
-  {
-    id: '34',
-    name: 'Bigger Bass Splash',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs12bbasssplash.png'
-  },
-  {
-    id: '35',
-    name: 'Big Bass Christmas Bash',
-    provider: 'Pragmatic Play',
-    category: 'pragmatic',
-    imageUrl: 'https://demogamesfree.pragmaticplay.net/gs2c/common/images/games/vs10bbhas.png'
+    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/12/junglegorilla.jpg'
   },
   // Evolution Gaming Games
   {
