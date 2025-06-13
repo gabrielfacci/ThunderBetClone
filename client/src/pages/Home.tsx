@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles } from 'lucide-react';
+import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppContext } from '@/contexts/AppContext';
@@ -23,6 +23,8 @@ export function Home() {
   const [showInsufficientBalance, setShowInsufficientBalance] = useState(false);
   const [showDepositFromGame, setShowDepositFromGame] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const gamesPerPage = 12;
   
   // Drag/swipe functionality for categories
   const categoriesRef = useRef<HTMLDivElement>(null);
@@ -108,6 +110,25 @@ export function Home() {
     const matchesCategory = selectedCategory === 'all' || game.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+  const startIndex = (currentPage - 1) * gamesPerPage;
+  const endIndex = startIndex + gamesPerPage;
+  const currentGames = filteredGames.slice(startIndex, endIndex);
+
+  // Reset to page 1 when category or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
+
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
 
   const handleGameClick = (game: GameData) => {
     if ((user?.balance || 0) < 10) {
@@ -327,7 +348,7 @@ export function Home() {
             {/* Games Grid */}
             <div id="games-section">
               <div className="grid grid-cols-2 gap-4">
-                {filteredGames.map((game) => (
+                {currentGames.map((game) => (
                   <div 
                     key={game.id}
                     className="relative bg-gray-900/50 rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
@@ -362,6 +383,68 @@ export function Home() {
                   </div>
                 ))}
               </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-8 px-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-400 text-sm">
+                      {t('Page')} {currentPage} {t('of')} {totalPages}
+                    </span>
+                    <span className="text-gray-500 text-xs">
+                      ({filteredGames.length} {t('games')})
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
+                      className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    
+                    {/* Page Numbers */}
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let pageNum;
+                        if (totalPages <= 5) {
+                          pageNum = i + 1;
+                        } else if (currentPage <= 3) {
+                          pageNum = i + 1;
+                        } else if (currentPage >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i;
+                        } else {
+                          pageNum = currentPage - 2 + i;
+                        }
+                        
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 ${
+                              currentPage === pageNum
+                                ? 'bg-purple-600 text-white border border-purple-500'
+                                : 'bg-gray-800/50 text-gray-400 border border-gray-700/50 hover:text-white hover:bg-gray-700/50'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    <button
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             
           </div>

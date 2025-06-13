@@ -74,6 +74,10 @@ export const translations = {
     'You need balance to play this game. Make a deposit to continue having fun!': 'Você precisa de saldo para jogar este jogo. Faça um depósito para continuar se divertindo!',
     'Back to Home': 'Voltar ao Início',
     
+    // Pagination
+    'Page': 'Página',
+    'of': 'de',
+    
     // Promotional Banner
     'WITH MY GOD DIAMOND': 'COM MEU GOD DIAMOND',
   },
