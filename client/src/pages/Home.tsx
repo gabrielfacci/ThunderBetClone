@@ -9,6 +9,7 @@ import { InsufficientBalanceModal } from '@/components/modals/InsufficientBalanc
 import { DepositModal } from '@/components/modals/DepositModal';
 import banner1 from '@assets/banner1_1749828043247.png';
 import banner2 from '@assets/banner2_1749828043246.png';
+import banner3 from '@assets/csev1741231448021443_1749828043248.webp';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Home() {
@@ -38,7 +39,7 @@ export function Home() {
   // Auto-rotate banners
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBanner((prev) => (prev + 1) % 2);
+      setCurrentBanner((prev) => (prev + 1) % 3);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
@@ -238,7 +239,17 @@ export function Home() {
                 }}
               />
             </div>
-            
+            <div className="min-w-full">
+              <img 
+                src={banner3}
+                alt="Banner 3"
+                className="w-full h-40 object-contain rounded-xl"
+                style={{ 
+                  objectPosition: 'center',
+                  minHeight: '160px'
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
