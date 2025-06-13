@@ -52,7 +52,7 @@ export function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Drag/swipe handlers
+  // Categories mouse handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!categoriesRef.current) return;
     setIsDragging(true);
@@ -76,7 +76,7 @@ export function Home() {
     categoriesRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // Touch handlers for mobile
+  // Categories touch handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!categoriesRef.current) return;
     setIsDragging(true);
@@ -95,7 +95,7 @@ export function Home() {
     setIsDragging(false);
   };
 
-  // Games drag/swipe handlers
+  // Games mouse handlers
   const handleGamesMouseDown = (e: React.MouseEvent) => {
     if (!gamesRef.current) return;
     setIsDraggingGames(true);
@@ -119,6 +119,7 @@ export function Home() {
     gamesRef.current.scrollLeft = scrollLeftGames - walk;
   };
 
+  // Games touch handlers
   const handleGamesTouchStart = (e: React.TouchEvent) => {
     if (!gamesRef.current) return;
     setIsDraggingGames(true);
@@ -137,6 +138,7 @@ export function Home() {
     setIsDraggingGames(false);
   };
 
+  // Filter games
   const filteredGames = games.filter(game => {
     const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          game.provider.toLowerCase().includes(searchQuery.toLowerCase());
@@ -144,17 +146,12 @@ export function Home() {
     return matchesSearch && matchesCategory;
   });
 
-  const formatBalance = (balance: number) => {
-    return user?.accountMode === 'national' 
-      ? `R$ ${balance.toFixed(2).replace('.', ',')}`
-      : `$ ${balance.toFixed(2)}`;
-  };
-
   const handleGameClick = (game: GameData) => {
-    setSelectedGame(game);
     if ((user?.balance || 0) < 10) {
+      setSelectedGame(game);
       setShowInsufficientBalance(true);
     } else {
+      setSelectedGame(game);
       setShowGameLoading(true);
     }
   };
@@ -162,11 +159,7 @@ export function Home() {
   const handleLoadingComplete = () => {
     setShowGameLoading(false);
     setSelectedGame(null);
-  };
-
-  const handleCloseInsufficientBalance = () => {
-    setShowInsufficientBalance(false);
-    setSelectedGame(null);
+    // Here you would typically navigate to the game
   };
 
   const handleDepositFromGame = () => {
@@ -174,9 +167,18 @@ export function Home() {
     setShowDepositFromGame(true);
   };
 
+  const handleCloseInsufficientBalance = () => {
+    setShowInsufficientBalance(false);
+    setSelectedGame(null);
+  };
+
   const handleCloseDeposit = () => {
     setShowDepositFromGame(false);
     setSelectedGame(null);
+  };
+
+  const formatBalance = (balance: number) => {
+    return `R$ ${balance.toFixed(2).replace('.', ',')}`;
   };
 
   return (
@@ -210,182 +212,189 @@ export function Home() {
           </div>
         </div>
       </header>
-      {/* Banner Section */}
-      <div className="px-4 max-w-md mx-auto mt-[0px] mb-[0px] pt-[0px] pb-[0px] pl-[16px] pr-[16px]">
-        <div className="relative overflow-hidden" style={{ borderRadius: '20px' }}>
-          <div 
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${currentBanner * 100}%)` }}
-          >
-            <div className="min-w-full">
-              <img 
-                src={banner1}
-                alt="Banner 1"
-                className="w-full h-32 object-contain"
-                style={{ 
-                  objectPosition: 'center',
-                  borderRadius: '20px'
-                }}
-              />
-            </div>
-            <div className="min-w-full">
-              <img 
-                src={banner2}
-                alt="Banner 2"
-                className="w-full h-32 object-contain"
-                style={{ 
-                  objectPosition: 'center',
-                  borderRadius: '20px'
-                }}
-              />
-            </div>
-            <div className="min-w-full">
-              <img 
-                src={banner3}
-                alt="Banner 3"
-                className="w-full h-32 object-contain"
-                style={{ 
-                  objectPosition: 'center',
-                  borderRadius: '20px'
-                }}
-              />
+      
+      {/* Content Container */}
+      <div className="pt-20">
+        {/* Banner Section */}
+        <div className="px-4 mb-2 max-w-md mx-auto">
+          <div className="relative overflow-hidden" style={{ borderRadius: '20px' }}>
+            <div 
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${currentBanner * 100}%)` }}
+            >
+              <div className="min-w-full">
+                <img 
+                  src={banner1}
+                  alt="Banner 1"
+                  className="w-full h-32 object-contain"
+                  style={{ 
+                    objectPosition: 'center',
+                    borderRadius: '20px'
+                  }}
+                />
+              </div>
+              <div className="min-w-full">
+                <img 
+                  src={banner2}
+                  alt="Banner 2"
+                  className="w-full h-32 object-contain"
+                  style={{ 
+                    objectPosition: 'center',
+                    borderRadius: '20px'
+                  }}
+                />
+              </div>
+              <div className="min-w-full">
+                <img 
+                  src={banner3}
+                  alt="Banner 3"
+                  className="w-full h-32 object-contain"
+                  style={{ 
+                    objectPosition: 'center',
+                    borderRadius: '20px'
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      {/* Winner Feed */}
-      <div className="px-4 mb-4">
-        <div className="bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 rounded-xl p-3">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-white">
-                {winners[currentWinner].avatar}
-              </span>
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center space-x-2">
-                <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
-                <span className="text-green-300 text-sm font-bold">{winners[currentWinner].amount}</span>
+        
+        {/* Winner Feed */}
+        <div className="px-4 mb-4 max-w-md mx-auto">
+          <div className="bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 rounded-xl p-3">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-xs font-bold text-white">
+                  {winners[currentWinner].avatar}
+                </span>
               </div>
-              <div className="text-xs text-gray-300">
-                {winners[currentWinner].game}
+              <div className="flex-1">
+                <div className="flex items-center space-x-2">
+                  <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
+                  <span className="text-green-300 text-sm font-bold">{winners[currentWinner].amount}</span>
+                </div>
+                <div className="text-xs text-gray-300">
+                  {winners[currentWinner].game}
+                </div>
               </div>
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             </div>
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
           </div>
         </div>
-      </div>
-      {/* Main Content Section */}
-      <div className="px-4 pb-24 max-w-md mx-auto">
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
-          
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-black/20 border-gray-600/30 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-xl backdrop-blur-sm"
-              placeholder="Buscar jogos por nome ou provedor"
-            />
-          </div>
-
-          {/* Categories */}
-          <div 
-            ref={categoriesRef}
-            className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
-            style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-            onMouseDown={handleMouseDown}
-            onMouseLeave={handleMouseLeave}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            {categories.map((category) => {
-              const getIcon = (iconName: string) => {
-                switch (iconName) {
-                  case 'flame':
-                    return <Flame className="w-6 h-6 text-orange-500" />;
-                  case 'trophy':
-                    return <Trophy className="w-6 h-6 text-yellow-500" />;
-                  case 'star':
-                    return <Star className="w-6 h-6 text-blue-500" />;
-                  case 'dice-6':
-                    return <Dice6 className="w-6 h-6 text-green-500" />;
-                  case 'diamond':
-                    return <Diamond className="w-6 h-6 text-purple-500" />;
-                  default:
-                    return <Flame className="w-6 h-6 text-orange-500" />;
-                }
-              };
-
-              return (
-                <button
-                  key={category.id}
-                  className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] ${
-                    selectedCategory === category.id 
-                      ? 'bg-gray-800/60 border border-gray-600/50' 
-                      : 'bg-transparent'
-                  }`}
-                  onClick={() => setSelectedCategory(category.id)}
-                >
-                  {getIcon(category.icon)}
-                  <span className="text-xs text-white whitespace-nowrap">{t(category.name)}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Games Counter */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Flame className="w-4 h-4 text-orange-500" />
-              <span className="font-medium text-white">{filteredGames.length} jogos</span>
+        
+        {/* Main Content Section */}
+        <div className="px-4 pb-24 max-w-md mx-auto">
+          <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
+            
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-black/20 border-gray-600/30 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-xl backdrop-blur-sm"
+                placeholder="Buscar jogos por nome ou provedor"
+              />
             </div>
-            <button className="text-gray-400 text-sm">Game Lobby →</button>
-          </div>
 
-          {/* Games Grid */}
-          <div 
-            ref={gamesRef}
-            className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
-            style={{ cursor: isDraggingGames ? 'grabbing' : 'grab' }}
-            onMouseDown={handleGamesMouseDown}
-            onMouseLeave={handleGamesMouseLeave}
-            onMouseUp={handleGamesMouseUp}
-            onMouseMove={handleGamesMouseMove}
-            onTouchStart={handleGamesTouchStart}
-            onTouchMove={handleGamesTouchMove}
-            onTouchEnd={handleGamesTouchEnd}
-          >
-            {filteredGames.map((game) => (
-              <div 
-                key={game.id}
-                className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer flex-shrink-0 w-40"
-                onClick={() => handleGameClick(game)}
-              >
-                <div className="relative">
-                  <img 
-                    src={game.imageUrl} 
-                    alt={game.name}
-                    className="w-full h-28 object-cover" 
-                  />
-                  <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
-                    <Heart className="w-3 h-3 text-white" />
+            {/* Categories */}
+            <div 
+              ref={categoriesRef}
+              className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
+              style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+              onMouseDown={handleMouseDown}
+              onMouseLeave={handleMouseLeave}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {categories.map((category) => {
+                const getIcon = (iconName: string) => {
+                  switch (iconName) {
+                    case 'flame':
+                      return <Flame className="w-6 h-6 text-orange-500" />;
+                    case 'trophy':
+                      return <Trophy className="w-6 h-6 text-yellow-500" />;
+                    case 'star':
+                      return <Star className="w-6 h-6 text-blue-500" />;
+                    case 'dice-6':
+                      return <Dice6 className="w-6 h-6 text-green-500" />;
+                    case 'diamond':
+                      return <Diamond className="w-6 h-6 text-purple-500" />;
+                    default:
+                      return <Flame className="w-6 h-6 text-orange-500" />;
+                  }
+                };
+
+                return (
+                  <button
+                    key={category.id}
+                    className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] ${
+                      selectedCategory === category.id 
+                        ? 'bg-gray-800/60 border border-gray-600/50' 
+                        : 'bg-transparent'
+                    }`}
+                    onClick={() => setSelectedCategory(category.id)}
+                  >
+                    {getIcon(category.icon)}
+                    <span className="text-xs text-white whitespace-nowrap">{t(category.name)}</span>
                   </button>
-                </div>
-                <div className="p-2">
-                  <h3 className="text-white text-xs font-medium truncate">{game.name}</h3>
-                  <p className="text-gray-400 text-xs truncate">{game.provider}</p>
-                </div>
+                );
+              })}
+            </div>
+
+            {/* Games Counter */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Flame className="w-4 h-4 text-orange-500" />
+                <span className="font-medium text-white">{filteredGames.length} jogos</span>
               </div>
-            ))}
+              <button className="text-gray-400 text-sm">Game Lobby →</button>
+            </div>
+
+            {/* Games Grid */}
+            <div 
+              ref={gamesRef}
+              className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
+              style={{ cursor: isDraggingGames ? 'grabbing' : 'grab' }}
+              onMouseDown={handleGamesMouseDown}
+              onMouseLeave={handleGamesMouseLeave}
+              onMouseUp={handleGamesMouseUp}
+              onMouseMove={handleGamesMouseMove}
+              onTouchStart={handleGamesTouchStart}
+              onTouchMove={handleGamesTouchMove}
+              onTouchEnd={handleGamesTouchEnd}
+            >
+              {filteredGames.map((game) => (
+                <div 
+                  key={game.id}
+                  className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer flex-shrink-0 w-40"
+                  onClick={() => handleGameClick(game)}
+                >
+                  <div className="relative">
+                    <img 
+                      src={game.imageUrl} 
+                      alt={game.name}
+                      className="w-full h-28 object-cover" 
+                    />
+                    <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
+                      <Heart className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                  <div className="p-2">
+                    <h3 className="text-white text-xs font-medium truncate">{game.name}</h3>
+                    <p className="text-gray-400 text-xs truncate">{game.provider}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
           </div>
-          
         </div>
       </div>
+      
       {/* Modals */}
       <GameLoadingModal
         isOpen={showGameLoading}
