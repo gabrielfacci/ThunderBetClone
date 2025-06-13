@@ -25,11 +25,12 @@
   --radius: 0.5rem;
   
   /* Custom ThunderBet colors */
-  --thunder-purple: hsl(262, 83%, 58%);
-  --thunder-purple-dark: hsl(258, 83%, 54%);
+  --thunder-green: hsl(142, 76%, 36%);
+  --thunder-emerald: hsl(160, 84%, 39%);
+  --thunder-teal: hsl(173, 80%, 40%);
   --thunder-orange: hsl(43, 96%, 56%);
   --thunder-yellow: hsl(48, 96%, 53%);
-  --thunder-gradient: linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(258, 83%, 54%) 50%, hsl(248, 95%, 70%) 100%);
+  --thunder-gradient: linear-gradient(135deg, hsl(142, 76%, 36%) 0%, hsl(160, 84%, 39%) 50%, hsl(173, 80%, 40%) 100%);
 }
 
 .dark {
