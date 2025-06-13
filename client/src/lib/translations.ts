@@ -156,6 +156,10 @@ export const translations = {
     'You need balance to play this game. Make a deposit to continue having fun!': 'You need balance to play this game. Make a deposit to continue having fun!',
     'Back to Home': 'Back to Home',
     
+    // Pagination
+    'Page': 'Page',
+    'of': 'of',
+    
     // Promotional Banner
     'WITH MY GOD DIAMOND': 'WITH MY GOD DIAMOND',
   }
