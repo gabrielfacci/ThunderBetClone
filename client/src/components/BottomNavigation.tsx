@@ -5,6 +5,7 @@ import { DepositModal } from './modals/DepositModal';
 import { WithdrawalModal } from './modals/WithdrawalModal';
 import { PromotionModal } from './modals/PromotionModal';
 import { ProfileModal } from './modals/ProfileModal';
+import navBackground from '@assets/image_1749830967541.png';
 
 type ModalType = 'deposit' | 'withdrawal' | 'promotion' | 'profile' | null;
 
@@ -28,7 +29,7 @@ export function BottomNavigation() {
       <nav 
         className="fixed bottom-0 left-0 right-0 backdrop-blur-sm border-t border-gray-700/50 z-40"
         style={{
-          backgroundImage: 'url(/assets/nav-background.png)',
+          backgroundImage: `url(${navBackground})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
