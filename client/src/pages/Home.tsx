@@ -258,7 +258,7 @@ export function Home() {
         </div>
       </div>
       {/* Winner Feed */}
-      <div className="px-4 mb-4 max-w-md mx-auto">
+      <div className="px-4 mb-2 max-w-md mx-auto">
         <div className="bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 rounded-xl p-3">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
@@ -280,7 +280,7 @@ export function Home() {
         </div>
       </div>
       {/* Main Content Section */}
-      <div className="px-4 pb-24 max-w-md mx-auto">
+      <div className="px-4 pb-32 max-w-md mx-auto">
         <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
           
           {/* Search Bar */}
