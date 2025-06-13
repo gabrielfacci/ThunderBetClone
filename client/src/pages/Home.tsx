@@ -198,7 +198,11 @@ export function Home() {
             return (
               <button
                 key={category.id}
-                className="flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] bg-[#1f293700]"
+                className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] ${
+                  selectedCategory === category.id 
+                    ? 'bg-gray-800/60 border border-gray-600/50' 
+                    : 'bg-transparent'
+                }`}
                 onClick={() => setSelectedCategory(category.id)}
               >
                 {getIcon(category.icon)}
