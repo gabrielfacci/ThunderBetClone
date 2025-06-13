@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw } from 'lucide-react';
+import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppContext } from '@/contexts/AppContext';
@@ -249,8 +249,12 @@ export function Home() {
         
         {/* Winner Feed */}
         <div className="px-4 mb-4 max-w-md mx-auto">
-          <div className="bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 rounded-xl p-3">
-            <div className="flex items-center space-x-3">
+          <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500/20 via-orange-500/15 to-red-500/20 border-yellow-400/40 border backdrop-blur-sm rounded-xl p-3 hover:scale-105 group transition-all duration-300">
+            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
+            <div className="absolute top-1 right-2 opacity-60">
+              <Sparkles className="h-3 w-3 text-yellow-300 animate-pulse" />
+            </div>
+            <div className="relative flex items-center space-x-3">
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-xs font-bold text-white">
                   {winners[currentWinner].avatar}
