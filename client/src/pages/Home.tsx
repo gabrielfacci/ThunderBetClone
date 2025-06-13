@@ -189,7 +189,7 @@ export function Home() {
               <img 
                 src={thunderbetLogo} 
                 alt="ThunderBet" 
-                className="h-10 w-auto transition-all duration-700 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]"
+                className="h-12 w-auto transition-all duration-700 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]"
               />
             </div>
             
