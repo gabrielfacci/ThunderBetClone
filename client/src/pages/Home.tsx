@@ -217,7 +217,7 @@ export function Home() {
       <div className="pt-20">
         {/* Banner Section */}
         <div className="px-4 mb-2 max-w-md mx-auto">
-          <div className="relative overflow-hidden" style={{ borderRadius: '22px' }}>
+          <div className="relative overflow-hidden rounded-3xl">
             <div 
               className="flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentBanner * 100}%)` }}
@@ -226,33 +226,21 @@ export function Home() {
                 <img 
                   src={banner1}
                   alt="Banner 1"
-                  className="w-full h-32 object-contain"
-                  style={{ 
-                    objectPosition: 'center',
-                    borderRadius: '22px'
-                  }}
+                  className="w-full h-32 object-cover rounded-3xl"
                 />
               </div>
               <div className="min-w-full">
                 <img 
                   src={banner2}
                   alt="Banner 2"
-                  className="w-full h-32 object-contain"
-                  style={{ 
-                    objectPosition: 'center',
-                    borderRadius: '22px'
-                  }}
+                  className="w-full h-32 object-cover rounded-3xl"
                 />
               </div>
               <div className="min-w-full">
                 <img 
                   src={banner3}
                   alt="Banner 3"
-                  className="w-full h-32 object-contain"
-                  style={{ 
-                    objectPosition: 'center',
-                    borderRadius: '22px'
-                  }}
+                  className="w-full h-32 object-cover rounded-3xl"
                 />
               </div>
             </div>
