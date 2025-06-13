@@ -14,6 +14,7 @@ export function Home() {
   const { user } = useAppContext();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentWinner, setCurrentWinner] = useState(0);
+  const [currentBanner, setCurrentBanner] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
   const [showGameLoading, setShowGameLoading] = useState(false);
@@ -25,6 +26,14 @@ export function Home() {
     const interval = setInterval(() => {
       setCurrentWinner(prev => (prev + 1) % winners.length);
     }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Cycle through banners every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % 3);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -89,25 +98,51 @@ export function Home() {
         </div>
       </header>
 
-      {/* Banner Section */}
+      {/* Banner Carousel Section */}
       <div className="px-4 py-2">
-        {/* Promotional Banner */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 rounded-xl p-4 mb-3 relative overflow-hidden h-24">
-          <div className="absolute inset-0 bg-black/20 rounded-xl"></div>
-          <div className="relative z-10 flex items-center justify-between h-full">
-            <div>
-              <div className="bg-white text-black px-3 py-1 rounded-md inline-block">
-                <span className="font-black text-base">R$40.000</span>
-              </div>
-              <div className="text-white text-xs mt-1 font-medium">
-                {t('WITH MY GOD DIAMOND')}
-              </div>
+        <div className="relative rounded-xl overflow-hidden mb-4">
+          <div 
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${currentBanner * 100}%)` }}
+          >
+            {/* Banner 1 - Desafio V-Wing */}
+            <div className="min-w-full h-24 relative">
+              <img 
+                src="/assets/banner2_1749828043246.png"
+                alt="Desafio V-Wing - Prêmio de R$40.000"
+                className="w-full h-full object-cover rounded-xl"
+              />
             </div>
-            <div className="text-white/80">
-              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
-                <div className="w-8 h-8 bg-yellow-400 rounded-full"></div>
-              </div>
+            
+            {/* Banner 2 - Disputa Brasil */}
+            <div className="min-w-full h-24 relative">
+              <img 
+                src="/assets/banner1_1749828043247.png"
+                alt="Entre na disputa contra os melhores do Brasil - R$1.000.000"
+                className="w-full h-full object-cover rounded-xl"
+              />
             </div>
+            
+            {/* Banner 3 - Chuva de Dinheiro */}
+            <div className="min-w-full h-24 relative">
+              <img 
+                src="/assets/csev1741231448021443_1749828043248.webp"
+                alt="Chuva de Dinheiro até R$7777"
+                className="w-full h-full object-cover rounded-xl"
+              />
+            </div>
+          </div>
+          
+          {/* Dots indicator */}
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            {[0, 1, 2].map((index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  currentBanner === index ? 'bg-yellow-500' : 'bg-white/50'
+                }`}
+              />
+            ))}
           </div>
         </div>
 
