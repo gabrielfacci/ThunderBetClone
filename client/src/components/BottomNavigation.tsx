@@ -35,7 +35,8 @@ export function BottomNavigation() {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="grid grid-cols-5 h-16">
+        <div className="px-4">
+          <div className="grid grid-cols-5 h-16">
           <button 
             className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
               activeTab === 'deposit' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
@@ -94,6 +95,7 @@ export function BottomNavigation() {
             </div>
             <span className="text-xs">{t('Profile')}</span>
           </button>
+          </div>
         </div>
       </nav>
 

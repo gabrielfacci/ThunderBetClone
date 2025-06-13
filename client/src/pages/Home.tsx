@@ -181,29 +181,31 @@ export function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 text-white">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 pt-12">
-        <div className="flex items-center space-x-2">
-          <div className="text-yellow-500 font-bold text-xl">
-            THUNDER
+      <header className="px-4 pt-12 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="text-yellow-500 font-bold text-xl">
+              THUNDER
+            </div>
+            <div className="text-white font-bold text-xl">
+              BET
+            </div>
           </div>
-          <div className="text-white font-bold text-xl">
-            BET
+          
+          <div className="flex items-center space-x-3">
+            <div className="bg-green-600/20 px-3 py-1 rounded-lg flex items-center space-x-2 border border-green-600/30">
+              <span className="text-green-400 text-sm">💰</span>
+              <span className="text-green-400 text-sm font-medium">
+                {formatBalance(user?.balance || 0)}
+              </span>
+            </div>
+            <button className="p-2">
+              <RotateCcw className="w-4 h-4 text-gray-300" />
+            </button>
+            <button className="p-2">
+              <Share className="w-4 h-4 text-gray-300" />
+            </button>
           </div>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <div className="bg-green-600/20 px-3 py-1 rounded-lg flex items-center space-x-2 border border-green-600/30">
-            <span className="text-green-400 text-sm">💰</span>
-            <span className="text-green-400 text-sm font-medium">
-              {formatBalance(user?.balance || 0)}
-            </span>
-          </div>
-          <button className="p-2">
-            <RotateCcw className="w-4 h-4 text-gray-300" />
-          </button>
-          <button className="p-2">
-            <Share className="w-4 h-4 text-gray-300" />
-          </button>
         </div>
       </header>
       {/* Banner Section */}
