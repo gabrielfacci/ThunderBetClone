@@ -211,7 +211,7 @@ export function Home() {
         </div>
       </header>
       {/* Banner Section */}
-      <div className="px-4 mb-2 max-w-md mx-auto pt-16">
+      <div className="px-4 max-w-md mx-auto mt-[0px] mb-[0px] pt-[0px] pb-[0px] pl-[16px] pr-[16px]">
         <div className="relative overflow-hidden" style={{ borderRadius: '20px' }}>
           <div 
             className="flex transition-transform duration-500 ease-in-out"
