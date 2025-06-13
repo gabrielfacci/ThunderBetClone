@@ -35,7 +35,7 @@ export function BottomNavigation() {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="px-4 max-w-md mx-auto">
+        <div className="px-4">
           <div className="grid grid-cols-5 h-16">
           <button 
             className={`flex flex-col items-center justify-center space-y-1 transition-colors ${

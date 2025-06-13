@@ -181,7 +181,7 @@ export function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 text-white">
       {/* Header */}
-      <header className="px-4 pt-12 pb-4 max-w-md mx-auto">
+      <header className="px-4 pt-12 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="text-yellow-500 font-bold text-xl">
@@ -209,7 +209,7 @@ export function Home() {
         </div>
       </header>
       {/* Banner Section */}
-      <div className="px-4 mb-4 max-w-md mx-auto">
+      <div className="px-4 mb-4">
         <div className="relative overflow-hidden rounded-xl">
           <div 
             className="flex transition-transform duration-500 ease-in-out"
@@ -262,7 +262,7 @@ export function Home() {
         </div>
       </div>
       {/* Main Content Section */}
-      <div className="px-4 pb-24 max-w-md mx-auto">
+      <div className="px-4 pb-24">
         <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
           
           {/* Search Bar */}
