@@ -249,29 +249,45 @@ export function Home() {
         
         {/* Winner Feed */}
         <div className="px-4 mb-4 max-w-md mx-auto">
-          <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500/20 via-orange-500/15 to-red-500/20 border-yellow-400/40 border backdrop-blur-sm rounded-xl p-3 hover:scale-105 group transition-all duration-300">
-            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
-            <div className="absolute top-1 right-2 opacity-60">
-              <Sparkles className="h-3 w-3 text-yellow-300 animate-pulse" />
-            </div>
-            <div className="relative flex items-center space-x-3">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-xs font-bold text-white">
-                  {winners[currentWinner].avatar}
-                </span>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2">
-                  <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
-                  <span className="text-green-300 text-sm font-bold">{winners[currentWinner].amount}</span>
+          {(() => {
+            // Extract numeric value from amount string (e.g., "R$ 225,00" -> 225)
+            const amountValue = parseFloat(winners[currentWinner].amount.replace(/[^\d,]/g, '').replace(',', '.'));
+            const isHighValue = amountValue > 200;
+            
+            return (
+              <div className={`relative overflow-hidden ${
+                isHighValue 
+                  ? 'bg-gradient-to-r from-yellow-500/20 via-orange-500/15 to-red-500/20 border-yellow-400/40' 
+                  : 'bg-gradient-to-r from-gray-500/20 via-gray-600/15 to-gray-700/20 border-gray-400/40'
+              } border backdrop-blur-sm rounded-xl p-3 hover:scale-105 group transition-all duration-300`}>
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
+                {isHighValue && (
+                  <div className="absolute top-1 right-2 opacity-60">
+                    <Sparkles className="h-3 w-3 text-yellow-300 animate-pulse" />
+                  </div>
+                )}
+                <div className="relative flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">
+                      {winners[currentWinner].avatar}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
+                      <span className={`text-sm font-bold ${
+                        isHighValue ? 'text-yellow-300' : 'text-green-300'
+                      }`}>{winners[currentWinner].amount}</span>
+                    </div>
+                    <div className="text-xs text-gray-300">
+                      {winners[currentWinner].game}
+                    </div>
+                  </div>
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                 </div>
-                <div className="text-xs text-gray-300">
-                  {winners[currentWinner].game}
-                </div>
               </div>
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            </div>
-          </div>
+            );
+          })()}
         </div>
         
         {/* Main Content Section */}
