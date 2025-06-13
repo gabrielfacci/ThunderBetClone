@@ -100,49 +100,37 @@ export function Home() {
 
       {/* Banner Carousel Section */}
       <div className="px-4 py-2">
-        <div className="relative rounded-xl overflow-hidden mb-4">
+        <div className="relative overflow-hidden mb-4">
           <div 
             className="flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentBanner * 100}%)` }}
           >
             {/* Banner 1 - Desafio V-Wing */}
-            <div className="min-w-full h-24 relative">
+            <div className="min-w-full relative">
               <img 
                 src="/assets/banner2_1749828043246.png"
                 alt="Desafio V-Wing - Prêmio de R$40.000"
-                className="w-full h-full object-cover rounded-xl"
+                className="w-full h-auto object-cover rounded-xl"
               />
             </div>
             
             {/* Banner 2 - Disputa Brasil */}
-            <div className="min-w-full h-24 relative">
+            <div className="min-w-full relative">
               <img 
                 src="/assets/banner1_1749828043247.png"
                 alt="Entre na disputa contra os melhores do Brasil - R$1.000.000"
-                className="w-full h-full object-cover rounded-xl"
+                className="w-full h-auto object-cover rounded-xl"
               />
             </div>
             
             {/* Banner 3 - Chuva de Dinheiro */}
-            <div className="min-w-full h-24 relative">
+            <div className="min-w-full relative">
               <img 
                 src="/assets/csev1741231448021443_1749828043248.webp"
                 alt="Chuva de Dinheiro até R$7777"
-                className="w-full h-full object-cover rounded-xl"
+                className="w-full h-auto object-cover rounded-xl"
               />
             </div>
-          </div>
-          
-          {/* Dots indicator */}
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            {[0, 1, 2].map((index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  currentBanner === index ? 'bg-yellow-500' : 'bg-white/50'
-                }`}
-              />
-            ))}
           </div>
         </div>
 
