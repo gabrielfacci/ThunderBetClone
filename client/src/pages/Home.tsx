@@ -46,10 +46,18 @@ export function Home() {
 
   // Auto-rotate winners
   useEffect(() => {
-    const interval = setInterval(() => {
+    const rotateWinner = () => {
       setCurrentWinner((prev) => (prev + 1) % winners.length);
-    }, 3000);
-    return () => clearInterval(interval);
+      // Random interval between 10-30 seconds
+      const randomInterval = Math.floor(Math.random() * 20000) + 10000;
+      setTimeout(rotateWinner, randomInterval);
+    };
+    
+    // Initial random delay
+    const initialDelay = Math.floor(Math.random() * 20000) + 10000;
+    const timeout = setTimeout(rotateWinner, initialDelay);
+    
+    return () => clearTimeout(timeout);
   }, []);
 
   // Categories mouse handlers
