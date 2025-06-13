@@ -221,7 +221,7 @@ export function Home() {
               <img 
                 src={banner1}
                 alt="Banner 1"
-                className="w-full h-40 object-contain rounded-xl bg-gradient-to-r from-gray-800/30 to-gray-700/30"
+                className="w-full h-40 object-contain rounded-xl"
                 style={{ 
                   objectPosition: 'center',
                   minHeight: '160px'
@@ -232,7 +232,7 @@ export function Home() {
               <img 
                 src={banner2}
                 alt="Banner 2"
-                className="w-full h-40 object-contain rounded-xl bg-gradient-to-r from-gray-800/30 to-gray-700/30"
+                className="w-full h-40 object-contain rounded-xl"
                 style={{ 
                   objectPosition: 'center',
                   minHeight: '160px'
@@ -243,7 +243,7 @@ export function Home() {
               <img 
                 src={banner3}
                 alt="Banner 3"
-                className="w-full h-40 object-contain rounded-xl bg-gradient-to-r from-gray-800/30 to-gray-700/30"
+                className="w-full h-40 object-contain rounded-xl"
                 style={{ 
                   objectPosition: 'center',
                   minHeight: '160px'
