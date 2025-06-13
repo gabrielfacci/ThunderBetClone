@@ -87,7 +87,7 @@
   }
   
   .game-card {
-    @apply thunder-card rounded-xl overflow-hidden relative cursor-pointer transition-all duration-200 hover:scale-102;
+    @apply thunder-card rounded-xl overflow-hidden relative cursor-pointer transition-all duration-200 hover:scale-105;
   }
   
   .modal-backdrop {
