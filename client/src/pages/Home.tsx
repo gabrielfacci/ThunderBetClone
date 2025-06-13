@@ -327,28 +327,32 @@ export function Home() {
 
             {/* Games Grid */}
             <div id="games-section">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {filteredGames.map((game) => (
                   <div 
                     key={game.id}
-                    className="group relative bg-gray-900/50 rounded-lg overflow-hidden border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
+                    className="relative bg-gray-900/50 rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
                     onClick={() => handleGameClick(game)}
                   >
-                    <div className="relative aspect-square overflow-hidden rounded-lg">
+                    <div className="relative h-32 overflow-hidden rounded-t-xl">
                       <img 
                         alt={game.name}
                         loading="lazy"
                         decoding="async"
                         src={game.imageUrl}
-                        className="object-cover transition-transform duration-300 group-hover:scale-110 opacity-100 w-full h-full"
+                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
                       />
-                      <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 hover:bg-black/70 transition-colors">
                         <Heart className="w-3 h-3 text-white" />
                       </button>
+                      <div className="absolute bottom-2 left-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">
+                        {game.provider}
+                      </div>
                     </div>
-                    <div className="p-3">
+                    <div className="p-3 bg-gray-900/80">
                       <h3 className="text-white text-sm font-medium truncate">{game.name}</h3>
-                      <p className="text-gray-400 text-xs truncate mt-1">{game.provider}</p>
+                      <p className="text-gray-400 text-xs uppercase tracking-wide mt-1">{game.category}</p>
                     </div>
                   </div>
                 ))}
