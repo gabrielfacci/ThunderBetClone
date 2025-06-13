@@ -38,9 +38,7 @@ export function BottomNavigation() {
         <div className="px-4 max-w-md mx-auto mt-[6px] mb-[6px]">
           <div className="grid grid-cols-5 h-20">
           <button 
-            className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
-              activeTab === 'deposit' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
-            }`}
+            className="flex flex-col items-center justify-center space-y-1 transition-colors text-gray-400 hover:text-gray-300 mt-[30px] mb-[30px] pt-[0px] pb-[0px]"
             onClick={() => openModal('deposit')}
           >
             <Wallet className="w-5 h-5" />
