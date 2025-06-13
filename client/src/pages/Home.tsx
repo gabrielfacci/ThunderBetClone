@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star } from 'lucide-react';
+import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppContext } from '@/contexts/AppContext';
@@ -109,7 +109,6 @@ export function Home() {
           </button>
         </div>
       </header>
-
       {/* Banner Section */}
       <div className="px-4 mb-4">
         <div className="relative overflow-hidden rounded-xl">
@@ -141,7 +140,6 @@ export function Home() {
           </div>
         </div>
       </div>
-
       {/* Winner Feed */}
       <div className="px-4 mb-4">
         <div className="bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 rounded-xl p-3">
@@ -164,7 +162,6 @@ export function Home() {
           </div>
         </div>
       </div>
-
       {/* Search Bar */}
       <div className="px-4 mb-6">
         <div className="relative">
@@ -177,48 +174,40 @@ export function Home() {
           />
         </div>
       </div>
-
       {/* Categories */}
       <div className="px-4 mb-6">
-        <div className="flex space-x-3">
-          <button
-            className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors ${
-              selectedCategory === 'all'
-                ? 'bg-orange-500/20 border border-orange-500/50'
-                : 'bg-gray-800/40'
-            }`}
-            onClick={() => setSelectedCategory('all')}
-          >
-            <Flame className="w-6 h-6 text-orange-500" />
-            <span className="text-xs text-white">Todos</span>
-          </button>
-          
-          <button
-            className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors ${
-              selectedCategory === 'pragmatic'
-                ? 'bg-yellow-500/20 border border-yellow-500/50'
-                : 'bg-gray-800/40'
-            }`}
-            onClick={() => setSelectedCategory('pragmatic')}
-          >
-            <Trophy className="w-6 h-6 text-yellow-500" />
-            <span className="text-xs text-white">Pragmatic Play</span>
-          </button>
-          
-          <button
-            className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors ${
-              selectedCategory === 'evolution'
-                ? 'bg-blue-500/20 border border-blue-500/50'
-                : 'bg-gray-800/40'
-            }`}
-            onClick={() => setSelectedCategory('evolution')}
-          >
-            <Star className="w-6 h-6 text-blue-500" />
-            <span className="text-xs text-white">Evolution</span>
-          </button>
+        <div className="flex space-x-3 overflow-x-auto pb-2">
+          {categories.map((category) => {
+            const getIcon = (iconName: string) => {
+              switch (iconName) {
+                case 'flame':
+                  return <Flame className="w-6 h-6 text-orange-500" />;
+                case 'trophy':
+                  return <Trophy className="w-6 h-6 text-yellow-500" />;
+                case 'star':
+                  return <Star className="w-6 h-6 text-blue-500" />;
+                case 'dice-6':
+                  return <Dice6 className="w-6 h-6 text-green-500" />;
+                case 'diamond':
+                  return <Diamond className="w-6 h-6 text-purple-500" />;
+                default:
+                  return <Flame className="w-6 h-6 text-orange-500" />;
+              }
+            };
+
+            return (
+              <button
+                key={category.id}
+                className="flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] bg-[#1f293700]"
+                onClick={() => setSelectedCategory(category.id)}
+              >
+                {getIcon(category.icon)}
+                <span className="text-xs text-white whitespace-nowrap">{t(category.name)}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
-
       {/* Games Counter */}
       <div className="px-4 mb-4">
         <div className="flex items-center justify-between">
@@ -229,11 +218,10 @@ export function Home() {
           <button className="text-gray-400 text-sm">Game Lobby →</button>
         </div>
       </div>
-
       {/* Games Grid */}
       <div className="px-4 pb-24">
         <div className="grid grid-cols-2 gap-3">
-          {filteredGames.slice(0, 4).map((game) => (
+          {filteredGames.map((game) => (
             <div 
               key={game.id}
               className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer"
@@ -253,7 +241,6 @@ export function Home() {
           ))}
         </div>
       </div>
-
       {/* Modals */}
       <GameLoadingModal
         isOpen={showGameLoading}
@@ -261,14 +248,12 @@ export function Home() {
         game={selectedGame}
         onLoadingComplete={handleLoadingComplete}
       />
-      
       <InsufficientBalanceModal
         isOpen={showInsufficientBalance}
         onClose={handleCloseInsufficientBalance}
         game={selectedGame}
         onDeposit={handleDepositFromGame}
       />
-
       <DepositModal
         isOpen={showDepositFromGame}
         onClose={handleCloseDeposit}
