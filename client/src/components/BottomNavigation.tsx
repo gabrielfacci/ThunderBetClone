@@ -25,7 +25,15 @@ export function BottomNavigation() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700/50 z-40">
+      <nav 
+        className="fixed bottom-0 left-0 right-0 backdrop-blur-sm border-t border-gray-700/50 z-40"
+        style={{
+          backgroundImage: 'url(/assets/nav-background.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <div className="grid grid-cols-5 h-16">
           <button 
             className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
