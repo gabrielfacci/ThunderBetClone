@@ -35,13 +35,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900/95 backdrop-blur-sm border-gray-700/50 text-white w-full max-w-md mx-4 rounded-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{t('Make Deposit')}</DialogTitle>
-          <p className="text-gray-400 text-sm">{t('Add balance to your account')}</p>
+      <DialogContent className="bg-gray-900/98 backdrop-blur-md border-gray-700/50 text-white w-[95%] max-w-sm mx-auto rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogHeader className="p-4 pb-2">
+          <DialogTitle className="text-lg sm:text-xl font-bold text-center">{t('Make Deposit')}</DialogTitle>
+          <p className="text-gray-400 text-xs sm:text-sm text-center">{t('Add balance to your account')}</p>
         </DialogHeader>
         
-        <div className="p-4">
+        <div className="px-4 pb-4">
           {/* Tabs */}
           <div className="flex space-x-2 mb-6">
             <Button
