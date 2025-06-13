@@ -57,14 +57,13 @@ export function BottomNavigation() {
           
           <button 
             className={`flex flex-col items-center justify-center space-y-1 transition-colors relative -mt-2 ${
-              activeTab === 'home' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
+              activeTab === 'home' ? 'text-white' : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab('home')}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-              activeTab === 'home' ? 'bg-yellow-500 text-black' : 'bg-transparent'
-            }`}>
-              <Home className="w-6 h-6" />
+            <div className="relative w-12 h-12 rounded-full flex items-center justify-center">
+              <div className="absolute inset-0 transition-all duration-300 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 shadow-lg shadow-orange-500/40"></div>
+              <Home className="w-6 h-6 relative z-10" />
             </div>
             <span className="text-xs">{t('Home')}</span>
           </button>
