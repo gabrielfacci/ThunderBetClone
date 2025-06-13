@@ -30,11 +30,7 @@ export function Home() {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   
-  // Drag/swipe functionality for games
-  const gamesRef = useRef<HTMLDivElement>(null);
-  const [isDraggingGames, setIsDraggingGames] = useState(false);
-  const [startXGames, setStartXGames] = useState(0);
-  const [scrollLeftGames, setScrollLeftGames] = useState(0);
+
 
   // Auto-rotate banners
   useEffect(() => {
@@ -103,48 +99,7 @@ export function Home() {
     setIsDragging(false);
   };
 
-  // Games mouse handlers
-  const handleGamesMouseDown = (e: React.MouseEvent) => {
-    if (!gamesRef.current) return;
-    setIsDraggingGames(true);
-    setStartXGames(e.pageX - gamesRef.current.offsetLeft);
-    setScrollLeftGames(gamesRef.current.scrollLeft);
-  };
 
-  const handleGamesMouseLeave = () => {
-    setIsDraggingGames(false);
-  };
-
-  const handleGamesMouseUp = () => {
-    setIsDraggingGames(false);
-  };
-
-  const handleGamesMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingGames || !gamesRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - gamesRef.current.offsetLeft;
-    const walk = (x - startXGames) * 2;
-    gamesRef.current.scrollLeft = scrollLeftGames - walk;
-  };
-
-  // Games touch handlers
-  const handleGamesTouchStart = (e: React.TouchEvent) => {
-    if (!gamesRef.current) return;
-    setIsDraggingGames(true);
-    setStartXGames(e.touches[0].pageX - gamesRef.current.offsetLeft);
-    setScrollLeftGames(gamesRef.current.scrollLeft);
-  };
-
-  const handleGamesTouchMove = (e: React.TouchEvent) => {
-    if (!isDraggingGames || !gamesRef.current) return;
-    const x = e.touches[0].pageX - gamesRef.current.offsetLeft;
-    const walk = (x - startXGames) * 2;
-    gamesRef.current.scrollLeft = scrollLeftGames - walk;
-  };
-
-  const handleGamesTouchEnd = () => {
-    setIsDraggingGames(false);
-  };
 
   // Filter games
   const filteredGames = games.filter(game => {
@@ -371,40 +326,33 @@ export function Home() {
             </div>
 
             {/* Games Grid */}
-            <div 
-              ref={gamesRef}
-              className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
-              style={{ cursor: isDraggingGames ? 'grabbing' : 'grab' }}
-              onMouseDown={handleGamesMouseDown}
-              onMouseLeave={handleGamesMouseLeave}
-              onMouseUp={handleGamesMouseUp}
-              onMouseMove={handleGamesMouseMove}
-              onTouchStart={handleGamesTouchStart}
-              onTouchMove={handleGamesTouchMove}
-              onTouchEnd={handleGamesTouchEnd}
-            >
-              {filteredGames.map((game) => (
-                <div 
-                  key={game.id}
-                  className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer flex-shrink-0 w-40"
-                  onClick={() => handleGameClick(game)}
-                >
-                  <div className="relative">
-                    <img 
-                      src={game.imageUrl} 
-                      alt={game.name}
-                      className="w-full h-28 object-cover" 
-                    />
-                    <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
-                      <Heart className="w-3 h-3 text-white" />
-                    </button>
+            <div id="games-section">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredGames.map((game) => (
+                  <div 
+                    key={game.id}
+                    className="group relative bg-gray-900/50 rounded-lg overflow-hidden border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
+                    onClick={() => handleGameClick(game)}
+                  >
+                    <div className="relative aspect-square overflow-hidden rounded-lg">
+                      <img 
+                        alt={game.name}
+                        loading="lazy"
+                        decoding="async"
+                        src={game.imageUrl}
+                        className="object-cover transition-transform duration-300 group-hover:scale-110 opacity-100 w-full h-full"
+                      />
+                      <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
+                        <Heart className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                    <div className="p-3">
+                      <h3 className="text-white text-sm font-medium truncate">{game.name}</h3>
+                      <p className="text-gray-400 text-xs truncate mt-1">{game.provider}</p>
+                    </div>
                   </div>
-                  <div className="p-2">
-                    <h3 className="text-white text-xs font-medium truncate">{game.name}</h3>
-                    <p className="text-gray-400 text-xs truncate">{game.provider}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
             
           </div>
