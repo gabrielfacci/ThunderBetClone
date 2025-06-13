@@ -7,146 +7,146 @@ export interface GameData {
 }
 
 export const games: GameData[] = [
-  // Pragmatic Play Games - Real game images from verified CDN sources
+  // Pragmatic Play Games - Authentic images from official Pragmatic Play CDN
   {
     id: '1',
     name: 'Sweet Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/sweet-bonanza.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/05/vs20fruitsw.png'
   },
   {
     id: '2',
     name: 'Gates of Olympus',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/gates-of-olympus.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2021/02/vs20gateso.png'
   },
   {
     id: '3',
     name: 'The Dog House',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/the-dog-house.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/05/vs20doghouse.png'
   },
   {
     id: '4',
     name: 'Big Bass Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/big-bass-bonanza.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2020/12/vs10bbbonanza.png'
   },
   {
     id: '5',
     name: 'Wild West Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/wild-west-gold.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/11/vs40wildwest.png'
   },
   {
     id: '6',
     name: 'Buffalo King',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/buffalo-king.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/11/vs4096buffalo.png'
   },
   {
     id: '7',
     name: 'Sugar Rush',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/sugar-rush.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2021/06/vs20sugarray.png'
   },
   {
     id: '8',
     name: 'Great Rhino',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/great-rhino.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2018/10/vs20rhino.png'
   },
   {
     id: '9',
     name: 'Fruit Party',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/fruit-party.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2020/05/vs20fruitparty.png'
   },
   {
     id: '10',
     name: 'Wolf Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/wolf-gold.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2017/05/vs25wolfgold.png'
   },
   {
     id: '11',
     name: 'Madame Destiny',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/madame-destiny.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2018/09/vs10madame.png'
   },
   {
     id: '12',
     name: 'Mustang Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/mustang-gold.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/01/vs25mustang.png'
   },
   {
     id: '13',
     name: 'Fire Strike',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/fire-strike.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2018/11/vs15firestrike.png'
   },
   {
     id: '14',
     name: 'John Hunter',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/john-hunter.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2018/11/vs25john.png'
   },
   {
     id: '15',
     name: 'Aztec Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/aztec-bonanza.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/08/vs20aztecbonus.png'
   },
   {
     id: '16',
     name: 'Bonanza Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/bonanza-gold.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2020/08/vs20bonzgold.png'
   },
   {
     id: '17',
     name: 'Hot Safari',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/hot-safari.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2018/08/vs25safari.png'
   },
   {
     id: '18',
     name: 'Pirate Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/pirate-gold.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/02/vs40pirate.png'
   },
   {
     id: '19',
     name: 'Gems Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/gems-bonanza.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2020/12/vs20gembo.png'
   },
   {
     id: '20',
     name: 'Jungle Gorilla',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/jungle-gorilla.jpg'
+    imageUrl: 'https://www.pragmaticplay.com/wp-content/uploads/2019/12/vs20gorilla.png'
   },
   // Evolution Gaming Games
   {
