@@ -273,51 +273,53 @@ export function Home() {
       </div>
       {/* Categories */}
       <div className="px-4 mb-6">
-        <div 
-          ref={categoriesRef}
-          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
-          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {categories.map((category) => {
-            const getIcon = (iconName: string) => {
-              switch (iconName) {
-                case 'flame':
-                  return <Flame className="w-6 h-6 text-orange-500" />;
-                case 'trophy':
-                  return <Trophy className="w-6 h-6 text-yellow-500" />;
-                case 'star':
-                  return <Star className="w-6 h-6 text-blue-500" />;
-                case 'dice-6':
-                  return <Dice6 className="w-6 h-6 text-green-500" />;
-                case 'diamond':
-                  return <Diamond className="w-6 h-6 text-purple-500" />;
-                default:
-                  return <Flame className="w-6 h-6 text-orange-500" />;
-              }
-            };
+        <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30">
+          <div 
+            ref={categoriesRef}
+            className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
+            style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {categories.map((category) => {
+              const getIcon = (iconName: string) => {
+                switch (iconName) {
+                  case 'flame':
+                    return <Flame className="w-6 h-6 text-orange-500" />;
+                  case 'trophy':
+                    return <Trophy className="w-6 h-6 text-yellow-500" />;
+                  case 'star':
+                    return <Star className="w-6 h-6 text-blue-500" />;
+                  case 'dice-6':
+                    return <Dice6 className="w-6 h-6 text-green-500" />;
+                  case 'diamond':
+                    return <Diamond className="w-6 h-6 text-purple-500" />;
+                  default:
+                    return <Flame className="w-6 h-6 text-orange-500" />;
+                }
+              };
 
-            return (
-              <button
-                key={category.id}
-                className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] ${
-                  selectedCategory === category.id 
-                    ? 'bg-gray-800/60 border border-gray-600/50' 
-                    : 'bg-transparent'
-                }`}
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                {getIcon(category.icon)}
-                <span className="text-xs text-white whitespace-nowrap">{t(category.name)}</span>
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={category.id}
+                  className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] ${
+                    selectedCategory === category.id 
+                      ? 'bg-gray-800/60 border border-gray-600/50' 
+                      : 'bg-transparent'
+                  }`}
+                  onClick={() => setSelectedCategory(category.id)}
+                >
+                  {getIcon(category.icon)}
+                  <span className="text-xs text-white whitespace-nowrap">{t(category.name)}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
       {/* Games Counter */}
@@ -332,18 +334,19 @@ export function Home() {
       </div>
       {/* Games Grid */}
       <div className="px-4 pb-24">
-        <div 
-          ref={gamesRef}
-          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
-          style={{ cursor: isDraggingGames ? 'grabbing' : 'grab' }}
-          onMouseDown={handleGamesMouseDown}
-          onMouseLeave={handleGamesMouseLeave}
-          onMouseUp={handleGamesMouseUp}
-          onMouseMove={handleGamesMouseMove}
-          onTouchStart={handleGamesTouchStart}
-          onTouchMove={handleGamesTouchMove}
-          onTouchEnd={handleGamesTouchEnd}
-        >
+        <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30">
+          <div 
+            ref={gamesRef}
+            className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
+            style={{ cursor: isDraggingGames ? 'grabbing' : 'grab' }}
+            onMouseDown={handleGamesMouseDown}
+            onMouseLeave={handleGamesMouseLeave}
+            onMouseUp={handleGamesMouseUp}
+            onMouseMove={handleGamesMouseMove}
+            onTouchStart={handleGamesTouchStart}
+            onTouchMove={handleGamesTouchMove}
+            onTouchEnd={handleGamesTouchEnd}
+          >
           {filteredGames.map((game) => (
             <div 
               key={game.id}
@@ -366,6 +369,7 @@ export function Home() {
               </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
       {/* Modals */}
