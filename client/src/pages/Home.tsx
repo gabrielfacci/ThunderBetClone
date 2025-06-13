@@ -212,44 +212,48 @@ export function Home() {
       </header>
       {/* Banner Section */}
       <div className="px-4 mb-4 max-w-md mx-auto pt-20">
-        <div className="relative overflow-hidden rounded-xl bg-gray-900/50">
-          <div 
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${currentBanner * 100}%)` }}
-          >
-            <div className="min-w-full">
-              <img 
-                src={banner1}
-                alt="Banner 1"
-                className="w-full h-40 object-contain rounded-xl"
-                style={{ 
-                  objectPosition: 'center',
-                  minHeight: '160px'
-                }}
-              />
-            </div>
-            <div className="min-w-full">
-              <img 
-                src={banner2}
-                alt="Banner 2"
-                className="w-full h-40 object-contain rounded-xl"
-                style={{ 
-                  objectPosition: 'center',
-                  minHeight: '160px'
-                }}
-              />
-            </div>
-            <div className="min-w-full">
-              <img 
-                src={banner3}
-                alt="Banner 3"
-                className="w-full h-40 object-contain rounded-xl"
-                style={{ 
-                  objectPosition: 'center',
-                  minHeight: '160px'
-                }}
-              />
-            </div>
+        <div className="relative overflow-hidden rounded-xl" style={{ height: '200px' }}>
+          <div className={`transition-opacity duration-500 ease-in-out ${currentBanner === 0 ? 'opacity-100' : 'opacity-0'} absolute inset-0`}>
+            <img 
+              alt="Banner Promocional 1"
+              loading="lazy"
+              width="400"
+              height="300"
+              decoding="async"
+              data-nimg="1"
+              className="w-full h-auto object-contain rounded-xl"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+              src={banner1}
+              style={{ color: 'transparent' }}
+            />
+          </div>
+          <div className={`transition-opacity duration-500 ease-in-out ${currentBanner === 1 ? 'opacity-100' : 'opacity-0'} absolute inset-0`}>
+            <img 
+              alt="Banner Promocional 2"
+              loading="lazy"
+              width="400"
+              height="300"
+              decoding="async"
+              data-nimg="1"
+              className="w-full h-auto object-contain rounded-xl"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+              src={banner2}
+              style={{ color: 'transparent' }}
+            />
+          </div>
+          <div className={`transition-opacity duration-500 ease-in-out ${currentBanner === 2 ? 'opacity-100' : 'opacity-0'} absolute inset-0`}>
+            <img 
+              alt="Banner Promocional 3"
+              loading="lazy"
+              width="400"
+              height="300"
+              decoding="async"
+              data-nimg="1"
+              className="w-full h-auto object-contain rounded-xl"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+              src={banner3}
+              style={{ color: 'transparent' }}
+            />
           </div>
         </div>
       </div>
