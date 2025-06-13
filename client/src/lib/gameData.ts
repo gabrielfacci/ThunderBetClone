@@ -63,7 +63,27 @@ export const winners: WinnerData[] = [
   { name: 'João Silva...', amount: '+ R$ 150,50', game: 'Dragon Fortune', avatar: 'J' },
   { name: 'Maria Costa...', amount: '+ R$ 89,20', game: 'Lucky Wheel', avatar: 'M' },
   { name: 'Pedro Alves...', amount: '+ R$ 312,00', game: 'Golden Temple', avatar: 'P' },
-  { name: 'Ana Santos...', amount: '+ R$ 75,80', game: 'Mega Test', avatar: 'A' }
+  { name: 'Ana Santos...', amount: '+ R$ 75,80', game: 'Mega Test', avatar: 'A' },
+  { name: 'Gabriel Nas...', amount: '+ R$ 225,00', game: 'Sweet Bonanza', avatar: 'G' },
+  { name: 'Carlos Pereira...', amount: '+ R$ 45,30', game: 'Buffalo King', avatar: 'C' },
+  { name: 'Fernanda Lima...', amount: '+ R$ 180,90', game: 'Wild West Gold', avatar: 'F' },
+  { name: 'Roberto Dias...', amount: '+ R$ 67,40', game: 'Gates of Olympus', avatar: 'R' },
+  { name: 'Camila Souza...', amount: '+ R$ 295,60', game: 'Big Bass Bonanza', avatar: 'C' },
+  { name: 'Bruno Torres...', amount: '+ R$ 132,15', game: 'Money Train 2', avatar: 'B' },
+  { name: 'Juliana Moraes...', amount: '+ R$ 58,75', game: 'Book of Dead', avatar: 'J' },
+  { name: 'Ricardo Nunes...', amount: '+ R$ 247,80', game: 'Reactoonz', avatar: 'R' },
+  { name: 'Patricia Ramos...', amount: '+ R$ 91,25', game: 'Starburst', avatar: 'P' },
+  { name: 'Thiago Mendes...', amount: '+ R$ 176,40', game: 'Gonzo Quest', avatar: 'T' },
+  { name: 'Vanessa Campos...', amount: '+ R$ 214,70', game: 'Bonanza Gold', avatar: 'V' },
+  { name: 'Eduardo Castro...', amount: '+ R$ 38,95', game: 'Fire Joker', avatar: 'E' },
+  { name: 'Luciana Reis...', amount: '+ R$ 163,30', game: 'Dead or Alive', avatar: 'L' },
+  { name: 'André Oliveira...', amount: '+ R$ 82,60', game: 'Jammin Jars', avatar: 'A' },
+  { name: 'Isabella Martins...', amount: '+ R$ 319,45', game: 'The Dog House', avatar: 'I' },
+  { name: 'Henrique Barbosa...', amount: '+ R$ 127,85', game: 'Sugar Rush', avatar: 'H' },
+  { name: 'Rafaela Santos...', amount: '+ R$ 73,20', game: 'Fruit Party', avatar: 'R' },
+  { name: 'Diego Fernandes...', amount: '+ R$ 198,50', game: 'Crash X', avatar: 'D' },
+  { name: 'Beatriz Lopes...', amount: '+ R$ 254,90', game: 'Zeus vs Hades', avatar: 'B' },
+  { name: 'Marcelo Gomes...', amount: '+ R$ 106,70', game: 'Aztec Bonanza', avatar: 'M' }
 ];
 
 export const categories = [
