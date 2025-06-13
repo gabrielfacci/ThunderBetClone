@@ -56,7 +56,7 @@ export function BottomNavigation() {
           </button>
           
           <button 
-            className={`flex flex-col items-center justify-center space-y-1 transition-colors relative -mt-2 ${
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors relative -mt-4 ${
               activeTab === 'home' ? 'text-white' : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab('home')}
