@@ -35,7 +35,7 @@ export function BottomNavigation() {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="px-4 max-w-md mx-auto">
+        <div className="px-4 max-w-md mx-auto mt-[6px] mb-[6px]">
           <div className="grid grid-cols-5 h-20">
           <button 
             className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
@@ -98,7 +98,6 @@ export function BottomNavigation() {
           </div>
         </div>
       </nav>
-
       {/* Modals */}
       <DepositModal isOpen={activeModal === 'deposit'} onClose={closeModal} />
       <WithdrawalModal isOpen={activeModal === 'withdrawal'} onClose={closeModal} />
