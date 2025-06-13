@@ -85,9 +85,7 @@ export function BottomNavigation() {
             }`}
             onClick={() => openModal('profile')}
           >
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-              activeTab === 'profile' ? 'bg-yellow-500 text-black' : 'bg-orange-500 text-white'
-            }`}>
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-white bg-[#f9731605]">
               <User className="w-4 h-4" />
             </div>
             <span className="text-xs">{t('Profile')}</span>
