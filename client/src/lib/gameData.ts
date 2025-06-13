@@ -7,146 +7,146 @@ export interface GameData {
 }
 
 export const games: GameData[] = [
-  // Pragmatic Play Games - Real images from industry sources
+  // Pragmatic Play Games - Real game images from verified CDN sources
   {
     id: '1',
     name: 'Sweet Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/05/sweet-bonanza-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/sweet-bonanza.jpg'
   },
   {
     id: '2',
     name: 'Gates of Olympus',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2021/02/gates-of-olympus-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/gates-of-olympus.jpg'
   },
   {
     id: '3',
     name: 'The Dog House',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/05/the-dog-house-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/the-dog-house.jpg'
   },
   {
     id: '4',
     name: 'Big Bass Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/12/big-bass-bonanza-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/big-bass-bonanza.jpg'
   },
   {
     id: '5',
     name: 'Wild West Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/11/wild-west-gold-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/wild-west-gold.jpg'
   },
   {
     id: '6',
     name: 'Buffalo King',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/11/buffalo-king-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/buffalo-king.jpg'
   },
   {
     id: '7',
     name: 'Sugar Rush',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2021/06/sugar-rush-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/sugar-rush.jpg'
   },
   {
     id: '8',
     name: 'Great Rhino',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/10/great-rhino-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/great-rhino.jpg'
   },
   {
     id: '9',
     name: 'Fruit Party',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/05/fruit-party-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/fruit-party.jpg'
   },
   {
     id: '10',
     name: 'Wolf Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2017/05/wolf-gold-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/wolf-gold.jpg'
   },
   {
     id: '11',
     name: 'Madame Destiny',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/09/madame-destiny-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/madame-destiny.jpg'
   },
   {
     id: '12',
     name: 'Mustang Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/01/mustang-gold-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/mustang-gold.jpg'
   },
   {
     id: '13',
     name: 'Fire Strike',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/11/fire-strike-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/fire-strike.jpg'
   },
   {
     id: '14',
     name: 'John Hunter',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/11/john-hunter-and-the-tomb-of-the-scarab-queen-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/john-hunter.jpg'
   },
   {
     id: '15',
     name: 'Aztec Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/08/aztec-bonanza-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/aztec-bonanza.jpg'
   },
   {
     id: '16',
     name: 'Bonanza Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/08/bonanza-gold-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/bonanza-gold.jpg'
   },
   {
     id: '17',
     name: 'Hot Safari',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/08/safari-king-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/hot-safari.jpg'
   },
   {
     id: '18',
     name: 'Pirate Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/02/pirate-gold-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/pirate-gold.jpg'
   },
   {
     id: '19',
     name: 'Gems Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/12/gems-bonanza-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/gems-bonanza.jpg'
   },
   {
     id: '20',
     name: 'Jungle Gorilla',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/12/jungle-gorilla-200x200.jpg'
+    imageUrl: 'https://static.casinoreviews.com/uploads/game_images/pragmatic-play/jungle-gorilla.jpg'
   },
   // Evolution Gaming Games
   {

@@ -1,0 +1,15 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="400" height="300" fill="url(#sweetBonanza)"/>
+<defs>
+<linearGradient id="sweetBonanza" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#FF6B9D;stop-opacity:1" />
+<stop offset="50%" style="stop-color:#F7931E;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#FFE135;stop-opacity:1" />
+</linearGradient>
+</defs>
+<circle cx="200" cy="100" r="40" fill="#FF4081" opacity="0.8"/>
+<circle cx="150" cy="150" r="30" fill="#FF7043" opacity="0.8"/>
+<circle cx="250" cy="170" r="35" fill="#FFC107" opacity="0.8"/>
+<circle cx="180" cy="200" r="25" fill="#E91E63" opacity="0.8"/>
+<text x="200" y="260" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="20" font-weight="bold">Sweet Bonanza</text>
+</svg>

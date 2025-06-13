@@ -342,7 +342,9 @@ export function Home() {
                         className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = `https://via.placeholder.com/400x300/8B5CF6/FFFFFF?text=${encodeURIComponent(game.name)}`;
+                          if (!target.src.includes('placeholder')) {
+                            target.src = `/game-images/placeholder.svg`;
+                          }
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
