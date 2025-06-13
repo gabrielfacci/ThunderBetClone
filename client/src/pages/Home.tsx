@@ -259,21 +259,22 @@ export function Home() {
           </div>
         </div>
       </div>
-      {/* Search Bar */}
-      <div className="px-4 mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-black/20 border-gray-600/30 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-xl backdrop-blur-sm"
-            placeholder="Buscar jogos por nome ou provedor"
-          />
-        </div>
-      </div>
-      {/* Categories */}
-      <div className="px-4 mb-6">
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30">
+      {/* Main Content Section */}
+      <div className="px-4 pb-24">
+        <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
+          
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-black/20 border-gray-600/30 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-xl backdrop-blur-sm"
+              placeholder="Buscar jogos por nome ou provedor"
+            />
+          </div>
+
+          {/* Categories */}
           <div 
             ref={categoriesRef}
             className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
@@ -320,21 +321,17 @@ export function Home() {
               );
             })}
           </div>
-        </div>
-      </div>
-      {/* Games Counter */}
-      <div className="px-4 mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Flame className="w-4 h-4 text-orange-500" />
-            <span className="font-medium text-white">{filteredGames.length} jogos</span>
+
+          {/* Games Counter */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Flame className="w-4 h-4 text-orange-500" />
+              <span className="font-medium text-white">{filteredGames.length} jogos</span>
+            </div>
+            <button className="text-gray-400 text-sm">Game Lobby →</button>
           </div>
-          <button className="text-gray-400 text-sm">Game Lobby →</button>
-        </div>
-      </div>
-      {/* Games Grid */}
-      <div className="px-4 pb-24">
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30">
+
+          {/* Games Grid */}
           <div 
             ref={gamesRef}
             className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
@@ -347,29 +344,30 @@ export function Home() {
             onTouchMove={handleGamesTouchMove}
             onTouchEnd={handleGamesTouchEnd}
           >
-          {filteredGames.map((game) => (
-            <div 
-              key={game.id}
-              className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer flex-shrink-0 w-40"
-              onClick={() => handleGameClick(game)}
-            >
-              <div className="relative">
-                <img 
-                  src={game.imageUrl} 
-                  alt={game.name}
-                  className="w-full h-28 object-cover" 
-                />
-                <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
-                  <Heart className="w-3 h-3 text-white" />
-                </button>
+            {filteredGames.map((game) => (
+              <div 
+                key={game.id}
+                className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer flex-shrink-0 w-40"
+                onClick={() => handleGameClick(game)}
+              >
+                <div className="relative">
+                  <img 
+                    src={game.imageUrl} 
+                    alt={game.name}
+                    className="w-full h-28 object-cover" 
+                  />
+                  <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
+                    <Heart className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+                <div className="p-2">
+                  <h3 className="text-white text-xs font-medium truncate">{game.name}</h3>
+                  <p className="text-gray-400 text-xs truncate">{game.provider}</p>
+                </div>
               </div>
-              <div className="p-2">
-                <h3 className="text-white text-xs font-medium truncate">{game.name}</h3>
-                <p className="text-gray-400 text-xs truncate">{game.provider}</p>
-              </div>
-            </div>
-          ))}
+            ))}
           </div>
+          
         </div>
       </div>
       {/* Modals */}
