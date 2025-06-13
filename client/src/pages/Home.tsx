@@ -16,60 +16,66 @@ import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 export function Home() {
   const { t } = useTranslation();
   const { user } = useAppContext();
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [currentWinner, setCurrentWinner] = useState(0);
-  const [currentBanner, setCurrentBanner] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [currentWinner, setCurrentWinner] = useState(0);
   const [showGameLoading, setShowGameLoading] = useState(false);
   const [showInsufficientBalance, setShowInsufficientBalance] = useState(false);
   const [showDepositFromGame, setShowDepositFromGame] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
 
-  // Cycle through winners every 3 seconds
+  // Auto-rotate banners
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentWinner(prev => (prev + 1) % winners.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Cycle through banners every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBanner(prev => (prev + 1) % 3);
+      setCurrentBanner((prev) => (prev + 1) % 3);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-rotate winners
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentWinner((prev) => (prev + 1) % winners.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const filteredGames = games.filter(game => {
-    const matchesCategory = selectedCategory === 'all' || game.category === selectedCategory;
     const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          game.provider.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesCategory = selectedCategory === 'all' || game.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
   const formatBalance = (balance: number) => {
-    return `R$ ${(balance / 100).toFixed(2).replace('.', ',')}`;
+    return user?.accountMode === 'national' 
+      ? `R$ ${balance.toFixed(2).replace('.', ',')}`
+      : `$ ${balance.toFixed(2)}`;
   };
 
   const handleGameClick = (game: GameData) => {
     setSelectedGame(game);
-    setShowGameLoading(true);
+    if ((user?.balance || 0) < 10) {
+      setShowInsufficientBalance(true);
+    } else {
+      setShowGameLoading(true);
+    }
   };
 
   const handleLoadingComplete = () => {
     setShowGameLoading(false);
-    setShowInsufficientBalance(true);
-  };
-
-  const handleDepositFromGame = () => {
-    setShowInsufficientBalance(false);
-    setShowDepositFromGame(true);
+    setSelectedGame(null);
   };
 
   const handleCloseInsufficientBalance = () => {
     setShowInsufficientBalance(false);
     setSelectedGame(null);
+  };
+
+  const handleDepositFromGame = () => {
+    setShowInsufficientBalance(false);
+    setShowDepositFromGame(true);
   };
 
   const handleCloseDeposit = () => {
@@ -100,24 +106,28 @@ export function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="bg-green-600/20 px-2 py-1 rounded-md flex items-center space-x-1 border border-green-600/30">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <div className="bg-green-600/20 px-3 py-2 rounded-lg flex items-center space-x-2 border border-green-600/30 backdrop-blur-sm">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span className="text-green-400 text-sm font-medium">
                   {formatBalance(user?.balance || 0)}
                 </span>
               </div>
-              <RotateCcw className="w-4 h-4 text-gray-300" />
-              <Share className="w-4 h-4 text-gray-300" />
+              <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm">
+                <RotateCcw className="w-4 h-4 text-gray-300" />
+              </button>
+              <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm">
+                <Share className="w-4 h-4 text-gray-300" />
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content Container */}
-      <div className="container mx-auto px-4">
+      {/* Main Content */}
+      <main className="container mx-auto px-4 space-y-6">
         
-        {/* Hero Section with Banners */}
-        <section className="relative mb-8">
+        {/* Hero Banners */}
+        <section className="relative">
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-800/80 via-blue-800/80 to-indigo-900/80 backdrop-blur-lg border border-purple-500/30">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20"></div>
             <div className="relative">
@@ -129,23 +139,21 @@ export function Home() {
                   <img 
                     src={banner1}
                     alt="Banner 1"
-                    className="w-full h-48 md:h-64 object-cover rounded-2xl"
+                    className="w-full h-48 md:h-64 object-cover"
                   />
                 </div>
-                
                 <div className="min-w-full relative">
                   <img 
                     src={banner2}
                     alt="Banner 2"
-                    className="w-full h-48 md:h-64 object-cover rounded-2xl"
+                    className="w-full h-48 md:h-64 object-cover"
                   />
                 </div>
-                
                 <div className="min-w-full relative">
                   <img 
                     src={banner3}
                     alt="Banner 3"
-                    className="w-full h-48 md:h-64 object-cover rounded-2xl"
+                    className="w-full h-48 md:h-64 object-cover"
                   />
                 </div>
               </div>
@@ -153,56 +161,50 @@ export function Home() {
           </div>
         </section>
 
-        {/* Winner Feed Section */}
-        <section className="mb-8">
-          <div className="relative overflow-hidden bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border-green-400/40 border backdrop-blur-sm rounded-xl p-3 hover:scale-105 group transition-all duration-300">
-            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
-            <div className="absolute top-1 right-2 opacity-60">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 text-yellow-300 animate-pulse">
-                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.064a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
-              </svg>
+        {/* Winner Feed */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-green-500/20 via-emerald-500/15 to-teal-500/20 border-green-400/40 border backdrop-blur-sm rounded-xl p-3 hover:scale-105 group transition-all duration-300">
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
+          <div className="absolute top-1 right-2 opacity-60">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 text-yellow-300 animate-pulse">
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.064a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+            </svg>
+          </div>
+          <div className="relative flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-sm font-bold text-white">
+                {winners[currentWinner].avatar}
+              </span>
             </div>
-            <div className="relative flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-sm font-bold text-white">
-                  {winners[currentWinner].avatar}
-                </span>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
+                <span className="text-green-300 text-sm font-bold">{winners[currentWinner].amount}</span>
               </div>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2">
-                  <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
-                  <span className="text-green-300 text-sm font-bold">{winners[currentWinner].amount}</span>
-                </div>
-                <div className="text-xs text-gray-300">
-                  ganhou em {winners[currentWinner].game}
-                </div>
+              <div className="text-xs text-gray-300">
+                ganhou em {winners[currentWinner].game}
               </div>
-              <div className="text-xs text-green-300 font-medium">
-                🎉 AGORA
-              </div>
+            </div>
+            <div className="text-xs text-green-300 font-medium">
+              🎉 AGORA
             </div>
           </div>
         </section>
-      </div>
 
-      {/* Search and Categories Section */}
-      <div className="container mx-auto px-4 mb-8">
-        
-        {/* Search Bar */}
-        <div className="relative mb-6">
+        {/* Search */}
+        <section>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-black/20 border-purple-500/30 text-white placeholder-gray-400 pl-12 pr-4 py-4 text-lg rounded-2xl backdrop-blur-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all"
-              placeholder={t('Pesquisar jogos por nome ou provedor...')}
+              placeholder="Pesquisar jogos por nome ou provedor..."
             />
           </div>
-        </div>
+        </section>
 
-        {/* Game Categories */}
-        <div className="mb-8">
+        {/* Categories */}
+        <section>
           <div className="flex items-center space-x-3 overflow-x-auto pb-4 scrollbar-hide">
             {categories.map((category) => {
               const getIcon = (iconName: string) => {
@@ -240,62 +242,63 @@ export function Home() {
               );
             })}
           </div>
-        </div>
+        </section>
 
         {/* Games Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
-              <Flame className="w-5 h-5 text-white" />
+        <section>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
+                <Flame className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">{filteredGames.length} Jogos</h2>
+                <p className="text-sm text-gray-400">Escolha seu jogo favorito</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">{filteredGames.length} Jogos</h2>
-              <p className="text-sm text-gray-400">Escolha seu jogo favorito</p>
-            </div>
+            <button className="text-purple-400 text-sm font-medium hover:text-purple-300 transition-colors">
+              Ver todos →
+            </button>
           </div>
-          <button className="text-purple-400 text-sm font-medium hover:text-purple-300 transition-colors">
-            Ver todos →
-          </button>
-        </div>
+        </section>
 
         {/* Games Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {filteredGames.map((game) => (
-            <div 
-              key={game.id}
-              className="group relative bg-black/20 rounded-2xl overflow-hidden border border-white/10 hover:border-purple-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer backdrop-blur-sm"
-              onClick={() => handleGameClick(game)}
-            >
-              <div className="relative overflow-hidden">
-                <img 
-                  src={game.imageUrl} 
-                  alt={game.name}
-                  className="w-full h-32 lg:h-40 object-cover transition-transform duration-300 group-hover:scale-110" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                {/* Favorite Button */}
-                <button className="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500/50">
-                  <Heart className="w-4 h-4 text-white" />
-                </button>
-                
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
-                    <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1"></div>
+        <section>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {filteredGames.map((game) => (
+              <div 
+                key={game.id}
+                className="group relative bg-black/20 rounded-2xl overflow-hidden border border-white/10 hover:border-purple-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer backdrop-blur-sm"
+                onClick={() => handleGameClick(game)}
+              >
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={game.imageUrl} 
+                    alt={game.name}
+                    className="w-full h-32 lg:h-40 object-cover transition-transform duration-300 group-hover:scale-110" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <button className="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500/50">
+                    <Heart className="w-4 h-4 text-white" />
+                  </button>
+                  
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
+                      <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1"></div>
+                    </div>
                   </div>
                 </div>
+                
+                <div className="p-4">
+                  <h3 className="font-bold text-white text-sm mb-1 truncate">{game.name}</h3>
+                  <p className="text-xs text-gray-400">{game.provider}</p>
+                </div>
               </div>
-              
-              {/* Game Info */}
-              <div className="p-4">
-                <h3 className="font-bold text-white text-sm mb-1 truncate">{game.name}</h3>
-                <p className="text-xs text-gray-400">{game.provider}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        </section>
+      </main>
 
       {/* Modals */}
       <GameLoadingModal
