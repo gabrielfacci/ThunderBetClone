@@ -175,7 +175,6 @@ export function Home() {
           </div>
         </div>
       </header>
-      
       {/* Content Container */}
       <div className="pt-20">
         {/* Banner Section */}
@@ -346,7 +345,7 @@ export function Home() {
                       <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 hover:bg-black/70 transition-colors">
                         <Heart className="w-3 h-3 text-white" />
                       </button>
-                      <div className="absolute bottom-2 left-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">
+                      <div className="absolute bottom-2 left-2 text-xs font-bold px-2 py-1 rounded bg-[#00000078] text-[#ffffff] pt-[5px] pb-[5px] pl-[12px] pr-[12px]">
                         {game.provider}
                       </div>
                     </div>
@@ -362,7 +361,6 @@ export function Home() {
           </div>
         </div>
       </div>
-      
       {/* Modals */}
       <GameLoadingModal
         isOpen={showGameLoading}
