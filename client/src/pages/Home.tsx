@@ -10,6 +10,7 @@ import { DepositModal } from '@/components/modals/DepositModal';
 import banner1 from '@assets/banner1_1749828043247.png';
 import banner2 from '@assets/banner2_1749828043246.png';
 import banner3 from '@assets/csev1741231448021443_1749828043248.webp';
+import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Home() {
   const { t } = useTranslation();
@@ -184,15 +185,12 @@ export function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-purple-500/20">
         <div className="px-4 py-3 max-w-md mx-auto">
           <div className="flex items-center justify-between">
-            <div className="relative flex items-center gap-2 transition-all duration-700 ease-out group hover:scale-110 cursor-pointer">
-              <div className="relative transition-all duration-700 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]">
-                <div className="text-yellow-500 font-bold text-xl">
-                  THUNDER
-                </div>
-              </div>
-              <div className="text-white font-bold text-xl">
-                BET
-              </div>
+            <div className="relative flex items-center transition-all duration-700 ease-out group hover:scale-110 cursor-pointer">
+              <img 
+                src={thunderbetLogo} 
+                alt="ThunderBet" 
+                className="h-10 w-auto transition-all duration-700 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]"
+              />
             </div>
             
             <div className="flex items-center space-x-3">
