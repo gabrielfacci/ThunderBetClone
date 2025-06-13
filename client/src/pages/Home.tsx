@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond } from 'lucide-react';
+import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppContext } from '@/contexts/AppContext';
@@ -194,15 +194,15 @@ export function Home() {
             </div>
             
             <div className="flex items-center space-x-3">
-              <div className="bg-green-600/20 px-3 py-1 rounded-lg flex items-center space-x-2 border border-green-600/30 backdrop-blur-sm">
-                <span className="text-green-400 text-sm">💰</span>
-                <span className="text-green-400 text-sm font-medium">
+              <div className="flex items-center space-x-2 bg-gray-800/50 rounded-lg px-3 py-2">
+                <Wallet className="h-4 w-4 text-green-400" />
+                <span className="text-green-400 font-medium">
                   {formatBalance(user?.balance || 0)}
                 </span>
+                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10">
+                  <RefreshCw className="h-3 w-3" />
+                </button>
               </div>
-              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                <RotateCcw className="w-4 h-4 text-gray-300" />
-              </button>
               <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                 <Share className="w-4 h-4 text-gray-300" />
               </button>
