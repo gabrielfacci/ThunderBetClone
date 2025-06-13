@@ -202,6 +202,15 @@
     background: linear-gradient(90deg, #9ca3af 0%, #d1d5db 100%);
   }
   
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .drag-container {
+    touch-action: pan-x;
+  }
+  
   .animate-progress {
     animation: progress 3s ease-in-out infinite;
   }

@@ -275,7 +275,7 @@ export function Home() {
       <div className="px-4 mb-6">
         <div 
           ref={categoriesRef}
-          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab"
+          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
           style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
           onMouseDown={handleMouseDown}
           onMouseLeave={handleMouseLeave}
@@ -334,7 +334,7 @@ export function Home() {
       <div className="px-4 pb-24">
         <div 
           ref={gamesRef}
-          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab"
+          className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
           style={{ cursor: isDraggingGames ? 'grabbing' : 'grab' }}
           onMouseDown={handleGamesMouseDown}
           onMouseLeave={handleGamesMouseLeave}
