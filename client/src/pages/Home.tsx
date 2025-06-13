@@ -11,6 +11,7 @@ import { DepositModal } from '@/components/modals/DepositModal';
 import banner1 from '@assets/banner1_1749828043247.png';
 import banner2 from '@assets/banner2_1749828043246.png';
 import banner3 from '@assets/csev1741231448021443_1749828043248.webp';
+import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Home() {
   const { t } = useTranslation();
@@ -81,9 +82,11 @@ export function Home() {
       {/* Header */}
       <header className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-            <Zap className="w-3 h-3 text-black font-bold" />
-          </div>
+          <img 
+            src={thunderbetLogo} 
+            alt="ThunderBet" 
+            className="w-8 h-8 object-contain"
+          />
           <h1 className="text-base font-bold">
             <span className="text-yellow-500">THUNDER</span>
             <span className="text-white">BET</span>
