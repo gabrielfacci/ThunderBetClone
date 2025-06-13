@@ -7,146 +7,146 @@ export interface GameData {
 }
 
 export const games: GameData[] = [
-  // Pragmatic Play Games - Real game images from trusted CDNs
+  // Pragmatic Play Games - Using reliable image sources
   {
     id: '1',
     name: 'Sweet Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/05/sweetbonanza.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=1'
   },
   {
     id: '2',
     name: 'Gates of Olympus',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://www.askgamblers.com/gambling-news/uploads/2021/02/gates-of-olympus-thumb.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=2'
   },
   {
     id: '3',
     name: 'The Dog House',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/05/thedoghouse.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=3'
   },
   {
     id: '4',
     name: 'Big Bass Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/12/bigbassbonanza.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=4'
   },
   {
     id: '5',
     name: 'Wild West Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/11/wildwestgold.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=5'
   },
   {
     id: '6',
     name: 'Buffalo King',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/11/buffaloking.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=6'
   },
   {
     id: '7',
     name: 'Sugar Rush',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2021/06/sugarrush.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=7'
   },
   {
     id: '8',
     name: 'Great Rhino',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/10/greatrhino.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=8'
   },
   {
     id: '9',
     name: 'Fruit Party',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/05/fruitparty.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=9'
   },
   {
     id: '10',
     name: 'Wolf Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2017/05/wolfgold.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=10'
   },
   {
     id: '11',
     name: 'Madame Destiny',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/09/madamedestiny.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=11'
   },
   {
     id: '12',
     name: 'Mustang Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/01/mustanggold.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=12'
   },
   {
     id: '13',
     name: 'Fire Strike',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/11/firestrike.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=13'
   },
   {
     id: '14',
     name: 'John Hunter',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/11/johnhunter.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=14'
   },
   {
     id: '15',
     name: 'Aztec Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/08/aztecbonanza.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=15'
   },
   {
     id: '16',
     name: 'Bonanza Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/08/bonanzagold.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=16'
   },
   {
     id: '17',
     name: 'Hot Safari',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2018/08/hotsafari.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=17'
   },
   {
     id: '18',
     name: 'Pirate Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/02/pirategold.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=18'
   },
   {
     id: '19',
     name: 'Gems Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2020/12/gemsbonanza.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=19'
   },
   {
     id: '20',
     name: 'Jungle Gorilla',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://pragmaticplaylive.net/wp-content/uploads/2019/12/junglegorilla.jpg'
+    imageUrl: 'https://picsum.photos/400/300?random=20'
   },
   // Evolution Gaming Games
   {

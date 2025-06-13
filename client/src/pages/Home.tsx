@@ -340,6 +340,10 @@ export function Home() {
                         decoding="async"
                         src={game.imageUrl}
                         className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = `https://via.placeholder.com/400x300/8B5CF6/FFFFFF?text=${encodeURIComponent(game.name)}`;
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 hover:bg-black/70 transition-colors">
