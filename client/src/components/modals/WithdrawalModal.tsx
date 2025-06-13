@@ -43,19 +43,18 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900 border-gray-700 text-white w-full max-w-md mx-4 rounded-2xl">
+      <DialogContent className="bg-gray-900/95 backdrop-blur-sm border-gray-700/50 text-white w-full max-w-md mx-4 rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold">{t('Request Withdrawal')}</DialogTitle>
+          <DialogTitle className="text-xl font-bold">{t('Request Withdrawal')}</DialogTitle>
+          <p className="text-gray-400 text-sm">{t('Withdraw your winnings via PIX')}</p>
         </DialogHeader>
         
         <div className="p-4">
-          <p className="text-gray-400 text-sm mb-4">{t('Withdraw your winnings via PIX')}</p>
-          
           {/* Tabs */}
-          <div className="flex space-x-2 mb-4">
+          <div className="flex space-x-2 mb-6">
             <Button
               variant={activeTab === 'withdrawal' ? 'default' : 'secondary'}
-              className={`flex-1 ${activeTab === 'withdrawal' ? 'thunder-button-secondary' : 'bg-gray-700 text-gray-400'}`}
+              className={`flex-1 h-12 ${activeTab === 'withdrawal' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
               onClick={() => setActiveTab('withdrawal')}
             >
               <TrendingDown className="w-4 h-4 mr-2" />
@@ -63,7 +62,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
             </Button>
             <Button
               variant={activeTab === 'history' ? 'default' : 'secondary'}
-              className={`flex-1 ${activeTab === 'history' ? 'thunder-button-secondary' : 'bg-gray-700 text-gray-400'}`}
+              className={`flex-1 h-12 ${activeTab === 'history' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
               onClick={() => setActiveTab('history')}
             >
               <History className="w-4 h-4 mr-2" />
@@ -73,23 +72,23 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
           {activeTab === 'withdrawal' && (
             <div>
-              <h3 className="font-bold mb-2">{t('Request Withdrawal')}</h3>
-              <p className="text-xs text-gray-400 mb-3">{t('Withdraw your winnings via PIX')}</p>
+              <h3 className="text-lg font-bold mb-1">Solicitar Saque</h3>
+              <p className="text-sm text-gray-400 mb-4">Retire seus ganhos via PIX</p>
               
               {/* Available Balance */}
-              <div className="bg-green-900/30 border border-green-500 rounded-lg p-3 mb-4">
+              <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 mb-6">
                 <div className="flex items-center space-x-2">
                   <DollarSign className="w-4 h-4 text-green-400" />
                   <span className="text-sm">{t('Available balance:')}</span>
-                  <span className="text-green-400 font-bold">
+                  <span className="text-green-400 font-bold text-lg">
                     {formatBalance(user?.balance || 0)}
                   </span>
                 </div>
               </div>
               
               {/* Quick Amounts */}
-              <div className="mb-4">
-                <p className="text-sm text-green-400 mb-2 flex items-center">
+              <div className="mb-6">
+                <p className="text-sm text-green-400 mb-3 flex items-center">
                   <DollarSign className="w-4 h-4 mr-1" />
                   {t('Quick amounts')}
                 </p>
@@ -99,7 +98,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
                       key={value}
                       variant="outline"
                       size="sm"
-                      className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600 text-xs"
+                      className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 text-xs h-8"
                       onClick={() => handleQuickAmount(value)}
                     >
                       R$ {value}
@@ -109,21 +108,21 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
               </div>
 
               {/* Amount Input */}
-              <div className="mb-4">
-                <Label className="text-sm text-gray-400 mb-2">{t('Withdrawal amount')}</Label>
+              <div className="mb-6">
+                <Label className="text-sm text-gray-400 mb-2 block">{t('Withdrawal amount')}</Label>
                 <Input
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="R$ 0,00"
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-12 text-lg"
                 />
               </div>
 
               {/* PIX Key Type */}
-              <div className="mb-4">
-                <Label className="text-sm text-gray-400 mb-2">{t('PIX key type')}</Label>
+              <div className="mb-6">
+                <Label className="text-sm text-gray-400 mb-2 block">{t('PIX key type')}</Label>
                 <Select value={pixKeyType} onValueChange={setPixKeyType}>
-                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectTrigger className="bg-gray-800/50 border-gray-600/50 text-white h-12">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">

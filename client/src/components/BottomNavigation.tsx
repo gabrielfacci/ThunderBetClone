@@ -25,10 +25,12 @@ export function BottomNavigation() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 z-40">
+      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700/50 z-40">
         <div className="grid grid-cols-5 h-16">
           <button 
-            className={`nav-item ${activeTab === 'deposit' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
+              activeTab === 'deposit' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
+            }`}
             onClick={() => openModal('deposit')}
           >
             <Wallet className="w-5 h-5" />
@@ -36,7 +38,9 @@ export function BottomNavigation() {
           </button>
           
           <button 
-            className={`nav-item ${activeTab === 'withdrawal' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
+              activeTab === 'withdrawal' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
+            }`}
             onClick={() => openModal('withdrawal')}
           >
             <TrendingDown className="w-5 h-5" />
@@ -44,26 +48,41 @@ export function BottomNavigation() {
           </button>
           
           <button 
-            className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
+              activeTab === 'home' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
+            }`}
             onClick={() => setActiveTab('home')}
           >
-            <Home className="w-5 h-5" />
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              activeTab === 'home' ? 'bg-yellow-500 text-black' : 'bg-transparent'
+            }`}>
+              <Home className="w-5 h-5" />
+            </div>
             <span className="text-xs">{t('Home')}</span>
           </button>
           
           <button 
-            className={`nav-item ${activeTab === 'promotion' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
+              activeTab === 'promotion' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
+            }`}
             onClick={() => openModal('promotion')}
           >
             <Gift className="w-5 h-5" />
             <span className="text-xs">{t('Promotion')}</span>
+            <div className="absolute top-1 right-3 w-2 h-2 bg-red-500 rounded-full"></div>
           </button>
           
           <button 
-            className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
+              activeTab === 'profile' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
+            }`}
             onClick={() => openModal('profile')}
           >
-            <User className="w-5 h-5" />
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+              activeTab === 'profile' ? 'bg-yellow-500 text-black' : 'bg-orange-500 text-white'
+            }`}>
+              <User className="w-4 h-4" />
+            </div>
             <span className="text-xs">{t('Profile')}</span>
           </button>
         </div>

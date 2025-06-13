@@ -35,19 +35,18 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900 border-gray-700 text-white w-full max-w-md mx-4 rounded-2xl">
+      <DialogContent className="bg-gray-900/95 backdrop-blur-sm border-gray-700/50 text-white w-full max-w-md mx-4 rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold">{t('Make Deposit')}</DialogTitle>
+          <DialogTitle className="text-xl font-bold">{t('Make Deposit')}</DialogTitle>
+          <p className="text-gray-400 text-sm">{t('Add balance to your account')}</p>
         </DialogHeader>
         
         <div className="p-4">
-          <p className="text-gray-400 text-sm mb-4">{t('Add balance to your account')}</p>
-          
           {/* Tabs */}
-          <div className="flex space-x-2 mb-4">
+          <div className="flex space-x-2 mb-6">
             <Button
               variant={activeTab === 'pix' ? 'default' : 'secondary'}
-              className={`flex-1 ${activeTab === 'pix' ? 'thunder-button-primary' : 'bg-gray-700 text-gray-400'}`}
+              className={`flex-1 h-12 ${activeTab === 'pix' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
               onClick={() => setActiveTab('pix')}
             >
               <CreditCard className="w-4 h-4 mr-2" />
@@ -55,7 +54,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
             </Button>
             <Button
               variant={activeTab === 'history' ? 'default' : 'secondary'}
-              className={`flex-1 ${activeTab === 'history' ? 'thunder-button-primary' : 'bg-gray-700 text-gray-400'}`}
+              className={`flex-1 h-12 ${activeTab === 'history' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
               onClick={() => setActiveTab('history')}
             >
               <History className="w-4 h-4 mr-2" />
@@ -65,44 +64,54 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
           {activeTab === 'pix' && (
             <div>
-              <h3 className="font-bold mb-2">{t('Deposit via PIX')}</h3>
-              <p className="text-xs text-gray-400 mb-3">{t('Fast, secure and available 24h')}</p>
+              <h3 className="text-lg font-bold mb-1">{t('Deposit via PIX')}</h3>
+              <p className="text-sm text-gray-400 mb-4">{t('Fast, secure and available 24h')}</p>
               
               {/* Quick Amounts */}
-              <div className="mb-4">
-                <p className="text-sm text-green-400 mb-2 flex items-center">
+              <div className="mb-6">
+                <p className="text-sm text-green-400 mb-3 flex items-center">
                   <DollarSign className="w-4 h-4 mr-1" />
                   {t('Quick amounts')}
                 </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {quickAmounts.map((value) => (
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {quickAmounts.slice(0, 5).map((value) => (
                     <Button
                       key={value}
                       variant="outline"
                       size="sm"
-                      className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+                      className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-10"
                       onClick={() => handleQuickAmount(value)}
                     >
                       R$ {value}
                     </Button>
                   ))}
                 </div>
+                <div className="grid grid-cols-1 gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-10"
+                    onClick={() => handleQuickAmount(quickAmounts[5])}
+                  >
+                    R$ {quickAmounts[5]}
+                  </Button>
+                </div>
               </div>
 
               {/* Amount Input */}
-              <div className="mb-4">
-                <Label className="text-sm text-gray-400 mb-2">{t('Deposit amount')}</Label>
+              <div className="mb-6">
+                <Label className="text-sm text-gray-400 mb-2 block">{t('Deposit amount')}</Label>
                 <Input
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="R$ 0,00"
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-12 text-lg"
                 />
               </div>
 
               {/* Generate PIX Button */}
-              <Button className="w-full thunder-button-primary">
-                <QrCode className="w-4 h-4 mr-2" />
+              <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-12 text-base">
+                <QrCode className="w-5 h-5 mr-2" />
                 {t('Generate PIX QR Code')}
               </Button>
             </div>
