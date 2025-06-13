@@ -67,18 +67,18 @@ export function Home() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 bg-black/20">
+      <header className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-            <Zap className="w-4 h-4 text-black" />
+          <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+            <Zap className="w-3 h-3 text-black font-bold" />
           </div>
-          <h1 className="text-lg font-bold">
+          <h1 className="text-base font-bold">
             <span className="text-yellow-500">THUNDER</span>
             <span className="text-white">BET</span>
           </h1>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="bg-green-600/20 px-3 py-1 rounded-lg flex items-center space-x-1">
+        <div className="flex items-center space-x-3">
+          <div className="bg-green-600/20 px-2 py-1 rounded-md flex items-center space-x-1 border border-green-600/30">
             <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             <span className="text-green-400 text-sm font-medium">
               {formatBalance(user?.balance || 0)}
@@ -92,34 +92,41 @@ export function Home() {
       {/* Banner Section */}
       <div className="px-4 py-2">
         {/* Promotional Banner */}
-        <div className="bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 rounded-xl p-4 mb-3 relative overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
-            alt="Gaming promotional banner" 
-            className="absolute inset-0 w-full h-full object-cover rounded-xl opacity-30" 
-          />
-          <div className="relative z-10">
-            <div className="bg-white text-black px-3 py-1 rounded-md inline-block mb-2">
-              <span className="font-bold text-lg">R$40.000</span>
-              <span className="text-sm ml-1">{t('WITH MY GOD DIAMOND')}</span>
+        <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 rounded-xl p-4 mb-3 relative overflow-hidden h-24">
+          <div className="absolute inset-0 bg-black/20 rounded-xl"></div>
+          <div className="relative z-10 flex items-center justify-between h-full">
+            <div>
+              <div className="bg-white text-black px-3 py-1 rounded-md inline-block">
+                <span className="font-black text-base">R$40.000</span>
+              </div>
+              <div className="text-white text-xs mt-1 font-medium">
+                {t('WITH MY GOD DIAMOND')}
+              </div>
+            </div>
+            <div className="text-white/80">
+              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-yellow-400 rounded-full"></div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Recent Winner Feed */}
         <div className="thunder-card rounded-lg p-3 mb-4">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
               <span className="text-xs font-bold text-white">
                 {winners[currentWinner].avatar}
               </span>
             </div>
             <div className="flex-1">
-              <span className="text-sm font-medium">{winners[currentWinner].name} </span>
-              <span className="text-green-400 text-sm font-bold">{winners[currentWinner].amount}</span>
-            </div>
-            <div className="text-xs text-gray-400">
-              {winners[currentWinner].game}
+              <div className="flex items-center space-x-2">
+                <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
+                <span className="text-green-400 text-sm font-bold">{winners[currentWinner].amount}</span>
+              </div>
+              <div className="text-xs text-gray-400">
+                {winners[currentWinner].game}
+              </div>
             </div>
           </div>
         </div>
@@ -132,7 +139,7 @@ export function Home() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="thunder-card border-gray-700 text-white placeholder-gray-400 pl-10"
+            className="bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400 pl-10 h-12 rounded-xl"
             placeholder={t('Search games by name or provider')}
           />
         </div>
@@ -140,21 +147,21 @@ export function Home() {
 
       {/* Game Categories */}
       <div className="px-4 mb-4">
-        <div className="flex space-x-4 overflow-x-auto pb-2">
+        <div className="flex space-x-2 overflow-x-auto pb-2">
           {categories.map((category) => (
             <Button
               key={category.id}
               variant="outline"
               size="sm"
-              className={`flex items-center space-x-2 whitespace-nowrap transition-colors ${
+              className={`flex flex-col items-center justify-center h-16 min-w-[80px] px-3 whitespace-nowrap transition-colors rounded-xl ${
                 selectedCategory === category.id
-                  ? 'thunder-button-primary border-yellow-500'
-                  : 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+                  ? 'bg-yellow-500 text-black border-yellow-500 font-bold'
+                  : 'bg-gray-800/50 text-gray-300 border-gray-600/50 hover:bg-gray-700/50'
               }`}
               onClick={() => setSelectedCategory(category.id)}
             >
-              <span>{category.icon}</span>
-              <span>{t(category.name)}</span>
+              <span className="text-lg mb-1">{category.icon}</span>
+              <span className="text-xs">{t(category.name)}</span>
             </Button>
           ))}
         </div>
@@ -164,35 +171,35 @@ export function Home() {
       <div className="px-4 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Flame className="w-4 h-4 text-yellow-500" />
-            <span className="font-medium">{filteredGames.length} {t('games')}</span>
+            <Flame className="w-4 h-4 text-orange-500" />
+            <span className="font-medium text-white">{filteredGames.length} {t('games')}</span>
           </div>
-          <button className="text-gray-400 text-sm">{t('Game Lobby →')}</button>
+          <button className="text-purple-400 text-sm font-medium">{t('Game Lobby →')}</button>
         </div>
       </div>
 
       {/* Games Grid */}
       <div className="px-4 pb-8">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {filteredGames.map((game) => (
             <div 
               key={game.id}
-              className="game-card"
+              className="bg-gray-800/40 rounded-xl overflow-hidden relative cursor-pointer transition-all duration-200 hover:scale-105"
               onClick={() => handleGameClick(game)}
             >
               <div className="relative">
                 <img 
                   src={game.imageUrl} 
                   alt={game.name}
-                  className="w-full h-32 object-cover" 
+                  className="w-full h-28 object-cover" 
                 />
-                <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1">
+                <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
                   <Heart className="w-3 h-3 text-white" />
                 </button>
-              </div>
-              <div className="p-3">
-                <h3 className="font-bold text-white text-sm">{game.name}</h3>
-                <p className="text-xs text-gray-400">{game.provider}</p>
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                  <h3 className="font-bold text-white text-sm">{game.name}</h3>
+                  <p className="text-xs text-gray-300">{game.provider}</p>
+                </div>
               </div>
             </div>
           ))}

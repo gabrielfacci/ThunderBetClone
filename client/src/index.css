@@ -60,8 +60,8 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-    background: var(--thunder-gradient);
+    @apply font-sans antialiased text-white;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     min-height: 100vh;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
@@ -73,7 +73,7 @@
   }
   
   .thunder-card {
-    @apply bg-gray-800/60 backdrop-blur-sm border border-gray-700/50;
+    @apply bg-gray-800/40 backdrop-blur-sm border border-gray-600/30 rounded-xl;
   }
   
   .thunder-button-primary {
