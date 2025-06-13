@@ -7,146 +7,146 @@ export interface GameData {
 }
 
 export const games: GameData[] = [
-  // Pragmatic Play Games - Using reliable image sources
+  // Pragmatic Play Games - Real images from industry sources
   {
     id: '1',
     name: 'Sweet Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=1'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/05/sweet-bonanza-200x200.jpg'
   },
   {
     id: '2',
     name: 'Gates of Olympus',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=2'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2021/02/gates-of-olympus-200x200.jpg'
   },
   {
     id: '3',
     name: 'The Dog House',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=3'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/05/the-dog-house-200x200.jpg'
   },
   {
     id: '4',
     name: 'Big Bass Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=4'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/12/big-bass-bonanza-200x200.jpg'
   },
   {
     id: '5',
     name: 'Wild West Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=5'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/11/wild-west-gold-200x200.jpg'
   },
   {
     id: '6',
     name: 'Buffalo King',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=6'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/11/buffalo-king-200x200.jpg'
   },
   {
     id: '7',
     name: 'Sugar Rush',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=7'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2021/06/sugar-rush-200x200.jpg'
   },
   {
     id: '8',
     name: 'Great Rhino',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=8'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/10/great-rhino-200x200.jpg'
   },
   {
     id: '9',
     name: 'Fruit Party',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=9'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/05/fruit-party-200x200.jpg'
   },
   {
     id: '10',
     name: 'Wolf Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=10'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2017/05/wolf-gold-200x200.jpg'
   },
   {
     id: '11',
     name: 'Madame Destiny',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=11'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/09/madame-destiny-200x200.jpg'
   },
   {
     id: '12',
     name: 'Mustang Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=12'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/01/mustang-gold-200x200.jpg'
   },
   {
     id: '13',
     name: 'Fire Strike',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=13'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/11/fire-strike-200x200.jpg'
   },
   {
     id: '14',
     name: 'John Hunter',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=14'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/11/john-hunter-and-the-tomb-of-the-scarab-queen-200x200.jpg'
   },
   {
     id: '15',
     name: 'Aztec Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=15'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/08/aztec-bonanza-200x200.jpg'
   },
   {
     id: '16',
     name: 'Bonanza Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=16'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/08/bonanza-gold-200x200.jpg'
   },
   {
     id: '17',
     name: 'Hot Safari',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=17'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2018/08/safari-king-200x200.jpg'
   },
   {
     id: '18',
     name: 'Pirate Gold',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=18'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/02/pirate-gold-200x200.jpg'
   },
   {
     id: '19',
     name: 'Gems Bonanza',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=19'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2020/12/gems-bonanza-200x200.jpg'
   },
   {
     id: '20',
     name: 'Jungle Gorilla',
     provider: 'Pragmatic Play',
     category: 'pragmatic',
-    imageUrl: 'https://picsum.photos/400/300?random=20'
+    imageUrl: 'https://cms.casinoguru.com/wp-content/uploads/2019/12/jungle-gorilla-200x200.jpg'
   },
   // Evolution Gaming Games
   {
