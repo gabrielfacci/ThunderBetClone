@@ -135,18 +135,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, []);
 
-  const signUp = async (phone: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      // Usar phone como email (formato necessário para Supabase)
-      const cleanPhone = phone.replace(/\D/g, '');
-      const email = `${cleanPhone}@thunderbet.temp`;
-
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            phone,
             full_name: fullName
           }
         }
@@ -161,12 +156,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const signIn = async (phone: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     try {
-      // Usar phone como email
-      const cleanPhone = phone.replace(/\D/g, '');
-      const email = `${cleanPhone}@thunderbet.temp`;
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
