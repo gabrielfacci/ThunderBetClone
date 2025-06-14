@@ -116,56 +116,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      const cleanEmail = email.trim().toLowerCase();
-      console.log('Iniciando cadastro para:', cleanEmail);
-      
-      // Validação do formato do email
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(cleanEmail)) {
-        throw new Error('Formato de email inválido');
+      if (!email || !password) {
+        throw new Error('Email e senha são obrigatórios');
       }
-      
-      // Converter email para domínio aceito pelo Supabase se necessário
-      let supabaseEmail = cleanEmail;
-      
-      // Lista de domínios que o Supabase pode rejeitar
-      const problematicDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com'];
-      const emailDomain = cleanEmail.split('@')[1];
-      
-      if (problematicDomains.includes(emailDomain)) {
-        // Usar um domínio alternativo que funciona
-        const username = cleanEmail.split('@')[0];
-        supabaseEmail = `${username}@thunderbet.app`;
-      }
-      
-      console.log('Email para Supabase:', supabaseEmail);
-      
+
       const { data, error } = await supabase.auth.signUp({
-        email: supabaseEmail,
+        email: email,
         password: password,
         options: {
           data: {
-            full_name: fullName.trim(),
-            original_email: cleanEmail // Guardar email original nos metadados
+            full_name: fullName.trim()
           }
         }
       });
 
       if (error) {
-        console.error('Erro do Supabase:', error);
+        console.error('Erro Supabase:', error.message);
         throw error;
       }
 
-      console.log('Cadastro bem-sucedido:', data);
+      console.log('Cadastro realizado com sucesso:', data);
       
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
       
       let message = 'Erro ao criar conta';
       
-      if (error.code === 'email_address_invalid') {
-        message = 'Email inválido. Tente com um email diferente.';
-      } else if (error.code === 'weak_password') {
+      if (error.code === 'weak_password') {
         message = 'Senha muito fraca. Use pelo menos 6 caracteres';
       } else if (error.code === 'email_address_already_in_use') {
         message = 'Este email já está cadastrado';
@@ -179,24 +156,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const cleanEmail = email.trim().toLowerCase();
-      
-      // Aplicar a mesma conversão de domínio do cadastro
-      let supabaseEmail = cleanEmail;
-      const problematicDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com'];
-      const emailDomain = cleanEmail.split('@')[1];
-      
-      if (problematicDomains.includes(emailDomain)) {
-        const username = cleanEmail.split('@')[0];
-        supabaseEmail = `${username}@thunderbet.app`;
+      if (!email || !password) {
+        throw new Error('Email e senha são obrigatórios');
       }
-      
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: supabaseEmail,
-        password
+        email: email,
+        password: password
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro Supabase:', error.message);
+        throw error;
+      }
       
     } catch (error: any) {
       console.error('Erro no login:', error);
