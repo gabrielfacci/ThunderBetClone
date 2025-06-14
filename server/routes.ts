@@ -47,11 +47,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newUser = await storage.createUser({
         username: 'testuser',
+        email: 'testuser@thunderbet.com',
         password: 'test123',
         fullName: fullName || 'João Silva',
         phone: phone || '(11) 99999-9999',
         accountMode: accountMode || 'national',
-        balance: balance || 1000
+        balance: balance?.toString() || '1000.00'
       });
       
       res.json(newUser);

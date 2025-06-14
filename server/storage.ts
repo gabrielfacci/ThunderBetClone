@@ -1,16 +1,74 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { 
+  users, 
+  games,
+  transactions,
+  gameSessions,
+  bonuses,
+  userPreferences,
+  auditLogs,
+  type User, 
+  type InsertUser,
+  type Game,
+  type InsertGame,
+  type Transaction,
+  type InsertTransaction,
+  type GameSession,
+  type InsertGameSession,
+  type Bonus,
+  type InsertBonus,
+  type UserPreferences,
+  type InsertUserPreferences,
+  type AuditLog,
+  type InsertAuditLog
+} from "@shared/schema";
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 // modify the interface with any CRUD methods
 // you might need
 
 export interface IStorage {
+  // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
+  
+  // Game operations
+  getGame(id: number): Promise<Game | undefined>;
+  getGameByGameId(gameId: string): Promise<Game | undefined>;
+  getAllGames(): Promise<Game[]>;
+  getGamesByCategory(category: string): Promise<Game[]>;
+  createGame(game: InsertGame): Promise<Game>;
+  updateGame(id: number, updates: Partial<InsertGame>): Promise<Game | undefined>;
+  
+  // Transaction operations
+  getTransaction(id: number): Promise<Transaction | undefined>;
+  getUserTransactions(userId: number): Promise<Transaction[]>;
+  createTransaction(transaction: InsertTransaction): Promise<Transaction>;
+  updateTransaction(id: number, updates: Partial<InsertTransaction>): Promise<Transaction | undefined>;
+  
+  // Game session operations
+  getGameSession(id: number): Promise<GameSession | undefined>;
+  getUserGameSessions(userId: number): Promise<GameSession[]>;
+  createGameSession(session: InsertGameSession): Promise<GameSession>;
+  updateGameSession(id: number, updates: Partial<InsertGameSession>): Promise<GameSession | undefined>;
+  
+  // Bonus operations
+  getUserBonuses(userId: number): Promise<Bonus[]>;
+  createBonus(bonus: InsertBonus): Promise<Bonus>;
+  updateBonus(id: number, updates: Partial<InsertBonus>): Promise<Bonus | undefined>;
+  
+  // User preferences
+  getUserPreferences(userId: number): Promise<UserPreferences | undefined>;
+  createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
+  updateUserPreferences(userId: number, updates: Partial<InsertUserPreferences>): Promise<UserPreferences | undefined>;
+  
+  // Audit logs
+  createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
+  getUserAuditLogs(userId: number): Promise<AuditLog[]>;
 }
 
 export class MemStorage implements IStorage {
