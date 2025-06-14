@@ -1,29 +1,24 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase, authHelpers, UserProfile } from '@/lib/supabase';
-import { getUserProfile, createUserProfile, updateUserBalance } from '@/lib/supabaseQueries';
+import { supabase } from '@/lib/supabase';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
-type AccountMode = 'national' | 'international';
-type Language = 'pt' | 'en';
-
-interface User {
+interface UserProfile {
   id: string;
-  fullName: string;
   phone: string;
-  accountMode: AccountMode;
+  full_name: string;
   balance: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: UserProfile | null;
   supabaseUser: SupabaseUser | null;
-  language: Language;
   isLoading: boolean;
   signUp: (phone: string, password: string, fullName: string) => Promise<void>;
   signIn: (phone: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  updateBalance: (balance: number) => Promise<void>;
-  refreshUser: () => Promise<void>;
+  signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,20 +28,66 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const language: Language = user?.accountMode === 'national' ? 'pt' : 'en';
+  // Carregar perfil do usuário do Supabase
+  async function loadUserProfile(authUser: SupabaseUser) {
+    try {
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', authUser.id)
+        .single();
 
-  // Initialize auth state on mount
+      if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao carregar perfil:', error);
+        return;
+      }
+
+      if (profile) {
+        setUser(profile);
+      } else {
+        // Criar perfil se não existir
+        const phoneFromMetadata = authUser.user_metadata?.phone || authUser.phone || '';
+        const nameFromMetadata = authUser.user_metadata?.full_name || 'Usuário';
+        
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: authUser.id,
+            phone: phoneFromMetadata,
+            full_name: nameFromMetadata,
+            balance: 0
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Erro ao criar perfil:', createError);
+        } else if (newProfile) {
+          setUser(newProfile);
+        }
+      }
+    } catch (error) {
+      console.error('Erro inesperado ao carregar perfil:', error);
+    }
+  }
+
+  // Inicializar autenticação
   useEffect(() => {
     let mounted = true;
 
-    async function getInitialSession() {
+    async function initializeAuth() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        // Verificar sessão atual
+        const { data: { session }, error } = await supabase.auth.getSession();
         
+        if (error) {
+          console.error('Erro ao verificar sessão:', error);
+        }
+
         if (mounted) {
           if (session?.user) {
             setSupabaseUser(session.user);
@@ -58,7 +99,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setIsLoading(false);
         }
       } catch (error) {
-        console.error('Error getting initial session:', error);
+        console.error('Erro ao inicializar auth:', error);
         if (mounted) {
           setIsLoading(false);
           setUser(null);
@@ -67,20 +108,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     }
 
-    getInitialSession();
+    initializeAuth();
 
-    // Listen for auth changes
+    // Escutar mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
+        
         if (mounted) {
-          setSupabaseUser(session?.user ?? null);
-          
           if (session?.user) {
+            setSupabaseUser(session.user);
             await loadUserProfile(session.user);
           } else {
             setUser(null);
+            setSupabaseUser(null);
           }
-          
           setIsLoading(false);
         }
       }
@@ -92,94 +134,84 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, []);
 
-  async function loadUserProfile(supabaseUser: SupabaseUser) {
-    try {
-      let profile = await getUserProfile(supabaseUser.id);
-      
-      // If profile doesn't exist, create it from auth metadata
-      if (!profile) {
-        const metadata = supabaseUser.user_metadata;
-        profile = await createUserProfile({
-          id: supabaseUser.id,
-          phone: metadata.phone || '',
-          full_name: metadata.full_name || 'User',
-          account_mode: 'national'
-        });
-      }
-
-      if (profile) {
-        setUser({
-          id: profile.id,
-          fullName: profile.full_name,
-          phone: profile.phone,
-          accountMode: profile.account_mode,
-          balance: profile.balance
-        });
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-    }
-  }
-
   const signUp = async (phone: string, password: string, fullName: string) => {
     try {
-      await authHelpers.signUpWithPhone(phone, password, fullName);
-      // The onAuthStateChange will handle the rest
+      // Usar phone como email (formato necessário para Supabase)
+      const cleanPhone = phone.replace(/\D/g, '');
+      const email = `${cleanPhone}@thunderbet.temp`;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            phone,
+            full_name: fullName
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      // Não precisa fazer mais nada - onAuthStateChange vai lidar com o resto
     } catch (error: any) {
+      console.error('Erro no cadastro:', error);
       throw new Error(error.message || 'Erro ao criar conta');
     }
   };
 
   const signIn = async (phone: string, password: string) => {
     try {
-      await authHelpers.signInWithPhone(phone, password);
-      // The onAuthStateChange will handle the rest
+      // Usar phone como email
+      const cleanPhone = phone.replace(/\D/g, '');
+      const email = `${cleanPhone}@thunderbet.temp`;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      
+      // Não precisa fazer mais nada - onAuthStateChange vai lidar com o resto
     } catch (error: any) {
+      console.error('Erro no login:', error);
       throw new Error(error.message || 'Erro ao fazer login');
     }
   };
 
-  const logout = async () => {
+  const signOut = async () => {
     try {
-      await authHelpers.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Limpar estado local
       setUser(null);
       setSupabaseUser(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
+    } catch (error: any) {
+      console.error('Erro no logout:', error);
+      throw new Error(error.message || 'Erro ao sair');
     }
   };
 
-  const updateBalance = async (newBalance: number) => {
-    if (!user) return;
-    
-    try {
-      const success = await updateUserBalance(user.id, newBalance);
-      if (success) {
-        setUser(prev => prev ? { ...prev, balance: newBalance } : null);
-      }
-    } catch (error) {
-      console.error('Error updating balance:', error);
-    }
-  };
-
-  const refreshUser = async () => {
+  const refreshProfile = async () => {
     if (supabaseUser) {
       await loadUserProfile(supabaseUser);
     }
   };
 
+  const value: AuthContextType = {
+    user,
+    supabaseUser,
+    isLoading,
+    signUp,
+    signIn,
+    signOut,
+    refreshProfile
+  };
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      supabaseUser,
-      language,
-      isLoading,
-      signUp,
-      signIn,
-      logout,
-      updateBalance,
-      refreshUser
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
@@ -188,7 +220,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
 }

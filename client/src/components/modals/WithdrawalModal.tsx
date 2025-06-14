@@ -16,7 +16,7 @@ interface WithdrawalModalProps {
 
 export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
   const { t } = useTranslation();
-  const { user, updateBalance } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'withdrawal' | 'history'>('withdrawal');
   const [amount, setAmount] = useState('');

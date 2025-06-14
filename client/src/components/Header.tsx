@@ -3,15 +3,20 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginModal } from '@/components/modals/LoginModal';
 import { RegisterModal } from '@/components/modals/RegisterModal';
-import { LogOut } from 'lucide-react';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Header() {
-  const { user, logout, isLoading } = useAuth();
+  const { user, isLoading, signOut } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-  console.log('Header - user:', user, 'isLoading:', isLoading);
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   return (
     <>
@@ -25,9 +30,31 @@ export function Header() {
             </span>
           </div>
 
-          {/* Auth Buttons or User Info */}
+          {/* Botões de Auth ou Dados do Usuário */}
           <div className="flex items-center space-x-2">
-            {!user && !isLoading && (
+            {isLoading ? (
+              // Mostrar loading enquanto verifica sessão
+              <div className="h-8 w-32 bg-gray-700/50 rounded animate-pulse"></div>
+            ) : user ? (
+              // Usuário logado - mostrar saldo e logout
+              <div className="flex items-center space-x-3">
+                <div className="text-right">
+                  <p className="text-white text-sm font-medium">{user.full_name}</p>
+                  <p className="text-green-400 text-xs">
+                    R$ {user.balance.toFixed(2).replace('.', ',')}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-transparent border-gray-600 text-white hover:bg-gray-700/50 h-8 px-3 text-xs"
+                  onClick={handleLogout}
+                >
+                  Sair
+                </Button>
+              </div>
+            ) : (
+              // Usuário não logado - mostrar botões de login/cadastro
               <>
                 <Button
                   variant="outline"
@@ -46,30 +73,11 @@ export function Header() {
                 </Button>
               </>
             )}
-            
-            {user && (
-              <div className="flex items-center space-x-3">
-                <div className="text-right">
-                  <p className="text-white text-sm font-medium">{user.fullName}</p>
-                  <p className="text-green-400 text-xs">
-                    R$ {user.balance.toFixed(2).replace('.', ',')}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-transparent border-gray-600 text-white hover:bg-gray-700/50 h-8 px-3 text-xs"
-                  onClick={logout}
-                >
-                  Sair
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </header>
 
-      {/* Modals */}
+      {/* Modais */}
       <LoginModal 
         isOpen={showLoginModal} 
         onClose={() => setShowLoginModal(false)}

@@ -15,7 +15,7 @@ interface DepositModalProps {
 
 export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const { t } = useTranslation();
-  const { user, updateBalance } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'pix' | 'history'>('pix');
   const [amount, setAmount] = useState('');
@@ -68,7 +68,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
       if (response.ok) {
         const transaction = await response.json();
-        await updateBalance(parseFloat(transaction.balanceAfter));
+        await refreshProfile();
         
         toast({
           title: "Depósito realizado!",
