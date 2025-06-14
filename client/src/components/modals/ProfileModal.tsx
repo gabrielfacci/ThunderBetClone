@@ -29,6 +29,10 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 via-purple-900/20 to-blue-900/20 border border-purple-500/30 backdrop-blur-xl rounded-lg relative">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Meu Perfil</DialogTitle>
+          <DialogDescription>Gerencie suas informações pessoais</DialogDescription>
+        </DialogHeader>
         <div className="flex flex-col space-y-1.5 text-center sm:text-left relative p-0">
           <button 
             className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 w-10 absolute right-0 top-0 text-gray-400 hover:text-white hover:bg-gray-800/50 z-10"
