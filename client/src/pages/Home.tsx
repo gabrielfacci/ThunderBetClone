@@ -3,7 +3,7 @@ import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, W
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/MockAuthContext';
 import { games, winners, categories, GameData, WinnerData } from '@/lib/gameData';
 import { GameLoadingModal } from '@/components/modals/GameLoadingModal';
 import { InsufficientBalanceModal } from '@/components/modals/InsufficientBalanceModal';

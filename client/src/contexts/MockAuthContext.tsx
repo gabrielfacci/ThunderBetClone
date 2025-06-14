@@ -7,6 +7,8 @@ interface SimpleUser {
     full_name?: string;
   };
   created_at?: string;
+  full_name?: string;
+  balance?: number;
 }
 
 interface AuthContextType {
@@ -15,6 +17,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -81,7 +84,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       id: userId,
       email,
       user_metadata: { full_name: fullName },
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      full_name: fullName,
+      balance: 1000.00 // Starting balance for demo
     };
 
     setUser(newUser);
@@ -107,7 +112,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       id: storedUser.id,
       email: storedUser.email,
       user_metadata: { full_name: storedUser.fullName },
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      full_name: storedUser.fullName,
+      balance: 1000.00 // Default balance for demo
     };
 
     setUser(authUser);
@@ -122,12 +129,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     console.log('Logout realizado');
   };
 
+  const refreshProfile = async () => {
+    // Mock implementation - in real app would refetch user data
+    console.log('Refreshing profile...');
+    if (user) {
+      const updatedUser = { ...user };
+      setUser(updatedUser);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
     signUp,
     signIn,
-    signOut
+    signOut,
+    refreshProfile
   };
 
   return (
