@@ -314,9 +314,7 @@ export function Home() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <span className="text-white font-medium text-[12px] ml-[0px] mr-[0px]">{winners[currentWinner].name}</span>
-                      <span className={`text-sm font-bold ${
-                        isHighValue ? 'text-yellow-300' : 'text-green-300'
-                      }`}>{winners[currentWinner].amount}</span>
+                      <span className="font-bold text-green-300 text-[12px]">{winners[currentWinner].amount}</span>
                     </div>
                     <div className="text-xs text-gray-300">
                       {winners[currentWinner].game}
