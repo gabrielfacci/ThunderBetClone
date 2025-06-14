@@ -316,11 +316,11 @@ export function Home() {
                       <span className="text-white font-medium text-[12px] ml-[0px] mr-[0px]">{winners[currentWinner].name}</span>
                       <span className="font-bold text-green-300 text-[12px]">{winners[currentWinner].amount}</span>
                     </div>
-                    <div className="text-xs text-gray-300">
-                      {winners[currentWinner].game}
+                    <div className="text-xs text-gray-300 font-normal">
+                      {winners[currentWinner].game === 'Lucky Wheel' ? 'Golden Temple' : winners[currentWinner].game}
                     </div>
                   </div>
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-red-500 rounded-full ml-[0px] mr-[0px]"></div>
                 </div>
               </div>
             );
