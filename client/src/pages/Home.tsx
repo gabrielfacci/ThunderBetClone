@@ -44,14 +44,14 @@ export function Home() {
   // Função para obter ícones relacionados a apostas/jogos/dinheiro
   const getWinnerIcon = (index: number) => {
     const icons = [
-      <DollarSign className="w-4 h-4 text-white" />,
-      <Trophy className="w-4 h-4 text-white" />,
-      <Coins className="w-4 h-4 text-white" />,
-      <Diamond className="w-4 h-4 text-white" />,
-      <Dice6 className="w-4 h-4 text-white" />,
-      <TrendingUp className="w-4 h-4 text-white" />,
-      <Star className="w-4 h-4 text-white" />,
-      <Flame className="w-4 h-4 text-white" />
+      <DollarSign className="h-3.5 w-3.5 text-green-400" />,
+      <Trophy className="h-3.5 w-3.5 text-green-400" />,
+      <Coins className="h-3.5 w-3.5 text-green-400" />,
+      <Diamond className="h-3.5 w-3.5 text-green-400" />,
+      <Dice6 className="h-3.5 w-3.5 text-green-400" />,
+      <TrendingUp className="h-3.5 w-3.5 text-green-400" />,
+      <Star className="h-3.5 w-3.5 text-green-400" />,
+      <Flame className="h-3.5 w-3.5 text-green-400" />
     ];
     return icons[index % icons.length];
   };
@@ -321,7 +321,7 @@ export function Home() {
                   </div>
                 )}
                 <div className="relative flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="flex-shrink-0 w-7 h-7 bg-black/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-2 ring-white/20">
                     {getWinnerIcon(currentWinner)}
                   </div>
                   <div className="flex-1">
