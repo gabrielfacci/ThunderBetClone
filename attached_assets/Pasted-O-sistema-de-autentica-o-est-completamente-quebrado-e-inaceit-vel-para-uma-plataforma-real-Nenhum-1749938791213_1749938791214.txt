@@ -1,0 +1,75 @@
+O sistema de autenticação está completamente quebrado e inaceitável para uma plataforma real. Nenhum usuário está conseguindo se cadastrar ou logar corretamente. Veja o log atual:
+
+- Cadastro com "teste@gmail.com" retorna: `email_address_invalid`
+- Login com qualquer usuário retorna: `invalid_credentials`
+- Após login ou cadastro, o estado `user` permanece como `null`
+- O header continua exibindo interface de visitante mesmo após login
+- O Supabase retorna `INITIAL_SESSION: null`, ou seja, nenhuma sessão é criada
+- A interface está usando valores inválidos ou hardcoded em vez de capturar os dados reais do usuário
+
+---
+
+### 🧱 Diagnóstico do problema:
+
+1. O input de e-mail está sendo corrompido ou sobrescrito com valores fixos como `"teste@thunderbet.app"`, causando erro de `email_address_invalid`.
+2. O login está sendo feito com credenciais que **nunca foram cadastradas**.
+3. O `AuthContext` está mal estruturado ou incompleto e **não mantém a sessão persistente**.
+4. O header depende de um estado `user` que **nunca é atualizado corretamente**.
+5. A interface está tentando renderizar componentes protegidos mesmo sem autenticação real.
+
+---
+
+## ✅ INSTRUÇÕES PARA REFAZER A AUTENTICAÇÃO 100% DO ZERO
+
+Apague toda a lógica de autenticação atual e implemente este fluxo REAL, SEGURO e FUNCIONAL:
+
+### 📁 Crie `src/contexts/AuthContext.tsx` com o seguinte conteúdo:
+
+```tsx
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user || null);
+      setIsLoading(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => listener?.subscription?.unsubscribe();
+  }, []);
+
+  const signUp = async (email, password) => {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    return data;
+  };
+
+  const signIn = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, isLoading, signUp, signIn, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

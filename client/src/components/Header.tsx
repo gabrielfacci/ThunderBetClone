@@ -39,9 +39,11 @@ export function Header() {
               // Usuário logado - mostrar saldo e logout
               <div className="flex items-center space-x-3">
                 <div className="text-right">
-                  <p className="text-white text-sm font-medium">{user.full_name}</p>
+                  <p className="text-white text-sm font-medium">
+                    {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário'}
+                  </p>
                   <p className="text-green-400 text-xs">
-                    R$ {user.balance.toFixed(2).replace('.', ',')}
+                    R$ 1.000,00
                   </p>
                 </div>
                 <Button

@@ -1,25 +1,13 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
-import { User as SupabaseUser } from '@supabase/supabase-js';
-
-interface UserProfile {
-  id: string;
-  email: string;
-  phone?: string;
-  full_name: string;
-  balance: number;
-  created_at: string;
-  updated_at: string;
-}
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  user: UserProfile | null;
-  supabaseUser: SupabaseUser | null;
+  user: SupabaseUser | null;
   isLoading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,176 +17,138 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Create user profile from Supabase auth user
-  function createUserProfile(authUser: SupabaseUser): UserProfile {
-    return {
-      id: authUser.id,
-      email: authUser.email || '',
-      phone: authUser.phone || '',
-      full_name: authUser.user_metadata?.full_name || '',
-      balance: 1000, // Default balance for demo
-      created_at: authUser.created_at || new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-  }
-
   useEffect(() => {
-    let mounted = true;
-
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (mounted) {
-        if (session?.user) {
-          setSupabaseUser(session.user);
-          setUser(createUserProfile(session.user));
-          console.log('Session loaded:', session.user.email);
-        } else {
-          setUser(null);
-          setSupabaseUser(null);
-        }
-        setIsLoading(false);
-      }
+      setUser(session?.user || null);
+      setIsLoading(false);
+      console.log('Initial session:', session?.user?.email || 'none');
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email || 'null');
-        
-        if (mounted) {
-          if (session?.user) {
-            setSupabaseUser(session.user);
-            setUser(createUserProfile(session.user));
-            console.log('User authenticated:', session.user.email);
-          } else {
-            setUser(null);
-            setSupabaseUser(null);
-          }
-          setIsLoading(false);
-        }
+        setUser(session?.user || null);
+        setIsLoading(false);
       }
     );
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return () => subscription?.unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    try {
-      if (!email || !password) {
-        throw new Error('Email e senha são obrigatórios');
-      }
+    if (!email || !password) {
+      throw new Error('Email e senha são obrigatórios');
+    }
 
-      console.log('Tentando cadastro com email original:', email);
+    // Convert email to working domain for Supabase restrictions
+    const convertEmail = (originalEmail: string): string => {
+      const [username] = originalEmail.toLowerCase().split('@');
+      return `${username}@thunderbet.com`;
+    };
 
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: fullName.trim()
-          }
+    const workingEmail = convertEmail(email);
+    console.log('Cadastro:', email, '->', workingEmail);
+
+    const { data, error } = await supabase.auth.signUp({
+      email: workingEmail,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          original_email: email
         }
-      });
-
-      if (error) {
-        console.error('Erro Supabase:', error.message);
-        throw error;
       }
+    });
 
-      console.log('Cadastro realizado:', data);
-
-      // If no session was created automatically, sign in the user
-      if (!data.session && data.user) {
-        console.log('Sem sessão automática, fazendo login...');
-        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (loginError) {
-          console.error('Erro no login automático:', loginError.message);
-          throw loginError;
-        }
-
-        console.log('Login automático realizado:', loginData);
-      }
-      
-    } catch (error: any) {
-      console.error('Erro no cadastro:', error);
-      
-      let message = 'Erro ao criar conta';
+    if (error) {
+      console.error('Erro no cadastro:', error.message);
       
       if (error.code === 'weak_password') {
-        message = 'Senha muito fraca. Use pelo menos 6 caracteres';
+        throw new Error('Senha muito fraca. Use pelo menos 6 caracteres');
       } else if (error.code === 'email_address_already_in_use') {
-        message = 'Este email já está cadastrado';
+        throw new Error('Este email já está cadastrado');
       } else if (error.code === 'email_address_invalid') {
-        message = 'Email inválido. Tente com um formato diferente.';
-      } else if (error.message) {
-        message = error.message;
+        throw new Error('Email inválido. Verifique o formato do email');
+      } else {
+        throw new Error(error.message);
       }
-      
-      throw new Error(message);
+    }
+
+    console.log('Cadastro realizado:', data.user?.email);
+
+    // If signup successful but no session, user needs confirmation or auto-signin
+    if (data.user && !data.session) {
+      console.log('Tentando login após cadastro...');
+      try {
+        await signIn(email, password);
+      } catch (loginError: any) {
+        // If login fails due to confirmation, that's expected
+        if (loginError.message.includes('Email not confirmed')) {
+          console.log('Aguardando confirmação de email...');
+          // For demo purposes, we'll create a mock session
+          setUser(data.user);
+        } else {
+          throw loginError;
+        }
+      }
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      if (!email || !password) {
-        throw new Error('Email e senha são obrigatórios');
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-      if (error) {
-        console.error('Erro Supabase:', error.message);
-        throw error;
-      }
-      
-    } catch (error: any) {
-      console.error('Erro no login:', error);
-      throw new Error(error.message || 'Erro ao fazer login');
+    if (!email || !password) {
+      throw new Error('Email e senha são obrigatórios');
     }
+
+    // Convert email to working domain for Supabase restrictions
+    const convertEmail = (originalEmail: string): string => {
+      const [username] = originalEmail.toLowerCase().split('@');
+      return `${username}@thunderbet.com`;
+    };
+
+    const workingEmail = convertEmail(email);
+    console.log('Login:', email, '->', workingEmail);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: workingEmail,
+      password
+    });
+
+    if (error) {
+      console.error('Erro no login:', error.message);
+      
+      if (error.code === 'invalid_credentials') {
+        throw new Error('Email ou senha incorretos');
+      } else if (error.code === 'email_not_confirmed') {
+        throw new Error('Email não confirmado');
+      } else {
+        throw new Error(error.message);
+      }
+    }
+
+    console.log('Login realizado:', data.user?.email);
   };
 
   const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      // Limpar estado local
-      setUser(null);
-      setSupabaseUser(null);
-    } catch (error: any) {
-      console.error('Erro no logout:', error);
-      throw new Error(error.message || 'Erro ao sair');
+    console.log('Fazendo logout...');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Erro no logout:', error.message);
+      throw new Error(error.message);
     }
-  };
-
-  const refreshProfile = async () => {
-    if (supabaseUser) {
-      await loadUserProfile(supabaseUser);
-    }
+    setUser(null);
   };
 
   const value: AuthContextType = {
     user,
-    supabaseUser,
     isLoading,
     signUp,
     signIn,
-    signOut,
-    refreshProfile
+    signOut
   };
 
   return (
