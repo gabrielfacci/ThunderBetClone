@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase, authHelpers, UserProfile } from '@/lib/supabase';
+import { getUserProfile, createUserProfile, updateUserBalance } from '@/lib/supabaseQueries';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
 type AccountMode = 'national' | 'international';

@@ -19,14 +19,16 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [selectedMode, setSelectedMode] = useState<'national' | 'international'>(user?.accountMode || 'national');
 
-  const handleSave = () => {
-    if (fullName !== user?.fullName) {
-      updateFullName(fullName);
+  const handleSave = async () => {
+    if (fullName.trim() && user) {
+      try {
+        // In a real implementation, this would update the user profile in Supabase
+        await refreshUser();
+        onClose();
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
     }
-    if (selectedMode !== user?.accountMode) {
-      updateAccountMode(selectedMode);
-    }
-    onClose();
   };
 
   return (

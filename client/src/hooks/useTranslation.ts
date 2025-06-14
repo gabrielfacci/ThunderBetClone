@@ -5,7 +5,7 @@ export function useTranslation() {
   const { language } = useAuth();
 
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    return (translations[language] as any)[key] || key;
   };
 
   return { t, language };
