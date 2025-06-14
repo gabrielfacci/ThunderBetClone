@@ -35,8 +35,8 @@ export function BottomNavigation() {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="px-2 sm:px-4 max-w-md mx-auto pt-1 pb-1 sm:pt-[6px] sm:pb-[6px]">
-          <div className="grid grid-cols-5 h-16 sm:h-20">
+        <div className="px-2 sm:px-4 max-w-md mx-auto py-2 sm:py-3">
+          <div className="grid grid-cols-5 h-20 sm:h-24">
           <button 
             className="flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 transition-colors text-gray-400 hover:text-gray-300 touch-manipulation active:scale-95 py-2"
             onClick={() => openModal('deposit')}
