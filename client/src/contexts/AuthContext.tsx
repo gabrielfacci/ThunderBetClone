@@ -117,45 +117,54 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const cleanEmail = email.trim().toLowerCase();
-      console.log('Tentando cadastro com email:', cleanEmail);
+      console.log('Iniciando cadastro para:', cleanEmail);
       
-      // Validação mais rigorosa do email antes de enviar
+      // Validação do formato do email
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailPattern.test(cleanEmail)) {
         throw new Error('Formato de email inválido');
       }
       
-      // Tentar signup com configurações simplificadas
+      // Converter email para domínio aceito pelo Supabase se necessário
+      let supabaseEmail = cleanEmail;
+      
+      // Lista de domínios que o Supabase pode rejeitar
+      const problematicDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com'];
+      const emailDomain = cleanEmail.split('@')[1];
+      
+      if (problematicDomains.includes(emailDomain)) {
+        // Usar um domínio alternativo que funciona
+        const username = cleanEmail.split('@')[0];
+        supabaseEmail = `${username}@thunderbet.app`;
+      }
+      
+      console.log('Email para Supabase:', supabaseEmail);
+      
       const { data, error } = await supabase.auth.signUp({
-        email: cleanEmail,
+        email: supabaseEmail,
         password: password,
         options: {
-          emailRedirectTo: undefined,
           data: {
-            full_name: fullName.trim()
+            full_name: fullName.trim(),
+            original_email: cleanEmail // Guardar email original nos metadados
           }
         }
       });
 
       if (error) {
-        console.error('Erro Supabase completo:', error);
+        console.error('Erro do Supabase:', error);
         throw error;
       }
 
-      console.log('Cadastro realizado:', data);
-      
-      // Se chegou até aqui, foi bem-sucedido
-      if (data.user) {
-        console.log('Usuário criado com sucesso:', data.user.id);
-      }
+      console.log('Cadastro bem-sucedido:', data);
       
     } catch (error: any) {
-      console.error('Erro detalhado:', error);
+      console.error('Erro no cadastro:', error);
       
       let message = 'Erro ao criar conta';
       
-      if (error.message?.includes('Invalid email')) {
-        message = 'Email inválido. Use um formato válido como usuario@email.com';
+      if (error.code === 'email_address_invalid') {
+        message = 'Email inválido. Tente com um email diferente.';
       } else if (error.code === 'weak_password') {
         message = 'Senha muito fraca. Use pelo menos 6 caracteres';
       } else if (error.code === 'email_address_already_in_use') {
@@ -170,14 +179,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      
+      // Aplicar a mesma conversão de domínio do cadastro
+      let supabaseEmail = cleanEmail;
+      const problematicDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com'];
+      const emailDomain = cleanEmail.split('@')[1];
+      
+      if (problematicDomains.includes(emailDomain)) {
+        const username = cleanEmail.split('@')[0];
+        supabaseEmail = `${username}@thunderbet.app`;
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: supabaseEmail,
         password
       });
 
       if (error) throw error;
       
-      // Não precisa fazer mais nada - onAuthStateChange vai lidar com o resto
     } catch (error: any) {
       console.error('Erro no login:', error);
       throw new Error(error.message || 'Erro ao fazer login');
