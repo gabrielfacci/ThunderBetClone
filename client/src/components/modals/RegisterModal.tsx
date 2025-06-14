@@ -122,8 +122,8 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="p-0 border-0 bg-transparent max-w-sm sm:max-w-md w-full">
-        <div className="relative w-full bg-gradient-to-br from-slate-900/98 via-purple-900/95 to-blue-900/98 border border-purple-500/30 backdrop-blur-2xl shadow-2xl rounded-lg mx-2 max-h-[90vh] overflow-hidden">
+      <DialogContent className="fixed left-[50%] top-[50%] z-50 grid translate-x-[-50%] translate-y-[-50%] gap-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg p-0 border-0 bg-transparent max-w-sm sm:max-w-md w-full pl-[20px] pr-[20px]">
+        <div className="relative w-full bg-gradient-to-br from-slate-900/98 via-purple-900/95 to-blue-900/98 border border-purple-500/30 backdrop-blur-2xl shadow-2xl rounded-lg max-h-[90vh] overflow-hidden">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-blue-600/5 to-cyan-600/10 rounded-lg"></div>
           <div className="absolute -top-16 -left-16 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl"></div>
@@ -142,17 +142,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
           <div className="relative z-10 p-4">
             {/* Compact Header */}
             <div className="text-center space-y-3 mb-4">
-              {/* Logo compacto */}
-              <div className="flex justify-center">
-                <div className="relative w-12 h-12 sm:w-16 sm:h-16">
-                  <img 
-                    alt="ThunderBet" 
-                    src={thunderbetLogo}
-                    className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]"
-                  />
-                  <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-yellow-400 animate-pulse" />
-                </div>
-              </div>
+              
 
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
