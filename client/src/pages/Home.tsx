@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
 import { games, winners, categories, GameData, WinnerData } from '@/lib/gameData';
 import { GameLoadingModal } from '@/components/modals/GameLoadingModal';
 import { InsufficientBalanceModal } from '@/components/modals/InsufficientBalanceModal';
 import { DepositModal } from '@/components/modals/DepositModal';
+import { LoginModal } from '@/components/modals/LoginModal';
+import { RegisterModal } from '@/components/modals/RegisterModal';
 import banner1 from '@assets/banner1_1749828043247.png';
 import banner2 from '@assets/banner2_1749828043246.png';
 import banner3 from '@assets/csev1741231448021443_1749828043248.webp';
@@ -14,7 +17,7 @@ import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Home() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, signOut, refreshProfile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -22,10 +25,21 @@ export function Home() {
   const [showGameLoading, setShowGameLoading] = useState(false);
   const [showInsufficientBalance, setShowInsufficientBalance] = useState(false);
   const [showDepositFromGame, setShowDepositFromGame] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const gamesPerPage = 12;
+
+  // Função de logout
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
   
   // Drag/swipe functionality for categories
   const categoriesRef = useRef<HTMLDivElement>(null);
@@ -192,18 +206,48 @@ export function Home() {
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-800/60 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
-                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
-                <span className="text-green-400 font-medium text-xs sm:text-sm">
-                  {formatBalance(user?.balance || 0)}
-                </span>
-                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors touch-manipulation active:scale-95 h-5 w-5 sm:h-6 sm:w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10">
-                  <RefreshCw className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                </button>
-              </div>
-              <button className="p-1.5 sm:p-2 hover:bg-white/10 rounded-lg transition-colors touch-manipulation active:scale-95">
-                <Share className="w-3 h-3 sm:w-4 sm:h-4 text-gray-300" />
-              </button>
+              {user ? (
+                // Usuário logado - mostrar saldo e botão refresh
+                <>
+                  <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-800/60 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+                    <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
+                    <span className="text-green-400 font-medium text-xs sm:text-sm">
+                      {formatBalance(user.balance)}
+                    </span>
+                    <button 
+                      onClick={() => refreshProfile()}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors touch-manipulation active:scale-95 h-5 w-5 sm:h-6 sm:w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10"
+                    >
+                      <RefreshCw className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    </button>
+                  </div>
+                  <button 
+                    onClick={handleLogout}
+                    className="p-1.5 sm:p-2 hover:bg-red-500/20 rounded-lg transition-colors touch-manipulation active:scale-95 text-red-400 hover:text-red-300"
+                  >
+                    <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </button>
+                </>
+              ) : (
+                // Usuário não logado - mostrar botões de login/cadastro
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-transparent border-gray-600 text-white hover:bg-gray-700/50 h-8 px-3 text-xs"
+                    onClick={() => setShowLoginModal(true)}
+                  >
+                    Entrar
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white h-8 px-3 text-xs font-semibold"
+                    onClick={() => setShowRegisterModal(true)}
+                  >
+                    Cadastrar
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -492,6 +536,25 @@ export function Home() {
       <DepositModal
         isOpen={showDepositFromGame}
         onClose={handleCloseDeposit}
+      />
+      
+      {/* Auth Modals */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)}
+        onSwitchToRegister={() => {
+          setShowLoginModal(false);
+          setShowRegisterModal(true);
+        }}
+      />
+      
+      <RegisterModal 
+        isOpen={showRegisterModal} 
+        onClose={() => setShowRegisterModal(false)}
+        onSwitchToLogin={() => {
+          setShowRegisterModal(false);
+          setShowLoginModal(true);
+        }}
       />
     </div>
   );

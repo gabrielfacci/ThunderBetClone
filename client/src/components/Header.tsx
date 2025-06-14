@@ -10,6 +10,9 @@ export function Header() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
+  // Debug logs
+  console.log('Header render - user:', user, 'isLoading:', isLoading);
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -32,10 +35,7 @@ export function Header() {
 
           {/* Botões de Auth ou Dados do Usuário */}
           <div className="flex items-center space-x-2">
-            {isLoading ? (
-              // Mostrar loading enquanto verifica sessão
-              <div className="h-8 w-32 bg-gray-700/50 rounded animate-pulse"></div>
-            ) : user ? (
+            {user ? (
               // Usuário logado - mostrar saldo e logout
               <div className="flex items-center space-x-3">
                 <div className="text-right">
@@ -60,14 +60,20 @@ export function Header() {
                   variant="outline"
                   size="sm"
                   className="bg-transparent border-gray-600 text-white hover:bg-gray-700/50 h-8 px-4 text-sm"
-                  onClick={() => setShowLoginModal(true)}
+                  onClick={() => {
+                    console.log('Abrindo modal de login');
+                    setShowLoginModal(true);
+                  }}
                 >
                   Entrar
                 </Button>
                 <Button
                   size="sm"
                   className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white h-8 px-4 text-sm font-semibold"
-                  onClick={() => setShowRegisterModal(true)}
+                  onClick={() => {
+                    console.log('Abrindo modal de cadastro');
+                    setShowRegisterModal(true);
+                  }}
                 >
                   Cadastrar
                 </Button>
