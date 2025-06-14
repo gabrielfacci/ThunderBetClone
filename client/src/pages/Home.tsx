@@ -385,8 +385,8 @@ export function Home() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      <button className="absolute top-2 right-2 w-6 h-6 bg-emerald-500/90 rounded-full flex items-center justify-center hover:bg-emerald-600 transition-colors shadow-sm">
-                        <Heart className="h-3 w-3 text-white fill-white" />
+                      <button className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-full hover:bg-black/70 transition-colors">
+                        <Heart className="h-4 w-4 fill-red-500 text-red-500" />
                       </button>
                     </div>
                     <div className="p-3">
