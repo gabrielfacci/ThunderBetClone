@@ -196,7 +196,7 @@ export function Home() {
             </div>
             
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-gray-800/50 rounded-lg px-3 py-2">
+              <div className="flex items-center space-x-2 bg-gray-800/50 rounded-lg px-3 py-2 pt-[0px] pb-[0px] pl-[0px] pr-[0px] text-center">
                 <Wallet className="h-4 w-4 text-green-400" />
                 <span className="text-green-400 font-medium">
                   {formatBalance(user?.balance || 0)}
