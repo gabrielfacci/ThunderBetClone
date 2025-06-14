@@ -7,8 +7,8 @@ interface SimpleUser {
     full_name?: string;
   };
   created_at?: string;
-  full_name?: string;
-  balance?: number;
+  full_name: string;
+  balance: number;
 }
 
 interface AuthContextType {
@@ -42,7 +42,18 @@ const storeUser = (email: string, password: string, fullName: string) => {
 
 const getCurrentUser = (): SimpleUser | null => {
   const stored = localStorage.getItem('thunderbet_current_user');
-  return stored ? JSON.parse(stored) : null;
+  if (!stored) return null;
+  
+  const user = JSON.parse(stored);
+  // Ensure user has required properties for backward compatibility
+  return {
+    id: user.id,
+    email: user.email,
+    user_metadata: user.user_metadata || { full_name: user.full_name },
+    created_at: user.created_at,
+    full_name: user.full_name || user.user_metadata?.full_name || 'Usuário',
+    balance: user.balance || 1000.00
+  };
 };
 
 const setCurrentUser = (user: SimpleUser | null) => {
