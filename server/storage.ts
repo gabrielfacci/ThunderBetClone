@@ -66,12 +66,22 @@ export class MemStorage implements IStorage {
     const user: User = { 
       id,
       username: insertUser.username,
+      email: insertUser.email,
       password: insertUser.password,
       fullName: insertUser.fullName,
       phone: insertUser.phone,
+      cpf: insertUser.cpf || null,
+      dateOfBirth: insertUser.dateOfBirth || null,
       accountMode: insertUser.accountMode || 'national',
-      balance: insertUser.balance || 0,
-      createdAt: new Date() 
+      balance: "0.00",
+      isActive: insertUser.isActive || true,
+      isVerified: insertUser.isVerified || false,
+      verificationCode: insertUser.verificationCode || null,
+      passwordResetToken: insertUser.passwordResetToken || null,
+      passwordResetExpires: insertUser.passwordResetExpires || null,
+      lastLoginAt: insertUser.lastLoginAt || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.users.set(id, user);
     return user;
@@ -84,6 +94,28 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...updates };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.email === email);
+  }
+
+  async authenticateUser(email: string, password: string): Promise<User | null> {
+    const user = await this.getUserByEmail(email);
+    if (user && user.password === password) {
+      return user;
+    }
+    return null;
+  }
+
+  async createTransaction(transaction: any): Promise<any> {
+    // Mock implementation for in-memory storage
+    return { id: Date.now(), ...transaction, createdAt: new Date() };
+  }
+
+  async getUserTransactions(userId: number): Promise<any[]> {
+    // Mock implementation for in-memory storage
+    return [];
   }
 }
 
