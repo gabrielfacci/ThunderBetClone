@@ -40,6 +40,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create test user
+  app.post("/api/test-user", async (req, res) => {
+    try {
+      const { fullName, phone, accountMode, balance } = req.body;
+      
+      const newUser = await storage.createUser({
+        username: 'testuser',
+        password: 'test123',
+        fullName: fullName || 'João Silva',
+        phone: phone || '(11) 99999-9999',
+        accountMode: accountMode || 'national',
+        balance: balance || 1000
+      });
+      
+      res.json(newUser);
+    } catch (error) {
+      console.error('Error creating test user:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Create deposit transaction
   app.post("/api/transactions/deposit", async (req, res) => {
     try {

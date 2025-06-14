@@ -37,21 +37,72 @@ export function AppProvider({ children }: AppProviderProps) {
 
   const language: Language = user?.accountMode === 'national' ? 'pt' : 'en';
 
-  const updateAccountMode = (mode: AccountMode) => {
+  const updateAccountMode = async (mode: AccountMode) => {
     if (user) {
-      setUser({ ...user, accountMode: mode });
+      try {
+        const response = await fetch(`/api/user/${user.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ accountMode: mode }),
+        });
+        
+        if (response.ok) {
+          const updatedUser = await response.json();
+          setUser(updatedUser);
+        }
+      } catch (error) {
+        console.error('Error updating account mode:', error);
+        // Fallback to local update if API fails
+        setUser({ ...user, accountMode: mode });
+      }
     }
   };
 
-  const updateBalance = (balance: number) => {
+  const updateBalance = async (balance: number) => {
     if (user) {
-      setUser({ ...user, balance });
+      try {
+        const response = await fetch(`/api/user/${user.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ balance }),
+        });
+        
+        if (response.ok) {
+          const updatedUser = await response.json();
+          setUser(updatedUser);
+        }
+      } catch (error) {
+        console.error('Error updating balance:', error);
+        // Fallback to local update if API fails
+        setUser({ ...user, balance });
+      }
     }
   };
 
-  const updateFullName = (name: string) => {
+  const updateFullName = async (name: string) => {
     if (user) {
-      setUser({ ...user, fullName: name });
+      try {
+        const response = await fetch(`/api/user/${user.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fullName: name }),
+        });
+        
+        if (response.ok) {
+          const updatedUser = await response.json();
+          setUser(updatedUser);
+        }
+      } catch (error) {
+        console.error('Error updating full name:', error);
+        // Fallback to local update if API fails
+        setUser({ ...user, fullName: name });
+      }
     }
   };
 
