@@ -28,15 +28,13 @@ interface AppProviderProps {
 }
 
 export function AppProvider({ children }: AppProviderProps) {
-  const [user, setUser] = useState<User | null>({
-    id: 1,
-    fullName: 'dasdvf sfddfds',
-    phone: '(00) 00000-0000',
-    accountMode: 'national',
-    balance: 0
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   const language: Language = user?.accountMode === 'national' ? 'pt' : 'en';
+
+  const logout = () => {
+    setUser(null);
+  };
 
   const updateAccountMode = async (mode: AccountMode) => {
     if (user) {
@@ -112,6 +110,7 @@ export function AppProvider({ children }: AppProviderProps) {
       user,
       language,
       setUser,
+      logout,
       updateAccountMode,
       updateBalance,
       updateFullName

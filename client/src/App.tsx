@@ -5,26 +5,24 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider, useAppContext } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
+import { Header } from "@/components/Header";
 import { Home } from "@/pages/Home";
-import { Auth } from "@/pages/Auth";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   const { user } = useAppContext();
   
-  // If no user is authenticated, show auth page
-  if (!user) {
-    return <Auth />;
-  }
-
-  // If user is authenticated, show main app
+  // Always show the app with Header - authentication happens via modals
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
+    <>
+      <Header />
+      <Layout>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+    </>
   );
 }
 
