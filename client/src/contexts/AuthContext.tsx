@@ -45,26 +45,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function getInitialSession() {
       try {
-        // Check if we have valid Supabase credentials
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://kgpmvqfehzkeyrtexdkb.supabase.co';
-        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
-        
-        if (!supabaseKey || supabaseKey.includes('placeholder')) {
-          console.log('No valid Supabase credentials - staying logged out');
-          if (mounted) {
-            setIsLoading(false);
-            setUser(null);
-            setSupabaseUser(null);
-          }
-          return;
-        }
-
         const { data: { session } } = await supabase.auth.getSession();
         
         if (mounted) {
           if (session?.user) {
             setSupabaseUser(session.user);
             await loadUserProfile(session.user);
+          } else {
+            setUser(null);
+            setSupabaseUser(null);
           }
           setIsLoading(false);
         }
@@ -133,13 +122,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const signUp = async (phone: string, password: string, fullName: string) => {
-    // Check if we have valid Supabase credentials
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
-    
-    if (!supabaseKey || supabaseKey.includes('placeholder')) {
-      throw new Error('Configure as credenciais do Supabase para usar a autenticação');
-    }
-
     try {
       await authHelpers.signUpWithPhone(phone, password, fullName);
       // The onAuthStateChange will handle the rest
@@ -149,13 +131,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const signIn = async (phone: string, password: string) => {
-    // Check if we have valid Supabase credentials
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
-    
-    if (!supabaseKey || supabaseKey.includes('placeholder')) {
-      throw new Error('Configure as credenciais do Supabase para usar a autenticação');
-    }
-
     try {
       await authHelpers.signInWithPhone(phone, password);
       // The onAuthStateChange will handle the rest

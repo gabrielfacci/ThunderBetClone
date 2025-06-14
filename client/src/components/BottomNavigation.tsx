@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Wallet, TrendingDown, Home, Gift, User } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/contexts/AuthContext';
 import { DepositModal } from './modals/DepositModal';
 import { WithdrawalModal } from './modals/WithdrawalModal';
 import { PromotionModal } from './modals/PromotionModal';
@@ -11,10 +12,15 @@ type ModalType = 'deposit' | 'withdrawal' | 'promotion' | 'profile' | null;
 
 export function BottomNavigation() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [activeTab, setActiveTab] = useState('home');
 
   const openModal = (modal: ModalType) => {
+    if (!user) {
+      // Se não estiver logado, não abre os modais
+      return;
+    }
     setActiveModal(modal);
     setActiveTab(modal || 'home');
   };
