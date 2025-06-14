@@ -81,7 +81,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="fixed left-[50%] top-[50%] z-50 grid translate-x-[-50%] translate-y-[-50%] gap-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg p-0 border-0 bg-transparent max-w-sm sm:max-w-md w-full pl-[20px] pr-[20px]">
         <div className="relative w-full bg-gradient-to-br from-slate-900/98 via-purple-900/95 to-blue-900/98 border border-purple-500/30 backdrop-blur-2xl shadow-2xl rounded-lg max-h-[90vh] overflow-hidden">
           {/* Background Effects */}
@@ -90,10 +90,10 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
           <div className="absolute -bottom-16 -right-16 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
           
           {/* Close Button */}
-          <div className="absolute top-3 right-3 z-10">
+          <div className="absolute top-3 right-3 z-50">
             <button 
               onClick={handleClose}
-              className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all duration-200 flex items-center justify-center"
+              className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
