@@ -4,8 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { X, Phone, Lock, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useAppContext } from '@/contexts/AppContext';
-import { countryCodes } from '@/lib/countryCodes';
+import { useAuth } from '@/contexts/AuthContext';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 const loginSchema = z.object({
@@ -25,7 +24,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { setUser } = useAppContext();
+  const { signIn } = useAuth();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -38,46 +37,22 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phone: `+55${data.phone}`,
-          password: data.password,
-        }),
-      });
+      // Format phone number for Supabase
+      const formattedPhone = `+55${data.phone.replace(/\D/g, '')}`;
+      
+      await signIn(formattedPhone, data.password);
 
-      if (response.ok) {
-        const userData = await response.json();
-        setUser({
-          id: userData.id,
-          fullName: userData.full_name || userData.fullName,
-          phone: userData.phone,
-          accountMode: userData.account_mode || userData.accountMode,
-          balance: parseFloat(userData.balance) || 0,
-        });
-
-        toast({
-          title: "Login realizado!",
-          description: "Bem-vindo de volta à ThunderBet",
-        });
-        
-        form.reset();
-        onClose();
-      } else {
-        const error = await response.json();
-        toast({
-          title: "Erro no login",
-          description: error.message || "Telefone ou senha inválidos",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
       toast({
-        title: "Erro de conexão",
-        description: "Não foi possível conectar ao servidor",
+        title: "Login realizado!",
+        description: "Bem-vindo de volta à ThunderBet",
+      });
+      
+      form.reset();
+      onClose();
+    } catch (error: any) {
+      toast({
+        title: "Erro no login",
+        description: error.message || "Telefone ou senha inválidos",
         variant: "destructive",
       });
     } finally {

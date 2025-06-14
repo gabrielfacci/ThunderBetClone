@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { X, User, Mail, Phone, Lock, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { X, User, Phone, Lock, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { countryCodes } from '@/lib/countryCodes';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 const registerSchema = z.object({
   fullName: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  email: z.string().email('Email inválido'),
   countryCode: z.string().min(1, 'Selecione o código do país'),
   phone: z.string().min(8, 'Número de telefone inválido').max(15, 'Número muito longo'),
   password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
