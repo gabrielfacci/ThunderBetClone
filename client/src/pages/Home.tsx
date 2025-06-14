@@ -385,8 +385,8 @@ export function Home() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <button className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5 hover:bg-red-500/80 hover:scale-110 transition-all duration-200 group touch-manipulation">
-                        <Heart className="w-3 h-3 text-white group-hover:fill-white transition-all duration-200" />
+                      <button className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-full hover:bg-black/70 transition-colors">
+                        <Heart className="h-4 w-4 text-white" />
                       </button>
                       <div className="absolute bottom-1.5 sm:bottom-2 left-1.5 sm:left-2 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-[#00000078] text-[#ffffff] text-center">
                         {game.provider}
