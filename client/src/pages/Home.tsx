@@ -270,7 +270,7 @@ export function Home() {
       {/* Content Container */}
       <div className="pt-16 sm:pt-20">
         {/* Banner Section */}
-        <div className="mb-3">
+        <div className="px-4 mb-4 max-w-md mx-auto">
           <div className="relative overflow-hidden rounded-3xl">
             <div 
               className="flex transition-transform duration-500 ease-in-out"
