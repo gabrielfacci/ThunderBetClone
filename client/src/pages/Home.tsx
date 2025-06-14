@@ -180,40 +180,36 @@ export function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 text-white">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-purple-500/20">
-        <div className="container mx-auto px-4 py-3 pt-[5px] pb-[5px] pl-[12px] pr-[12px] text-center">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-purple-500/20 safe-area-inset-top">
+        <div className="px-3 sm:px-4 py-2 sm:py-3 max-w-md mx-auto bg-[#00000042]">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="relative flex items-center gap-2 transition-all duration-700 ease-out group hover:scale-110 cursor-pointer">
-                <div className="relative transition-all duration-700 w-16 h-16 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]">
-                  <img 
-                    src={thunderbetLogo} 
-                    alt="ThunderBet" 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              </div>
+            <div className="relative flex items-center transition-all duration-700 ease-out group hover:scale-105 cursor-pointer touch-manipulation">
+              <img 
+                src={thunderbetLogo} 
+                alt="ThunderBet" 
+                className="h-12 sm:h-16 w-auto transition-all duration-700 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]"
+              />
             </div>
             
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-gray-800/50 rounded-lg px-3 py-2 pt-[0px] pb-[0px] mt-[0px] mb-[0px] pl-[5px] pr-[5px]">
-                <Wallet className="h-4 w-4 text-green-400" />
-                <span className="text-green-400 font-medium">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-800/60 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
+                <span className="text-green-400 font-medium text-xs sm:text-sm">
                   {formatBalance(user?.balance || 0)}
                 </span>
-                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10">
-                  <RefreshCw className="h-3 w-3" />
+                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors touch-manipulation active:scale-95 h-5 w-5 sm:h-6 sm:w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10">
+                  <RefreshCw className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 </button>
               </div>
-              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                <Share className="w-4 h-4 text-gray-300" />
+              <button className="p-1.5 sm:p-2 hover:bg-white/10 rounded-lg transition-colors touch-manipulation active:scale-95">
+                <Share className="w-3 h-3 sm:w-4 sm:h-4 text-gray-300" />
               </button>
             </div>
           </div>
         </div>
       </header>
       {/* Content Container */}
-      <div className="pt-20">
+      <div className="pt-16 sm:pt-20">
         {/* Banner Section */}
         <div className="mb-3">
           <div className="relative overflow-hidden rounded-3xl">
@@ -290,7 +286,7 @@ export function Home() {
         </div>
         
         {/* Main Content Section */}
-        <div className="pb-[87px]">
+        <div className="pb-20">
           <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl mx-2 p-3 sm:p-4 border border-gray-700/30 space-y-4 sm:space-y-6">
             
             {/* Search Bar */}
@@ -367,16 +363,16 @@ export function Home() {
                 {currentGames.map((game) => (
                   <div 
                     key={game.id}
-                    className="group relative bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl overflow-hidden border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 cursor-pointer"
+                    className="relative bg-gray-900/50 rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 touch-manipulation cursor-pointer"
                     onClick={() => handleGameClick(game)}
                   >
-                    <div className="relative h-32 overflow-hidden">
+                    <div className="relative h-28 sm:h-32 overflow-hidden rounded-t-xl">
                       <img 
                         alt={game.name}
                         loading="lazy"
                         decoding="async"
                         src={game.imageUrl}
-                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           if (!target.src.includes('placeholder')) {
@@ -384,14 +380,17 @@ export function Home() {
                           }
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      <button className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-full hover:bg-black/70 transition-colors">
-                        <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <button className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 bg-black/50 rounded-full p-1 sm:p-1.5 hover:bg-black/70 transition-colors touch-manipulation">
+                        <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
                       </button>
+                      <div className="absolute bottom-1.5 sm:bottom-2 left-1.5 sm:left-2 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-[#00000078] text-[#ffffff] text-center">
+                        {game.provider}
+                      </div>
                     </div>
-                    <div className="p-3">
-                      <h3 className="text-white text-sm font-semibold truncate mb-1">{game.name}</h3>
-                      <p className="text-gray-400 text-xs uppercase tracking-wide">{game.provider}</p>
+                    <div className="p-2 sm:p-3 bg-gray-900/80">
+                      <h3 className="text-white text-xs sm:text-sm font-medium truncate">{game.name}</h3>
+                      <p className="text-gray-400 text-[10px] sm:text-xs uppercase tracking-wide mt-0.5 sm:mt-1">{game.category}</p>
                     </div>
                   </div>
                 ))}
