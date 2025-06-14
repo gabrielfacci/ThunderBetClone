@@ -181,7 +181,7 @@ export function Home() {
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 text-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-purple-500/20">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-3 pt-[5px] pb-[5px] pl-[12px] pr-[12px] text-center">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="relative flex items-center gap-2 transition-all duration-700 ease-out group hover:scale-110 cursor-pointer">
