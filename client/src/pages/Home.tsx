@@ -198,7 +198,7 @@ export function Home() {
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2 bg-gray-800/50 rounded-lg px-3 py-2 pt-[0px] pb-[0px] pl-[0px] pr-[0px] text-center">
                 <Wallet className="h-4 w-4 text-green-400" />
-                <span className="text-green-400 font-medium">
+                <span className="text-green-400 font-medium ml-[3px] mr-[3px]">
                   {formatBalance(user?.balance || 0)}
                 </span>
                 <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10">
