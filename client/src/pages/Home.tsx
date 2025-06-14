@@ -243,42 +243,42 @@ export function Home() {
         </div>
         
         {/* Winner Feed */}
-        <div className="mb-3">
+        <div className="px-4 mb-4 max-w-md mx-auto">
           {(() => {
             // Extract numeric value from amount string (e.g., "R$ 225,00" -> 225)
             const amountValue = parseFloat(winners[currentWinner].amount.replace(/[^\d,]/g, '').replace(',', '.'));
             const isHighValue = amountValue > 200;
             
             return (
-              <div className={`relative overflow-hidden mx-2 ${
+              <div className={`relative overflow-hidden ${
                 isHighValue 
                   ? 'bg-gradient-to-r from-yellow-500/20 via-orange-500/15 to-red-500/20 border-yellow-400/40' 
                   : 'bg-gradient-to-r from-gray-500/20 via-gray-600/15 to-gray-700/20 border-gray-400/40'
-              } border backdrop-blur-sm rounded-xl p-2.5 sm:p-3 hover:scale-105 group transition-all duration-300 touch-manipulation`}>
+              } border backdrop-blur-sm rounded-xl p-3 hover:scale-105 group transition-all duration-300`}>
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
                 {isHighValue && (
                   <div className="absolute top-1 right-2 opacity-60">
-                    <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-yellow-300 animate-pulse" />
+                    <Sparkles className="h-3 w-3 text-yellow-300 animate-pulse" />
                   </div>
                 )}
-                <div className="relative flex items-center space-x-2 sm:space-x-3">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <div className="relative flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                     <span className="text-xs font-bold text-white">
                       {winners[currentWinner].avatar}
                     </span>
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <span className="text-white text-xs sm:text-sm font-medium truncate">{winners[currentWinner].name}</span>
-                      <span className={`text-xs sm:text-sm font-bold flex-shrink-0 ${
+                      <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
+                      <span className={`text-sm font-bold ${
                         isHighValue ? 'text-yellow-300' : 'text-green-300'
                       }`}>{winners[currentWinner].amount}</span>
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-300 truncate">
+                    <div className="text-xs text-gray-300">
                       {winners[currentWinner].game}
                     </div>
                   </div>
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full flex-shrink-0"></div>
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                 </div>
               </div>
             );
@@ -286,16 +286,16 @@ export function Home() {
         </div>
         
         {/* Main Content Section */}
-        <div className="pb-20">
-          <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl mx-2 p-3 sm:p-4 border border-gray-700/30 space-y-4 sm:space-y-6">
+        <div className="px-4 pb-24 max-w-md mx-auto">
+          <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
             
             {/* Search Bar */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-black/20 border-gray-600/30 text-white placeholder-gray-400 pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 rounded-xl backdrop-blur-sm text-sm sm:text-base touch-manipulation"
+                className="w-full bg-black/20 border-gray-600/30 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-xl backdrop-blur-sm"
                 placeholder="Buscar jogos por nome ou provedor"
               />
             </div>
@@ -303,7 +303,7 @@ export function Home() {
             {/* Categories */}
             <div 
               ref={categoriesRef}
-              className="flex space-x-2 sm:space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container -mx-1"
+              className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar select-none cursor-grab smooth-scroll drag-container"
               style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
               onMouseDown={handleMouseDown}
               onMouseLeave={handleMouseLeave}
@@ -317,24 +317,24 @@ export function Home() {
                 const getIcon = (iconName: string) => {
                   switch (iconName) {
                     case 'flame':
-                      return <Flame className="w-4 h-4 sm:w-6 sm:h-6 text-orange-500" />;
+                      return <Flame className="w-6 h-6 text-orange-500" />;
                     case 'trophy':
-                      return <Trophy className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-500" />;
+                      return <Trophy className="w-6 h-6 text-yellow-500" />;
                     case 'star':
-                      return <Star className="w-4 h-4 sm:w-6 sm:h-6 text-blue-500" />;
+                      return <Star className="w-6 h-6 text-blue-500" />;
                     case 'dice-6':
-                      return <Dice6 className="w-4 h-4 sm:w-6 sm:h-6 text-green-500" />;
+                      return <Dice6 className="w-6 h-6 text-green-500" />;
                     case 'diamond':
-                      return <Diamond className="w-4 h-4 sm:w-6 sm:h-6 text-purple-500" />;
+                      return <Diamond className="w-6 h-6 text-purple-500" />;
                     default:
-                      return <Flame className="w-4 h-4 sm:w-6 sm:h-6 text-orange-500" />;
+                      return <Flame className="w-6 h-6 text-orange-500" />;
                   }
                 };
 
                 return (
                   <button
                     key={category.id}
-                    className={`flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl transition-colors flex-shrink-0 min-w-[65px] sm:min-w-[80px] touch-manipulation active:scale-95 ${
+                    className={`flex flex-col items-center justify-center space-y-1 px-4 py-3 rounded-xl transition-colors flex-shrink-0 min-w-[80px] ${
                       selectedCategory === category.id 
                         ? 'bg-gray-800/60 border border-gray-600/50' 
                         : 'bg-transparent'
@@ -342,7 +342,7 @@ export function Home() {
                     onClick={() => setSelectedCategory(category.id)}
                   >
                     {getIcon(category.icon)}
-                    <span className="text-[10px] sm:text-xs text-white whitespace-nowrap">{t(category.name)}</span>
+                    <span className="text-xs text-white whitespace-nowrap">{t(category.name)}</span>
                   </button>
                 );
               })}
@@ -350,23 +350,23 @@ export function Home() {
 
             {/* Games Counter */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-1.5 sm:space-x-2">
-                <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />
-                <span className="font-medium text-white text-sm sm:text-base">{filteredGames.length} jogos</span>
+              <div className="flex items-center space-x-2">
+                <Flame className="w-4 h-4 text-orange-500" />
+                <span className="font-medium text-white">{filteredGames.length} jogos</span>
               </div>
-              <button className="text-gray-400 text-xs sm:text-sm touch-manipulation">Game Lobby →</button>
+              <button className="text-gray-400 text-sm">Game Lobby →</button>
             </div>
 
             {/* Games Grid */}
             <div id="games-section">
-              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {currentGames.map((game) => (
                   <div 
                     key={game.id}
-                    className="relative bg-gray-900/50 rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 touch-manipulation cursor-pointer"
+                    className="relative bg-gray-900/50 rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
                     onClick={() => handleGameClick(game)}
                   >
-                    <div className="relative h-28 sm:h-32 overflow-hidden rounded-t-xl">
+                    <div className="relative h-32 overflow-hidden rounded-t-xl">
                       <img 
                         alt={game.name}
                         loading="lazy"
@@ -381,16 +381,16 @@ export function Home() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <button className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 bg-black/50 rounded-full p-1 sm:p-1.5 hover:bg-black/70 transition-colors touch-manipulation">
-                        <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
+                      <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 hover:bg-black/70 transition-colors">
+                        <Heart className="w-3 h-3 text-white" />
                       </button>
-                      <div className="absolute bottom-1.5 sm:bottom-2 left-1.5 sm:left-2 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-[#00000078] text-[#ffffff] text-center">
+                      <div className="absolute bottom-2 left-2 text-xs font-bold px-2 py-1 rounded bg-[#00000078] text-[#ffffff] pt-[5px] pb-[5px] pl-[12px] pr-[12px] text-center">
                         {game.provider}
                       </div>
                     </div>
-                    <div className="p-2 sm:p-3 bg-gray-900/80">
-                      <h3 className="text-white text-xs sm:text-sm font-medium truncate">{game.name}</h3>
-                      <p className="text-gray-400 text-[10px] sm:text-xs uppercase tracking-wide mt-0.5 sm:mt-1">{game.category}</p>
+                    <div className="p-3 bg-gray-900/80">
+                      <h3 className="text-white text-sm font-medium truncate">{game.name}</h3>
+                      <p className="text-gray-400 text-xs uppercase tracking-wide mt-1">{game.category}</p>
                     </div>
                   </div>
                 ))}
@@ -398,16 +398,16 @@ export function Home() {
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="mt-4 sm:mt-6 px-1 sm:px-2">
+                <div className="mt-6 px-2">
                   {/* Mobile-first responsive pagination */}
-                  <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                     {/* Page info */}
-                    <div className="flex items-center justify-center sm:justify-start space-x-1.5 sm:space-x-2">
-                      <span className="text-gray-400 text-xs sm:text-sm">
-                        Página {currentPage} de {totalPages}
+                    <div className="flex items-center justify-center sm:justify-start space-x-2">
+                      <span className="text-gray-400 text-sm">
+                        {t('Page')} {currentPage} {t('of')} {totalPages}
                       </span>
-                      <span className="text-gray-500 text-[10px] sm:text-xs hidden sm:inline">
-                        ({filteredGames.length} jogos)
+                      <span className="text-gray-500 text-xs hidden sm:inline">
+                        ({filteredGames.length} {t('games')})
                       </span>
                     </div>
                     
@@ -416,9 +416,9 @@ export function Home() {
                       <button
                         onClick={handlePreviousPage}
                         disabled={currentPage === 1}
-                        className="flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation active:scale-95"
+                        className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                       >
-                        <ChevronLeft className="w-3 h-3 sm:w-5 sm:h-5" />
+                        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                       
                       {/* Page Numbers - responsive display */}
