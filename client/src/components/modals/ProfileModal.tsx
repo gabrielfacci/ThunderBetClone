@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { User, Phone, Globe, X } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppContext } from '@/contexts/AppContext';
-import type { AccountMode } from '@/contexts/AppContext';
+// Remove this import since AccountMode is not exported
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -17,7 +17,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { t } = useTranslation();
   const { user, updateAccountMode, updateFullName } = useAppContext();
   const [fullName, setFullName] = useState(user?.fullName || '');
-  const [selectedMode, setSelectedMode] = useState<AccountMode>(user?.accountMode || 'national');
+  const [selectedMode, setSelectedMode] = useState<'national' | 'international'>(user?.accountMode || 'national');
 
   const handleSave = () => {
     if (fullName !== user?.fullName) {
@@ -82,12 +82,11 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     Nome Completo
                   </label>
                   <input 
-                    className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800/50 border-gray-700 text-white placeholder-gray-500 cursor-not-allowed" 
-                    disabled 
+                    className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 bg-gray-800/50 border-gray-700 text-white placeholder-gray-500" 
                     placeholder="Nome Completo" 
                     name="name"
                     value={fullName}
-                    readOnly
+                    onChange={(e) => setFullName(e.target.value)}
                   />
                 </div>
                 
@@ -96,29 +95,76 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     <Globe className="w-4 h-4" />
                     Modo de conta
                   </label>
-                  <div className="relative w-full">
-                    <button 
-                      className="inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border hover:text-white h-10 px-4 py-2 w-full justify-between text-left font-normal bg-gray-800/50 border-gray-700 text-white hover:bg-gray-800/70 cursor-not-allowed opacity-50" 
-                      type="button" 
-                      disabled
+                  
+                  <div className="space-y-2">
+                    {/* International Option */}
+                    <div 
+                      className={`rounded-lg p-3 cursor-pointer border-2 transition-colors ${
+                        selectedMode === 'international' 
+                          ? 'border-purple-500 bg-gray-700/50' 
+                          : 'border-gray-700 bg-gray-800/50 hover:bg-gray-700/50'
+                      }`}
+                      onClick={() => setSelectedMode('international')}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">🇧🇷</span>
-                        <div className="flex flex-col items-start">
-                          <span className="text-white">Nacional</span>
-                          <span className="text-xs text-gray-400">Brasil</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <Globe className="w-3 h-3 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-white text-sm">Internacional</h4>
+                            <p className="text-xs text-gray-400">Outros países</p>
+                          </div>
+                        </div>
+                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                          selectedMode === 'international' 
+                            ? 'bg-purple-500 border-purple-500' 
+                            : 'border-gray-400'
+                        }`}>
+                          {selectedMode === 'international' && (
+                            <div className="w-2 h-2 bg-white rounded-full" />
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down h-4 w-4 text-gray-400 transition-transform duration-200" aria-hidden="true">
-                          <path d="m6 9 6 6 6-6"></path>
-                        </svg>
+                    </div>
+
+                    {/* National Option */}
+                    <div 
+                      className={`rounded-lg p-3 cursor-pointer border-2 transition-colors ${
+                        selectedMode === 'national' 
+                          ? 'border-purple-500 bg-gray-700/50' 
+                          : 'border-gray-700 bg-gray-800/50 hover:bg-gray-700/50'
+                      }`}
+                      onClick={() => setSelectedMode('national')}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-6 h-6 bg-green-600 rounded-lg flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">BR</span>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-white text-sm">Nacional</h4>
+                            <p className="text-xs text-gray-400">Brasil</p>
+                          </div>
+                        </div>
+                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                          selectedMode === 'national' 
+                            ? 'bg-purple-500 border-purple-500' 
+                            : 'border-gray-400'
+                        }`}>
+                          {selectedMode === 'national' && (
+                            <div className="w-2 h-2 bg-white rounded-full" />
+                          )}
+                        </div>
                       </div>
-                    </button>
+                    </div>
                   </div>
+                  
                   <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
                     <p className="text-xs text-gray-400 mb-1">Sua conta vai estar como:</p>
-                    <p className="text-sm text-white font-medium">Nacional</p>
+                    <p className="text-sm text-white font-medium">
+                      {selectedMode === 'national' ? 'Nacional' : 'Internacional'}
+                    </p>
                   </div>
                 </div>
                 

@@ -70,10 +70,7 @@ export function BottomNavigation() {
             <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">Promoção</span>
           </div>
           
-          <div className="tabbar-left-item relative flex flex-col items-center cursor-pointer transition-all duration-300" onClick={() => {
-            console.log('Profile button clicked');
-            openModal('profile');
-          }}>
+          <div className="tabbar-left-item relative flex flex-col items-center cursor-pointer transition-all duration-300" onClick={() => openModal('profile')}>
             <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
               <User className="relative z-10 transition-all duration-300 h-5 w-5 text-gray-300 group-hover:text-white" />
             </div>
@@ -85,7 +82,7 @@ export function BottomNavigation() {
       <DepositModal isOpen={activeModal === 'deposit'} onClose={closeModal} />
       <WithdrawalModal isOpen={activeModal === 'withdrawal'} onClose={closeModal} />
       <PromotionModal isOpen={activeModal === 'promotion'} onClose={closeModal} />
-      {console.log('Active modal:', activeModal)}
+
       <ProfileModal isOpen={activeModal === 'profile'} onClose={closeModal} />
     </>
   );
