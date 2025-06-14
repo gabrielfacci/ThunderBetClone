@@ -270,7 +270,7 @@ export function Home() {
       {/* Content Container */}
       <div className="pt-16 sm:pt-20">
         {/* Banner Section */}
-        <div className="px-4 mb-4 max-w-md mx-auto">
+        <div className="px-4 max-w-md mx-auto pt-[0px] pb-[0px] mt-[20px] mb-[20px]">
           <div className="relative w-full group">
             <div className="relative w-full overflow-hidden rounded-xl">
               <div className={`transition-opacity duration-500 ease-in-out ${currentBanner === 0 ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}>
