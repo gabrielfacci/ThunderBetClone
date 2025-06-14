@@ -4,7 +4,8 @@ import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface UserProfile {
   id: string;
-  phone: string;
+  email: string;
+  phone?: string;
   full_name: string;
   balance: number;
   created_at: string;
@@ -15,8 +16,8 @@ interface AuthContextType {
   user: UserProfile | null;
   supabaseUser: SupabaseUser | null;
   isLoading: boolean;
-  signUp: (phone: string, password: string, fullName: string) => Promise<void>;
-  signIn: (phone: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }

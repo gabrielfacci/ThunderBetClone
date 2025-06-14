@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Phone, Lock, Sparkles, X, User } from 'lucide-react';
+import { Eye, EyeOff, Phone, Lock, Sparkles, X, User, Mail } from 'lucide-react';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 interface RegisterModalProps {
@@ -15,6 +15,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
   const { signUp } = useAuth();
   const { toast } = useToast();
   const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +38,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!fullName || !phone || !password) {
+    if (!fullName || !email || !phone || !password) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha todos os campos.",
@@ -50,6 +51,17 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       toast({
         title: "Nome inválido",
         description: "O nome deve ter pelo menos 2 caracteres.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Email inválido",
+        description: "Digite um email válido.",
         variant: "destructive",
       });
       return;
@@ -77,7 +89,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
     setIsLoading(true);
     try {
       const cleanPhone = `+55${phoneNumbers}`;
-      await signUp(cleanPhone, password, fullName.trim());
+      await signUp(email, password, fullName.trim());
       
       toast({
         title: "Conta criada com sucesso!",
@@ -86,6 +98,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       
       onClose();
       setFullName('');
+      setEmail('');
       setPhone('');
       setPassword('');
     } catch (error: any) {
@@ -102,6 +115,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
   const handleClose = () => {
     onClose();
     setFullName('');
+    setEmail('');
     setPhone('');
     setPassword('');
   };
@@ -179,11 +193,27 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                 />
               </div>
 
+              {/* Email Field */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-300 flex items-center gap-1">
+                  <Mail className="h-3 w-3 text-purple-400" />
+                  Email
+                </label>
+                <input 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="w-full px-3 py-2 text-xs sm:text-sm text-white bg-gray-800/70 border border-gray-600/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-lg transition-all duration-200 placeholder:text-gray-400 h-9 sm:h-10"
+                  required
+                />
+              </div>
+
               {/* Phone Field */}
               <div className="space-y-1">
                 <label className="text-xs font-medium text-gray-300 flex items-center gap-1">
                   <Phone className="h-3 w-3 text-purple-400" />
-                  Telefone
+                  Telefone (Contato)
                 </label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">

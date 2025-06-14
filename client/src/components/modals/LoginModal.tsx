@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Phone, Lock, Sparkles, X } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Sparkles, X } from 'lucide-react';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 interface LoginModalProps {
@@ -14,32 +14,29 @@ interface LoginModalProps {
 export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) {
   const { signIn } = useAuth();
   const { toast } = useToast();
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const formatPhone = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 11) {
-      const formatted = numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-      return formatted;
-    }
-    return value;
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhone(e.target.value);
-    setPhone(formatted);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!phone || !password) {
+    if (!email || !password) {
       toast({
         title: "Campos obrigatórios",
-        description: "Por favor, preencha telefone e senha.",
+        description: "Por favor, preencha email e senha.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Email inválido",
+        description: "Digite um email válido.",
         variant: "destructive",
       });
       return;
@@ -56,8 +53,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
 
     setIsLoading(true);
     try {
-      const cleanPhone = `+55${phone.replace(/\D/g, '')}`;
-      await signIn(cleanPhone, password);
+      await signIn(email, password);
       
       toast({
         title: "Login realizado!",
@@ -65,7 +61,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
       });
       
       onClose();
-      setPhone('');
+      setEmail('');
       setPassword('');
     } catch (error: any) {
       toast({
@@ -80,7 +76,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
 
   const handleClose = () => {
     onClose();
-    setPhone('');
+    setEmail('');
     setPassword('');
   };
 
@@ -141,26 +137,20 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
 
             {/* Form compacto */}
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* Phone Field */}
+              {/* Email Field */}
               <div className="space-y-1">
                 <label className="text-xs font-medium text-gray-300 flex items-center gap-1">
-                  <Phone className="h-3 w-3 text-purple-400" />
-                  Telefone
+                  <Mail className="h-3 w-3 text-purple-400" />
+                  Email
                 </label>
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                    <span className="text-green-400 text-xs font-medium">🇧🇷 +55</span>
-                  </div>
-                  <input 
-                    type="tel"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    placeholder="(11) 99999-9999"
-                    className="w-full pl-14 pr-3 py-2 text-xs sm:text-sm text-white bg-gray-800/70 border border-gray-600/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-lg transition-all duration-200 placeholder:text-gray-400 h-9 sm:h-10"
-                    maxLength={15}
-                    required
-                  />
-                </div>
+                <input 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="w-full px-3 py-2 text-xs sm:text-sm text-white bg-gray-800/70 border border-gray-600/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-lg transition-all duration-200 placeholder:text-gray-400 h-9 sm:h-10"
+                  required
+                />
               </div>
 
               {/* Password Field */}
