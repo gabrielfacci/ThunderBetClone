@@ -116,43 +116,55 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      console.log('Iniciando cadastro:', { email: email.trim(), fullName });
+      const cleanEmail = email.trim().toLowerCase();
+      console.log('Tentando cadastro com email:', cleanEmail);
       
-      // Primeiro, fazer signup no Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password,
+      // Validação mais rigorosa do email antes de enviar
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(cleanEmail)) {
+        throw new Error('Formato de email inválido');
+      }
+      
+      // Tentar signup com configurações simplificadas
+      const { data, error } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password: password,
         options: {
+          emailRedirectTo: undefined,
           data: {
             full_name: fullName.trim()
           }
         }
       });
 
-      if (authError) {
-        console.error('Erro de autenticação:', authError);
-        throw authError;
+      if (error) {
+        console.error('Erro Supabase completo:', error);
+        throw error;
       }
 
-      console.log('Cadastro de auth bem-sucedido:', authData);
+      console.log('Cadastro realizado:', data);
       
-      // O trigger do banco vai criar automaticamente o perfil na tabela users
-      
-    } catch (error: any) {
-      console.error('Erro no cadastro:', error);
-      
-      let errorMessage = 'Erro ao criar conta';
-      if (error.code === 'email_address_invalid') {
-        errorMessage = 'Email inválido. Verifique o formato do email.';
-      } else if (error.code === 'weak_password') {
-        errorMessage = 'Senha muito fraca. Use pelo menos 6 caracteres.';
-      } else if (error.code === 'email_address_already_in_use') {
-        errorMessage = 'Este email já está em uso.';
-      } else if (error.message) {
-        errorMessage = error.message;
+      // Se chegou até aqui, foi bem-sucedido
+      if (data.user) {
+        console.log('Usuário criado com sucesso:', data.user.id);
       }
       
-      throw new Error(errorMessage);
+    } catch (error: any) {
+      console.error('Erro detalhado:', error);
+      
+      let message = 'Erro ao criar conta';
+      
+      if (error.message?.includes('Invalid email')) {
+        message = 'Email inválido. Use um formato válido como usuario@email.com';
+      } else if (error.code === 'weak_password') {
+        message = 'Senha muito fraca. Use pelo menos 6 caracteres';
+      } else if (error.code === 'email_address_already_in_use') {
+        message = 'Este email já está cadastrado';
+      } else if (error.message) {
+        message = error.message;
+      }
+      
+      throw new Error(message);
     }
   };
 
