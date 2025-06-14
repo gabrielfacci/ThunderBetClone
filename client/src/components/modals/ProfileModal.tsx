@@ -108,9 +108,6 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <div className="inline-flex items-center justify-center h-5 w-5 hover:bg-gray-700 text-gray-400 hover:text-white rounded-md cursor-pointer">
-                          <X className="h-3 w-3" />
-                        </div>
                         <ChevronDown className="h-4 w-4 text-gray-400 transition-transform duration-200" />
                       </div>
                     </button>
