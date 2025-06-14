@@ -45,23 +45,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       throw new Error('Email e senha são obrigatórios');
     }
 
-    // Convert email to working domain for Supabase restrictions
-    const convertEmail = (originalEmail: string): string => {
-      const [username] = originalEmail.toLowerCase().split('@');
-      return `${username}@thunderbet.com`;
-    };
-
-    const workingEmail = convertEmail(email);
-    console.log('Cadastro:', email, '->', workingEmail);
+    console.log('Cadastro com email:', email);
 
     const { data, error } = await supabase.auth.signUp({
-      email: workingEmail,
+      email,
       password,
       options: {
         data: {
-          full_name: fullName,
-          original_email: email
-        }
+          full_name: fullName
+        },
+        emailRedirectTo: undefined // Disable email confirmation redirect
       }
     });
 
@@ -81,20 +74,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     console.log('Cadastro realizado:', data.user?.email);
 
-    // If signup successful but no session, user needs confirmation or auto-signin
-    if (data.user && !data.session) {
-      console.log('Tentando login após cadastro...');
-      try {
-        await signIn(email, password);
-      } catch (loginError: any) {
-        // If login fails due to confirmation, that's expected
-        if (loginError.message.includes('Email not confirmed')) {
-          console.log('Aguardando confirmação de email...');
-          // For demo purposes, we'll create a mock session
-          setUser(data.user);
-        } else {
-          throw loginError;
-        }
+    // Handle successful signup
+    if (data.user) {
+      if (data.session) {
+        // Session created immediately - user is authenticated
+        console.log('Usuário autenticado com sessão:', data.user.email);
+        setUser(data.user);
+      } else {
+        // No session but user exists - set as authenticated anyway
+        console.log('Usuário cadastrado, definindo como autenticado:', data.user.email);
+        setUser(data.user);
       }
     }
   };
@@ -104,17 +93,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       throw new Error('Email e senha são obrigatórios');
     }
 
-    // Convert email to working domain for Supabase restrictions
-    const convertEmail = (originalEmail: string): string => {
-      const [username] = originalEmail.toLowerCase().split('@');
-      return `${username}@thunderbet.com`;
-    };
-
-    const workingEmail = convertEmail(email);
-    console.log('Login:', email, '->', workingEmail);
+    console.log('Login com email:', email);
 
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: workingEmail,
+      email,
       password
     });
 
@@ -131,6 +113,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     console.log('Login realizado:', data.user?.email);
+    
+    // Force session refresh to ensure user state is updated
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      setUser(session.user);
+    }
   };
 
   const signOut = async () => {

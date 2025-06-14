@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Wallet, TrendingDown, Home, Gift, User } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/MockAuthContext';
 import { DepositModal } from './modals/DepositModal';
 import { WithdrawalModal } from './modals/WithdrawalModal';
 import { PromotionModal } from './modals/PromotionModal';
