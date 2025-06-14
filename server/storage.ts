@@ -35,6 +35,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
+  authenticateUser(email: string, password: string): Promise<User | null>;
   
   // Transaction operations for deposits/withdrawals
   createTransaction(transaction: any): Promise<any>;
@@ -183,6 +184,28 @@ export class PostgresStorage implements IStorage {
     } catch (error) {
       console.error('Error getting user transactions:', error);
       return [];
+    }
+  }
+
+  async authenticateUser(email: string, password: string): Promise<User | null> {
+    try {
+      const result = await this.db.select().from(users).where(eq(users.email, email)).limit(1);
+      const user = result[0];
+      
+      if (!user) {
+        return null;
+      }
+
+      // Para implementação real, usar bcrypt para verificar hash da senha
+      // Por agora, comparação simples para demonstração
+      if (user.password === password) {
+        return user;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error authenticating user:', error);
+      return null;
     }
   }
 }

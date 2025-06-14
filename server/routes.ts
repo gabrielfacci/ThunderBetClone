@@ -40,24 +40,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create test user
-  app.post("/api/test-user", async (req, res) => {
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
     try {
-      const { fullName, phone, accountMode, balance } = req.body;
+      const { fullName, email, phone, password } = req.body;
       
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email já cadastrado" });
+      }
+
+      // Create new user with default values
       const newUser = await storage.createUser({
-        username: 'testuser',
-        email: 'testuser@thunderbet.com',
-        password: 'test123',
-        fullName: fullName || 'João Silva',
-        phone: phone || '(11) 99999-9999',
-        accountMode: accountMode || 'national',
-        balance: balance?.toString() || '1000.00'
+        username: email.split('@')[0], // Use email prefix as username
+        email,
+        password, // In production, hash this password
+        fullName,
+        phone,
+        accountMode: 'national',
+        balance: '0.00'
       });
       
       res.json(newUser);
     } catch (error) {
-      console.error('Error creating test user:', error);
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      const user = await storage.authenticateUser(email, password);
+      if (!user) {
+        return res.status(401).json({ message: "Email ou senha inválidos" });
+      }
+
+      // Update last login
+      await storage.updateUser(user.id, { lastLoginAt: new Date() });
+      
+      res.json(user);
+    } catch (error) {
+      console.error('Error authenticating user:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
