@@ -16,10 +16,10 @@ interface ProfileModalProps {
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { t } = useTranslation();
-  const { user, refreshUser } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { toast } = useToast();
-  const [fullName, setFullName] = useState(user?.fullName || '');
-  const [selectedMode, setSelectedMode] = useState<'national' | 'international'>(user?.accountMode || 'national');
+  const [fullName, setFullName] = useState(user?.full_name || '');
+  const [selectedMode, setSelectedMode] = useState<'national' | 'international'>('national');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
@@ -29,17 +29,13 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     try {
       const updates: { full_name?: string; account_mode?: 'national' | 'international' } = {};
       
-      if (fullName !== user.fullName) {
+      if (fullName !== user.full_name) {
         updates.full_name = fullName;
-      }
-      
-      if (selectedMode !== user.accountMode) {
-        updates.account_mode = selectedMode;
       }
       
       if (Object.keys(updates).length > 0) {
         await updateUserProfile(user.id, updates);
-        await refreshUser();
+        await refreshProfile();
         
         toast({
           title: "Perfil atualizado",

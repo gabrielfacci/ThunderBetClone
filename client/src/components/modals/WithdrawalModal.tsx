@@ -84,7 +84,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
       if (response.ok) {
         const transaction = await response.json();
-        await updateBalance(parseFloat(transaction.balanceAfter));
+        await refreshProfile();
         
         toast({
           title: "Saque solicitado!",
