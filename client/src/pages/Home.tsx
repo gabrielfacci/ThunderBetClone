@@ -367,16 +367,16 @@ export function Home() {
                 {currentGames.map((game) => (
                   <div 
                     key={game.id}
-                    className="relative bg-gray-900/50 rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 touch-manipulation cursor-pointer"
+                    className="group relative bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl overflow-hidden border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 cursor-pointer"
                     onClick={() => handleGameClick(game)}
                   >
-                    <div className="relative h-28 sm:h-32 overflow-hidden rounded-t-xl">
+                    <div className="relative h-32 overflow-hidden">
                       <img 
                         alt={game.name}
                         loading="lazy"
                         decoding="async"
                         src={game.imageUrl}
-                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
+                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           if (!target.src.includes('placeholder')) {
@@ -384,16 +384,14 @@ export function Home() {
                           }
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       <button className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-full hover:bg-black/70 transition-colors">
                         <Heart className="h-4 w-4 text-white" />
                       </button>
-                      <div className="absolute bottom-1.5 sm:bottom-2 left-1.5 sm:left-2 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-[#00000078] text-[#ffffff] text-center">
-                        {game.provider}
-                      </div>
                     </div>
-                    <div className="p-2 sm:p-3 bg-gray-900/80">
-                      <h3 className="text-white text-xs sm:text-sm font-medium truncate">{game.name}</h3>
+                    <div className="p-3">
+                      <h3 className="text-white text-sm font-semibold truncate mb-1">{game.name}</h3>
+                      <p className="text-gray-400 text-xs uppercase tracking-wide">{game.provider}</p>
                     </div>
                   </div>
                 ))}
