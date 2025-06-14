@@ -2,7 +2,7 @@
 
 ## Overview
 
-ThunderBet is a Brazilian online betting platform built as a full-stack TypeScript application using React and Express. The application features a mobile-first design with casino games, deposit/withdrawal functionality via PIX, and user profile management. The system is designed for both national (Portuguese) and international (English) users with automatic language switching based on account mode.
+ThunderBet is a comprehensive Brazilian online betting platform built as a full-stack TypeScript application using React and Express. The application features a mobile-first design with casino games, real-time transaction processing via PIX, and complete user management. The system supports multiple users with individual profiles, game sessions, bonuses, and financial tracking. Real data is stored in Supabase PostgreSQL database with full CRUD operations for users, games, transactions, and system analytics.
 
 ## System Architecture
 

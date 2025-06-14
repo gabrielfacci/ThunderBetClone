@@ -29,46 +29,16 @@ import { eq, and } from 'drizzle-orm';
 // you might need
 
 export interface IStorage {
-  // User operations
+  // Core user operations for the platform
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
   
-  // Game operations
-  getGame(id: number): Promise<Game | undefined>;
-  getGameByGameId(gameId: string): Promise<Game | undefined>;
-  getAllGames(): Promise<Game[]>;
-  getGamesByCategory(category: string): Promise<Game[]>;
-  createGame(game: InsertGame): Promise<Game>;
-  updateGame(id: number, updates: Partial<InsertGame>): Promise<Game | undefined>;
-  
-  // Transaction operations
-  getTransaction(id: number): Promise<Transaction | undefined>;
-  getUserTransactions(userId: number): Promise<Transaction[]>;
-  createTransaction(transaction: InsertTransaction): Promise<Transaction>;
-  updateTransaction(id: number, updates: Partial<InsertTransaction>): Promise<Transaction | undefined>;
-  
-  // Game session operations
-  getGameSession(id: number): Promise<GameSession | undefined>;
-  getUserGameSessions(userId: number): Promise<GameSession[]>;
-  createGameSession(session: InsertGameSession): Promise<GameSession>;
-  updateGameSession(id: number, updates: Partial<InsertGameSession>): Promise<GameSession | undefined>;
-  
-  // Bonus operations
-  getUserBonuses(userId: number): Promise<Bonus[]>;
-  createBonus(bonus: InsertBonus): Promise<Bonus>;
-  updateBonus(id: number, updates: Partial<InsertBonus>): Promise<Bonus | undefined>;
-  
-  // User preferences
-  getUserPreferences(userId: number): Promise<UserPreferences | undefined>;
-  createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
-  updateUserPreferences(userId: number, updates: Partial<InsertUserPreferences>): Promise<UserPreferences | undefined>;
-  
-  // Audit logs
-  createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
-  getUserAuditLogs(userId: number): Promise<AuditLog[]>;
+  // Transaction operations for deposits/withdrawals
+  createTransaction(transaction: any): Promise<any>;
+  getUserTransactions(userId: number): Promise<any[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -171,11 +141,48 @@ export class PostgresStorage implements IStorage {
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
     try {
-      const result = await this.db.update(users).set(updates).where(eq(users.id, id)).returning();
+      const result = await this.db.update(users).set({
+        ...updates,
+        updatedAt: new Date()
+      }).where(eq(users.id, id)).returning();
       return result[0] || undefined;
     } catch (error) {
       console.error('Error updating user:', error);
       return undefined;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    try {
+      const result = await this.db.select().from(users).where(eq(users.email, email)).limit(1);
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return undefined;
+    }
+  }
+
+  async createTransaction(transaction: any): Promise<any> {
+    try {
+      const result = await this.db.insert(transactions).values({
+        ...transaction,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+      throw error;
+    }
+  }
+
+  async getUserTransactions(userId: number): Promise<any[]> {
+    try {
+      const result = await this.db.select().from(transactions).where(eq(transactions.userId, userId));
+      return result;
+    } catch (error) {
+      console.error('Error getting user transactions:', error);
+      return [];
     }
   }
 }
