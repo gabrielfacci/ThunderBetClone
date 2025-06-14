@@ -280,21 +280,21 @@ export function Home() {
                 <img 
                   src={banner1}
                   alt="Banner 1"
-                  className="w-full h-32 object-cover rounded-3xl"
+                  className="w-full h-28 sm:h-32 object-contain bg-gray-900/20 rounded-3xl"
                 />
               </div>
               <div className="min-w-full">
                 <img 
                   src={banner2}
                   alt="Banner 2"
-                  className="w-full h-32 object-cover rounded-3xl"
+                  className="w-full h-28 sm:h-32 object-contain bg-gray-900/20 rounded-3xl"
                 />
               </div>
               <div className="min-w-full">
                 <img 
                   src={banner3}
                   alt="Banner 3"
-                  className="w-full h-32 object-cover rounded-3xl"
+                  className="w-full h-28 sm:h-32 object-contain bg-gray-900/20 rounded-3xl"
                 />
               </div>
             </div>
