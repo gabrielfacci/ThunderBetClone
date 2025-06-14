@@ -3,17 +3,28 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppProvider } from "@/contexts/AppContext";
+import { AppProvider, useAppContext } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
 import { Home } from "@/pages/Home";
+import { Auth } from "@/pages/Auth";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  const { user } = useAppContext();
+  
+  // If no user is authenticated, show auth page
+  if (!user) {
+    return <Auth />;
+  }
+
+  // If user is authenticated, show main app
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route component={NotFound} />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
   );
 }
 
@@ -23,9 +34,7 @@ function App() {
       <AppProvider>
         <TooltipProvider>
           <Toaster />
-          <Layout>
-            <Router />
-          </Layout>
+          <Router />
         </TooltipProvider>
       </AppProvider>
     </QueryClientProvider>

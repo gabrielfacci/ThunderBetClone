@@ -15,6 +15,7 @@ interface AppContextType {
   user: User | null;
   language: Language;
   setUser: (user: User | null) => void;
+  logout: () => void;
   updateAccountMode: (mode: AccountMode) => void;
   updateBalance: (balance: number) => void;
   updateFullName: (name: string) => void;
