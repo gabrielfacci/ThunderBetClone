@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles, ChevronLeft, ChevronRight, LogOut, DollarSign, Coins, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -39,6 +39,21 @@ export function Home() {
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }
+  };
+
+  // Função para obter ícones relacionados a apostas/jogos/dinheiro
+  const getWinnerIcon = (index: number) => {
+    const icons = [
+      <DollarSign className="w-4 h-4 text-white" />,
+      <Trophy className="w-4 h-4 text-white" />,
+      <Coins className="w-4 h-4 text-white" />,
+      <Diamond className="w-4 h-4 text-white" />,
+      <Dice6 className="w-4 h-4 text-white" />,
+      <TrendingUp className="w-4 h-4 text-white" />,
+      <Star className="w-4 h-4 text-white" />,
+      <Flame className="w-4 h-4 text-white" />
+    ];
+    return icons[index % icons.length];
   };
   
   // Drag/swipe functionality for categories
@@ -307,9 +322,7 @@ export function Home() {
                 )}
                 <div className="relative flex items-center space-x-3">
                   <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-bold text-white">
-                      {winners[currentWinner].avatar}
-                    </span>
+                    {getWinnerIcon(currentWinner)}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
