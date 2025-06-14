@@ -354,7 +354,7 @@ export function Home() {
         
         {/* Main Content Section */}
         <div className="pb-6">
-          <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
+          <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6 ml-[15px] mr-[15px] pl-[15px] pr-[15px] pt-[15px] pb-[15px]">
             
             {/* Search Bar */}
             <div className="relative">
