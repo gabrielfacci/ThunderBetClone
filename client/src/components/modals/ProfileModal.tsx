@@ -38,13 +38,6 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         </DialogHeader>
         
         <div className="p-6 max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 via-purple-900/20 to-blue-900/20 border border-purple-500/30 backdrop-blur-xl rounded-lg relative">
-          {/* Close Button */}
-          <button 
-            className="absolute right-4 top-4 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-md p-2 z-10"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </button>
           
           {/* Content */}
           <div className="pt-4 pb-2">
@@ -108,6 +101,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
+                        <div className="inline-flex items-center justify-center h-5 w-5 hover:bg-gray-700 text-gray-400 hover:text-white rounded-md cursor-pointer">
+                          <X className="h-3 w-3" />
+                        </div>
                         <ChevronDown className="h-4 w-4 text-gray-400 transition-transform duration-200" />
                       </div>
                     </button>
