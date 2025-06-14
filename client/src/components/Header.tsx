@@ -11,6 +11,8 @@ export function Header() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
+  console.log('Header - user:', user, 'isLoading:', isLoading);
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-purple-500/20">
@@ -25,7 +27,7 @@ export function Header() {
 
           {/* Auth Buttons or User Info */}
           <div className="flex items-center space-x-2">
-            {!user ? (
+            {!user && !isLoading && (
               <>
                 <Button
                   variant="outline"
@@ -43,7 +45,9 @@ export function Header() {
                   Cadastrar
                 </Button>
               </>
-            ) : (
+            )}
+            
+            {user && (
               <div className="flex items-center space-x-3">
                 <div className="text-right">
                   <p className="text-white text-sm font-medium">{user.fullName}</p>
