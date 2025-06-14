@@ -201,7 +201,7 @@ export function Home() {
                 <span className="text-green-400 font-medium ml-[3px] mr-[3px]">
                   {formatBalance(user?.balance || 0)}
                 </span>
-                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10">
+                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10 ml-[0px] mr-[0px]">
                   <RefreshCw className="h-3 w-3" />
                 </button>
               </div>
