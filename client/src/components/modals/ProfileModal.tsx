@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User, Phone, Globe, X } from 'lucide-react';
+import { User, Phone, Globe, X, Save, MapPin, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppContext } from '@/contexts/AppContext';
 // Remove this import since AccountMode is not exported
@@ -82,7 +82,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     Nome Completo
                   </label>
                   <input 
-                    className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 bg-gray-800/50 border-gray-700 text-white placeholder-gray-500" 
+                    className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 bg-gray-800/50 text-white placeholder-gray-500 border-purple-500/50 focus:border-purple-400" 
                     placeholder="Nome Completo" 
                     name="name"
                     value={fullName}
@@ -92,90 +92,51 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Globe className="w-4 h-4" />
+                    <MapPin className="w-4 h-4" />
                     Modo de conta
                   </label>
-                  
-                  <div className="space-y-2">
-                    {/* International Option */}
-                    <div 
-                      className={`rounded-lg p-3 cursor-pointer border-2 transition-colors ${
-                        selectedMode === 'international' 
-                          ? 'border-purple-500 bg-gray-700/50' 
-                          : 'border-gray-700 bg-gray-800/50 hover:bg-gray-700/50'
-                      }`}
-                      onClick={() => setSelectedMode('international')}
+                  <div className="relative w-full">
+                    <button 
+                      className="inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border hover:text-white h-10 px-4 py-2 w-full justify-between text-left font-normal bg-gray-800/50 border-gray-700 text-white hover:bg-gray-800/70" 
+                      type="button"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Globe className="w-3 h-3 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-white text-sm">Internacional</h4>
-                            <p className="text-xs text-gray-400">Outros países</p>
-                          </div>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                          selectedMode === 'international' 
-                            ? 'bg-purple-500 border-purple-500' 
-                            : 'border-gray-400'
-                        }`}>
-                          {selectedMode === 'international' && (
-                            <div className="w-2 h-2 bg-white rounded-full" />
-                          )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🇧🇷</span>
+                        <div className="flex flex-col items-start">
+                          <span className="text-white">Nacional</span>
+                          <span className="text-xs text-gray-400">Brasil</span>
                         </div>
                       </div>
-                    </div>
-
-                    {/* National Option */}
-                    <div 
-                      className={`rounded-lg p-3 cursor-pointer border-2 transition-colors ${
-                        selectedMode === 'national' 
-                          ? 'border-purple-500 bg-gray-700/50' 
-                          : 'border-gray-700 bg-gray-800/50 hover:bg-gray-700/50'
-                      }`}
-                      onClick={() => setSelectedMode('national')}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-6 h-6 bg-green-600 rounded-lg flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">BR</span>
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-white text-sm">Nacional</h4>
-                            <p className="text-xs text-gray-400">Brasil</p>
-                          </div>
+                      <div className="flex items-center gap-1">
+                        <div className="inline-flex items-center justify-center h-5 w-5 hover:bg-gray-700 text-gray-400 hover:text-white rounded-md cursor-pointer">
+                          <X className="h-3 w-3" />
                         </div>
-                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                          selectedMode === 'national' 
-                            ? 'bg-purple-500 border-purple-500' 
-                            : 'border-gray-400'
-                        }`}>
-                          {selectedMode === 'national' && (
-                            <div className="w-2 h-2 bg-white rounded-full" />
-                          )}
-                        </div>
+                        <ChevronDown className="h-4 w-4 text-gray-400 transition-transform duration-200" />
                       </div>
-                    </div>
+                    </button>
                   </div>
-                  
                   <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
                     <p className="text-xs text-gray-400 mb-1">Sua conta vai estar como:</p>
-                    <p className="text-sm text-white font-medium">
-                      {selectedMode === 'national' ? 'Nacional' : 'Internacional'}
-                    </p>
+                    <p className="text-sm text-white font-medium">Nacional</p>
                   </div>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <button 
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-10 px-4 py-2 w-full text-white" 
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-10 px-4 py-2 flex-1 border-gray-600 text-gray-300 hover:bg-gray-800" 
                     type="button"
-                    onClick={handleSave}
+                    onClick={onClose}
                   >
-                    <User className="w-4 h-4 mr-2" />
-                    Editar Perfil
+                    Cancelar
+                  </button>
+                  <button 
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-10 px-4 py-2 flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50" 
+                    type="submit"
+                    onClick={handleSave}
+                    disabled={false}
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Salvar Alterações
                   </button>
                 </div>
               </form>
