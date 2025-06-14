@@ -120,12 +120,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('Email e senha são obrigatórios');
       }
 
+      // Convert all emails to use the working thunderbet.com domain
+      const convertEmailForAuth = (originalEmail: string): string => {
+        const emailLower = originalEmail.toLowerCase().trim();
+        const [username] = emailLower.split('@');
+        
+        // Use a simple hash to make usernames unique while preserving the original
+        const hashCode = username.split('').reduce((a, b) => {
+          a = ((a << 5) - a) + b.charCodeAt(0);
+          return a & a;
+        }, 0);
+        
+        return `${username}${Math.abs(hashCode)}@thunderbet.com`;
+      };
+
+      const authEmail = convertEmailForAuth(email);
+      console.log('Original email:', email);
+      console.log('Auth email:', authEmail);
+
       const { data, error } = await supabase.auth.signUp({
-        email: email,
+        email: authEmail,
         password: password,
         options: {
           data: {
-            full_name: fullName.trim()
+            full_name: fullName.trim(),
+            original_email: email // Store original email in metadata
           }
         }
       });
@@ -146,6 +165,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         message = 'Senha muito fraca. Use pelo menos 6 caracteres';
       } else if (error.code === 'email_address_already_in_use') {
         message = 'Este email já está cadastrado';
+      } else if (error.code === 'email_address_invalid') {
+        message = 'Email inválido. Tente com um formato diferente.';
       } else if (error.message) {
         message = error.message;
       }
@@ -160,8 +181,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('Email e senha são obrigatórios');
       }
 
+      // Apply same email conversion for login
+      const convertEmailForAuth = (originalEmail: string): string => {
+        const emailLower = originalEmail.toLowerCase().trim();
+        const [username] = emailLower.split('@');
+        
+        // Use same hash logic as signup
+        const hashCode = username.split('').reduce((a, b) => {
+          a = ((a << 5) - a) + b.charCodeAt(0);
+          return a & a;
+        }, 0);
+        
+        return `${username}${Math.abs(hashCode)}@thunderbet.com`;
+      };
+
+      const authEmail = convertEmailForAuth(email);
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
+        email: authEmail,
         password: password
       });
 
