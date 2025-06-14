@@ -137,22 +137,42 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      console.log('Tentando cadastrar:', { email: email.trim(), fullName });
+      
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         options: {
           data: {
-            full_name: fullName
+            full_name: fullName.trim()
           }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro detalhado do Supabase:', error);
+        throw error;
+      }
+      
+      console.log('Cadastro bem-sucedido:', data);
       
       // Não precisa fazer mais nada - onAuthStateChange vai lidar com o resto
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
-      throw new Error(error.message || 'Erro ao criar conta');
+      
+      // Melhorar mensagens de erro
+      let errorMessage = 'Erro ao criar conta';
+      if (error.code === 'email_address_invalid') {
+        errorMessage = 'Email inválido. Verifique o formato do email.';
+      } else if (error.code === 'weak_password') {
+        errorMessage = 'Senha muito fraca. Use pelo menos 6 caracteres.';
+      } else if (error.code === 'email_address_already_in_use') {
+        errorMessage = 'Este email já está em uso.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
     }
   };
 

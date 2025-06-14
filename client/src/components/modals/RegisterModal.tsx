@@ -56,12 +56,14 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       return;
     }
 
-    // Validação de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Validação de email mais rigorosa
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const cleanEmail = email.trim().toLowerCase();
+    
+    if (!emailRegex.test(cleanEmail) || cleanEmail.length < 3 || cleanEmail.length > 254) {
       toast({
         title: "Email inválido",
-        description: "Digite um email válido.",
+        description: "Digite um email válido (ex: nome@email.com).",
         variant: "destructive",
       });
       return;
@@ -89,7 +91,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
     setIsLoading(true);
     try {
       const cleanPhone = `+55${phoneNumbers}`;
-      await signUp(email, password, fullName.trim());
+      await signUp(cleanEmail, password, fullName.trim());
       
       toast({
         title: "Conta criada com sucesso!",
@@ -102,6 +104,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       setPhone('');
       setPassword('');
     } catch (error: any) {
+      console.error('Erro no modal de cadastro:', error);
       toast({
         title: "Erro no cadastro",
         description: error.message || "Não foi possível criar a conta. Tente novamente.",
