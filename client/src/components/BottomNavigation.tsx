@@ -6,21 +6,31 @@ import { DepositModal } from './modals/DepositModal';
 import { WithdrawalModal } from './modals/WithdrawalModal';
 import { PromotionModal } from './modals/PromotionModal';
 import { ProfileModal } from './modals/ProfileModal';
+import { LoginToast } from './ui/toast-login';
 import navBackground from '@assets/image_1749830967541.png';
 
 type ModalType = 'deposit' | 'withdrawal' | 'promotion' | 'profile' | null;
 
-export function BottomNavigation() {
+interface BottomNavigationProps {
+  onLoginRequest?: () => void;
+}
+
+export function BottomNavigation({ onLoginRequest }: BottomNavigationProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [activeTab, setActiveTab] = useState('home');
+  const [showLoginToast, setShowLoginToast] = useState(false);
 
   const openModal = (modal: ModalType) => {
-    // Bloquear modais que requerem autenticação
-    if ((modal === 'deposit' || modal === 'withdrawal' || modal === 'profile') && !user) {
-      return; // Não abre modal se não estiver logado
+    // Bloquear modais que requerem autenticação se usuário não estiver logado
+    const protectedModals: ModalType[] = ['deposit', 'withdrawal', 'profile'];
+    
+    if (protectedModals.includes(modal) && !user) {
+      setShowLoginToast(true);
+      return;
     }
+
     setActiveModal(modal);
     setActiveTab(modal || 'home');
   };
@@ -88,8 +98,17 @@ export function BottomNavigation() {
       <DepositModal isOpen={activeModal === 'deposit'} onClose={closeModal} />
       <WithdrawalModal isOpen={activeModal === 'withdrawal'} onClose={closeModal} />
       <PromotionModal isOpen={activeModal === 'promotion'} onClose={closeModal} />
-
       <ProfileModal isOpen={activeModal === 'profile'} onClose={closeModal} />
+
+      {/* Login Toast para usuários não logados */}
+      <LoginToast 
+        isOpen={showLoginToast}
+        onClose={() => setShowLoginToast(false)}
+        onLogin={() => {
+          setShowLoginToast(false);
+          onLoginRequest?.();
+        }}
+      />
     </>
   );
 }
