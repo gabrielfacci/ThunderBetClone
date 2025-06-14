@@ -286,7 +286,7 @@ export function Home() {
         </div>
         
         {/* Main Content Section */}
-        <div className="px-4 pb-24 max-w-md mx-auto">
+        <div className="pb-6">
           <div className="bg-gray-800/20 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 space-y-6">
             
             {/* Search Bar */}
