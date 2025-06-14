@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingDown, History, DollarSign } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface WithdrawalModalProps {
@@ -16,7 +16,7 @@ interface WithdrawalModalProps {
 
 export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
   const { t } = useTranslation();
-  const { user, updateBalance } = useAppContext();
+  const { user, updateBalance } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'withdrawal' | 'history'>('withdrawal');
   const [amount, setAmount] = useState('');

@@ -165,24 +165,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                   )}
                 </div>
 
-                {/* Email Input */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-purple-400" />
-                    Email
-                  </label>
-                  <div className="relative group">
-                    <input
-                      {...form.register('email')}
-                      type="email"
-                      className="flex w-full border px-3 py-2 text-sm text-white h-12 bg-gray-800/70 border-gray-600/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-xl transition-all duration-200 group-hover:border-gray-500 placeholder:text-gray-400 focus-visible:outline-none"
-                      placeholder="seu@email.com"
-                    />
-                  </div>
-                  {form.formState.errors.email && (
-                    <p className="text-sm text-red-400">{form.formState.errors.email.message}</p>
-                  )}
-                </div>
+
 
                 {/* Phone Input */}
                 <div className="space-y-2">

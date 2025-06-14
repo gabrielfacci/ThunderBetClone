@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard, History, QrCode, DollarSign } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface DepositModalProps {
@@ -15,7 +15,7 @@ interface DepositModalProps {
 
 export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const { t } = useTranslation();
-  const { user, updateBalance } = useAppContext();
+  const { user, updateBalance } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'pix' | 'history'>('pix');
   const [amount, setAmount] = useState('');

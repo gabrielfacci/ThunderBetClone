@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Phone, Globe, X, Save, MapPin, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 // Remove this import since AccountMode is not exported
 
 interface ProfileModalProps {
@@ -15,7 +15,7 @@ interface ProfileModalProps {
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { t } = useTranslation();
-  const { user, updateAccountMode, updateFullName } = useAppContext();
+  const { user, refreshUser } = useAuth();
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [selectedMode, setSelectedMode] = useState<'national' | 'international'>(user?.accountMode || 'national');
 
