@@ -1,4 +1,7 @@
 import { users, type User, type InsertUser } from "@shared/schema";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { eq } from 'drizzle-orm';
 
 // modify the interface with any CRUD methods
 // you might need
@@ -7,6 +10,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
 }
 
 export class MemStorage implements IStorage {
