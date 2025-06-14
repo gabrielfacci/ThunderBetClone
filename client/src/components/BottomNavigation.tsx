@@ -17,9 +17,9 @@ export function BottomNavigation() {
   const [activeTab, setActiveTab] = useState('home');
 
   const openModal = (modal: ModalType) => {
-    if (!user) {
-      // Se não estiver logado, não abre os modais
-      return;
+    // Bloquear modais que requerem autenticação
+    if ((modal === 'deposit' || modal === 'withdrawal' || modal === 'profile') && !user) {
+      return; // Não abre modal se não estiver logado
     }
     setActiveModal(modal);
     setActiveTab(modal || 'home');
