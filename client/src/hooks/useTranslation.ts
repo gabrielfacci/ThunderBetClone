@@ -1,8 +1,8 @@
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { translations } from '@/lib/translations';
 
 export function useTranslation() {
-  const { language } = useAppContext();
+  const { language } = useAuth();
 
   const t = (key: string): string => {
     return translations[language][key] || key;

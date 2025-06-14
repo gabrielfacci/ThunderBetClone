@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, RotateCcw, Share, Heart, Flame, Trophy, Star, Dice6, Diamond, Wallet, RefreshCw, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { games, winners, categories, GameData, WinnerData } from '@/lib/gameData';
 import { GameLoadingModal } from '@/components/modals/GameLoadingModal';
 import { InsufficientBalanceModal } from '@/components/modals/InsufficientBalanceModal';
@@ -14,7 +14,7 @@ import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Home() {
   const { t } = useTranslation();
-  const { user } = useAppContext();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentBanner, setCurrentBanner] = useState(0);

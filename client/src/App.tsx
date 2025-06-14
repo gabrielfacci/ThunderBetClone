@@ -3,15 +3,13 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppProvider, useAppContext } from "@/contexts/AppContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { Header } from "@/components/Header";
 import { Home } from "@/pages/Home";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { user } = useAppContext();
-  
   // Always show the app with Header - authentication happens via modals
   return (
     <>
@@ -29,12 +27,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppProvider>
+      <AuthProvider>
         <TooltipProvider>
           <Toaster />
           <Router />
         </TooltipProvider>
-      </AppProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

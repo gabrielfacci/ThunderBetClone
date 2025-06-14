@@ -32,13 +32,12 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { setUser } = useAppContext();
+  const { signUp } = useAuth();
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       fullName: '',
-      email: '',
       countryCode: '+55',
       phone: '',
       password: '',
@@ -49,50 +48,21 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      const fullPhoneNumber = `${data.countryCode}${data.phone}`;
+      const fullPhoneNumber = `${data.countryCode}${data.phone.replace(/\D/g, '')}`;
       
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: data.fullName,
-          email: data.email,
-          phone: fullPhoneNumber,
-          password: data.password,
-        }),
-      });
+      await signUp(fullPhoneNumber, data.password, data.fullName);
 
-      if (response.ok) {
-        const userData = await response.json();
-        setUser({
-          id: userData.id,
-          fullName: userData.full_name || userData.fullName,
-          phone: userData.phone,
-          accountMode: userData.account_mode || userData.accountMode,
-          balance: parseFloat(userData.balance) || 0,
-        });
-
-        toast({
-          title: "Conta criada!",
-          description: "Bem-vindo à ThunderBet. Sua conta foi criada com sucesso.",
-        });
-        
-        form.reset();
-        onClose();
-      } else {
-        const error = await response.json();
-        toast({
-          title: "Erro no cadastro",
-          description: error.message || "Não foi possível criar a conta",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
       toast({
-        title: "Erro de conexão",
-        description: "Não foi possível conectar ao servidor",
+        title: "Conta criada!",
+        description: "Bem-vindo à ThunderBet. Sua conta foi criada com sucesso.",
+      });
+      
+      form.reset();
+      onClose();
+    } catch (error: any) {
+      toast({
+        title: "Erro no cadastro",
+        description: error.message || "Não foi possível criar a conta",
         variant: "destructive",
       });
     } finally {

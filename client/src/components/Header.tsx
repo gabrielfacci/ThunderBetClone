@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { LoginModal } from '@/components/modals/LoginModal';
 import { RegisterModal } from '@/components/modals/RegisterModal';
+import { LogOut } from 'lucide-react';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Header() {
-  const { user, logout } = useAppContext();
+  const { user, logout, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
