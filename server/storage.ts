@@ -47,6 +47,80 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
     return user;
   }
+
+  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...updates };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
 }
 
-export const storage = new MemStorage();
+// PostgreSQL Storage implementation for Supabase
+export class PostgresStorage implements IStorage {
+  private db: ReturnType<typeof drizzle>;
+
+  constructor() {
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL environment variable is required');
+    }
+    
+    // Create postgres client with connection options instead of URL parsing
+    const sql = postgres({
+      host: 'aws-0-sa-east-1.pooler.supabase.com',
+      port: 6543,
+      database: 'postgres',
+      username: 'postgres.kgpmvqfehzkeyrtexdkb',
+      password: 'Jo#83321666',
+      ssl: 'require',
+      max: 1,
+    });
+    this.db = drizzle(sql);
+  }
+
+  async getUser(id: number): Promise<User | undefined> {
+    try {
+      const result = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return undefined;
+    }
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    try {
+      const result = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error getting user by username:', error);
+      return undefined;
+    }
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    try {
+      const result = await this.db.insert(users).values(insertUser).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+  }
+
+  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
+    try {
+      const result = await this.db.update(users).set(updates).where(eq(users.id, id)).returning();
+      return result[0] || undefined;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return undefined;
+    }
+  }
+}
+
+// Use PostgreSQL storage when DATABASE_URL is available, fallback to memory storage
+export const storage = process.env.DATABASE_URL ? new PostgresStorage() : new MemStorage();

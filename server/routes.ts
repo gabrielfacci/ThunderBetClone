@@ -27,9 +27,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = parseInt(req.params.id);
       const updates = req.body;
       
-      // Mock update - in real app would use storage.updateUser
-      res.json({ success: true, message: "Profile updated successfully" });
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json(updatedUser);
     } catch (error) {
+      console.error('Error updating user:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
