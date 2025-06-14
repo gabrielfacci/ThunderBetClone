@@ -46,12 +46,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async function getInitialSession() {
       try {
         // Check if we have valid Supabase credentials
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.SUPABASE_URL;
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://kgpmvqfehzkeyrtexdkb.supabase.co';
         const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
         
-        if (!supabaseUrl || !supabaseKey || 
-            supabaseUrl.includes('placeholder') || 
-            supabaseKey.includes('placeholder')) {
+        if (!supabaseKey || supabaseKey.includes('placeholder')) {
           console.log('No valid Supabase credentials - staying logged out');
           if (mounted) {
             setIsLoading(false);
@@ -136,12 +134,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (phone: string, password: string, fullName: string) => {
     // Check if we have valid Supabase credentials
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.SUPABASE_URL;
     const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
     
-    if (!supabaseUrl || !supabaseKey || 
-        supabaseUrl.includes('placeholder') || 
-        supabaseKey.includes('placeholder')) {
+    if (!supabaseKey || supabaseKey.includes('placeholder')) {
       throw new Error('Configure as credenciais do Supabase para usar a autenticação');
     }
 
@@ -155,12 +150,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signIn = async (phone: string, password: string) => {
     // Check if we have valid Supabase credentials
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.SUPABASE_URL;
     const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
     
-    if (!supabaseUrl || !supabaseKey || 
-        supabaseUrl.includes('placeholder') || 
-        supabaseKey.includes('placeholder')) {
+    if (!supabaseKey || supabaseKey.includes('placeholder')) {
       throw new Error('Configure as credenciais do Supabase para usar a autenticação');
     }
 
