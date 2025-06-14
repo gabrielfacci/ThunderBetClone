@@ -8,7 +8,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-black text-white overflow-x-hidden">
-      <div className="w-full max-w-md mx-auto relative min-h-screen pb-24 sm:pb-28">
+      <div className="w-full max-w-md mx-auto relative min-h-screen pb-[87px]">
         <div className="px-3 sm:px-4">
           {children}
         </div>
