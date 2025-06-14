@@ -276,35 +276,29 @@ export function Home() {
               className="flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentBanner * 100}%)` }}
             >
-              <div className="min-w-full">
-                <div className="relative w-full overflow-hidden rounded-3xl bg-gray-900/20">
-                  <img 
-                    src={banner1}
-                    alt="Banner 1"
-                    className="w-full h-auto object-contain rounded-3xl"
-                    style={{ minHeight: '112px', maxHeight: '160px' }}
-                  />
-                </div>
+              <div className="min-w-full flex justify-center">
+                <img 
+                  src={banner1}
+                  alt="Banner 1"
+                  className="w-full h-auto object-contain rounded-3xl shadow-lg"
+                  style={{ maxWidth: '100%', maxHeight: '160px' }}
+                />
               </div>
-              <div className="min-w-full">
-                <div className="relative w-full overflow-hidden rounded-3xl bg-gray-900/20">
-                  <img 
-                    src={banner2}
-                    alt="Banner 2"
-                    className="w-full h-auto object-contain rounded-3xl"
-                    style={{ minHeight: '112px', maxHeight: '160px' }}
-                  />
-                </div>
+              <div className="min-w-full flex justify-center">
+                <img 
+                  src={banner2}
+                  alt="Banner 2"
+                  className="w-full h-auto object-contain rounded-3xl shadow-lg"
+                  style={{ maxWidth: '100%', maxHeight: '160px' }}
+                />
               </div>
-              <div className="min-w-full">
-                <div className="relative w-full overflow-hidden rounded-3xl bg-gray-900/20">
-                  <img 
-                    src={banner3}
-                    alt="Banner 3"
-                    className="w-full h-auto object-contain rounded-3xl"
-                    style={{ minHeight: '112px', maxHeight: '160px' }}
-                  />
-                </div>
+              <div className="min-w-full flex justify-center">
+                <img 
+                  src={banner3}
+                  alt="Banner 3"
+                  className="w-full h-auto object-contain rounded-3xl shadow-lg"
+                  style={{ maxWidth: '100%', maxHeight: '160px' }}
+                />
               </div>
             </div>
           </div>
