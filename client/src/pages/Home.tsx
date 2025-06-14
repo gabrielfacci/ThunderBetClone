@@ -180,31 +180,33 @@ export function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 text-white">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-purple-500/20 safe-area-inset-top">
-        <div className="px-3 sm:px-4 py-2 sm:py-3 max-w-md mx-auto bg-[#00000042]">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-800 via-purple-700 to-purple-800 safe-area-inset-top">
+        <div className="px-4 py-3 max-w-md mx-auto">
           <div className="flex items-center justify-between">
-            <div className="relative flex items-center transition-all duration-700 ease-out group hover:scale-105 cursor-pointer touch-manipulation">
-              <img 
-                src={thunderbetLogo} 
-                alt="ThunderBet" 
-                className="h-12 sm:h-16 w-auto transition-all duration-700 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_35px_rgba(255,215,0,0.8)]"
-              />
+            {/* Logo */}
+            <div className="flex items-center">
+              <div className="text-yellow-400 font-bold text-lg tracking-wide">
+                THUNDER
+                <span className="text-yellow-300">⚡</span>
+                BET
+              </div>
             </div>
             
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-800/60 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
-                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
-                <span className="text-green-400 font-medium text-xs sm:text-sm">
-                  {formatBalance(user?.balance || 0)}
-                </span>
-                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors touch-manipulation active:scale-95 h-5 w-5 sm:h-6 sm:w-6 text-green-400 hover:text-green-300 hover:bg-green-400/10">
-                  <RefreshCw className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                </button>
-              </div>
-              <button className="p-1.5 sm:p-2 hover:bg-white/10 rounded-lg transition-colors touch-manipulation active:scale-95">
-                <Share className="w-3 h-3 sm:w-4 sm:h-4 text-gray-300" />
+            {/* Center - Balance */}
+            <div className="flex items-center space-x-2 bg-black/20 rounded-lg px-3 py-2">
+              <Wallet className="h-4 w-4 text-green-400" />
+              <span className="text-green-400 font-medium text-sm">
+                {formatBalance(user?.balance || 0)}
+              </span>
+              <button className="text-green-400 hover:text-green-300 transition-colors">
+                <RefreshCw className="h-3 w-3" />
               </button>
             </div>
+            
+            {/* Right - Share */}
+            <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+              <Share className="w-4 h-4 text-white" />
+            </button>
           </div>
         </div>
       </header>
