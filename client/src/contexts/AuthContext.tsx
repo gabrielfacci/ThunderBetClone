@@ -33,72 +33,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Carregar perfil do usuário do Supabase
-  async function loadUserProfile(authUser: SupabaseUser) {
-    try {
-      const { data: profile, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', authUser.id)
-        .single();
-
-      if (error) {
-        console.error('Erro ao carregar perfil:', error);
-        return;
-      }
-
-      if (profile) {
-        setUser(profile);
-      }
-    } catch (error) {
-      console.error('Erro inesperado ao carregar perfil:', error);
-    }
+  // Create user profile from Supabase auth user
+  function createUserProfile(authUser: SupabaseUser): UserProfile {
+    return {
+      id: authUser.id,
+      email: authUser.email || '',
+      phone: authUser.phone || '',
+      full_name: authUser.user_metadata?.full_name || '',
+      balance: 1000, // Default balance for demo
+      created_at: authUser.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
   }
 
-  // Inicializar autenticação
   useEffect(() => {
     let mounted = true;
 
-    async function initializeAuth() {
-      try {
-        // Verificar sessão atual
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Erro ao verificar sessão:', error);
-        }
-
-        if (mounted) {
-          if (session?.user) {
-            setSupabaseUser(session.user);
-            await loadUserProfile(session.user);
-          } else {
-            setUser(null);
-            setSupabaseUser(null);
-          }
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error('Erro ao inicializar auth:', error);
-        if (mounted) {
-          setIsLoading(false);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mounted) {
+        if (session?.user) {
+          setSupabaseUser(session.user);
+          setUser(createUserProfile(session.user));
+          console.log('Session loaded:', session.user.email);
+        } else {
           setUser(null);
           setSupabaseUser(null);
         }
+        setIsLoading(false);
       }
-    }
+    });
 
-    initializeAuth();
-
-    // Escutar mudanças de autenticação
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
+      (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email || 'null');
         
         if (mounted) {
           if (session?.user) {
             setSupabaseUser(session.user);
-            await loadUserProfile(session.user);
+            setUser(createUserProfile(session.user));
+            console.log('User authenticated:', session.user.email);
           } else {
             setUser(null);
             setSupabaseUser(null);
@@ -120,31 +95,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('Email e senha são obrigatórios');
       }
 
-      // Convert all emails to use the working thunderbet.com domain
-      const convertEmailForAuth = (originalEmail: string): string => {
-        const emailLower = originalEmail.toLowerCase().trim();
-        const [username] = emailLower.split('@');
-        
-        // Use a simple hash to make usernames unique while preserving the original
-        const hashCode = username.split('').reduce((a, b) => {
-          a = ((a << 5) - a) + b.charCodeAt(0);
-          return a & a;
-        }, 0);
-        
-        return `${username}${Math.abs(hashCode)}@thunderbet.com`;
-      };
-
-      const authEmail = convertEmailForAuth(email);
-      console.log('Original email:', email);
-      console.log('Auth email:', authEmail);
+      console.log('Tentando cadastro com email original:', email);
 
       const { data, error } = await supabase.auth.signUp({
-        email: authEmail,
+        email: email,
         password: password,
         options: {
           data: {
-            full_name: fullName.trim(),
-            original_email: email // Store original email in metadata
+            full_name: fullName.trim()
           }
         }
       });
@@ -154,7 +112,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw error;
       }
 
-      console.log('Cadastro realizado com sucesso:', data);
+      console.log('Cadastro realizado:', data);
+
+      // If no session was created automatically, sign in the user
+      if (!data.session && data.user) {
+        console.log('Sem sessão automática, fazendo login...');
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (loginError) {
+          console.error('Erro no login automático:', loginError.message);
+          throw loginError;
+        }
+
+        console.log('Login automático realizado:', loginData);
+      }
       
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
@@ -181,24 +155,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('Email e senha são obrigatórios');
       }
 
-      // Apply same email conversion for login
-      const convertEmailForAuth = (originalEmail: string): string => {
-        const emailLower = originalEmail.toLowerCase().trim();
-        const [username] = emailLower.split('@');
-        
-        // Use same hash logic as signup
-        const hashCode = username.split('').reduce((a, b) => {
-          a = ((a << 5) - a) + b.charCodeAt(0);
-          return a & a;
-        }, 0);
-        
-        return `${username}${Math.abs(hashCode)}@thunderbet.com`;
-      };
-
-      const authEmail = convertEmailForAuth(email);
-
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: authEmail,
+        email: email,
         password: password
       });
 
