@@ -105,6 +105,12 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     }
   };
 
+  useEffect(() => {
+    if (isOpen && activeTab === 'history') {
+      loadTransactions();
+    }
+  }, [isOpen, activeTab, user]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gray-900/98 backdrop-blur-md border-gray-700/50 text-white w-[95%] max-w-sm mx-auto rounded-2xl max-h-[85vh] overflow-y-auto p-0 sm:max-w-md ml-[0px] mr-[0px] pl-[12px] pr-[12px] pt-[30px] pb-[30px]">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { TrendingDown, History, DollarSign } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAppContext } from '@/contexts/AppContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface WithdrawalModalProps {
   isOpen: boolean;
@@ -15,10 +16,14 @@ interface WithdrawalModalProps {
 
 export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
   const { t } = useTranslation();
-  const { user } = useAppContext();
+  const { user, updateBalance } = useAppContext();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'withdrawal' | 'history'>('withdrawal');
   const [amount, setAmount] = useState('');
+  const [pixKey, setPixKey] = useState('');
   const [pixKeyType, setPixKeyType] = useState('cpf');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   const quickAmounts = [50, 100, 200, 500, 1000];
 
@@ -38,8 +43,91 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
   };
 
   const formatBalance = (balance: number) => {
-    return `R$ ${(balance / 100).toFixed(2).replace('.', ',')}`;
+    return `R$ ${balance.toFixed(2).replace('.', ',')}`;
   };
+
+  const handleWithdrawal = async () => {
+    if (!user || !amount || !pixKey) return;
+    
+    const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
+    if (numericAmount < 20) {
+      toast({
+        title: "Valor mínimo",
+        description: "O valor mínimo para saque é R$ 20,00",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (numericAmount > user.balance) {
+      toast({
+        title: "Saldo insuficiente",
+        description: "Você não possui saldo suficiente para este saque",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/transactions/withdrawal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          amount: numericAmount,
+          pixKey
+        }),
+      });
+
+      if (response.ok) {
+        const transaction = await response.json();
+        await updateBalance(parseFloat(transaction.balanceAfter));
+        
+        toast({
+          title: "Saque solicitado!",
+          description: `Seu saque de R$ ${numericAmount.toFixed(2).replace('.', ',')} está sendo processado`,
+        });
+        
+        setAmount('');
+        setPixKey('');
+        onClose();
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || 'Erro ao processar saque');
+      }
+    } catch (error) {
+      toast({
+        title: "Erro no saque",
+        description: error instanceof Error ? error.message : "Não foi possível processar o saque",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const loadTransactions = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`/api/user/${user.id}/transactions`);
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data.filter((t: any) => t.type === 'withdrawal'));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar transações:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && activeTab === 'history') {
+      loadTransactions();
+    }
+  }, [isOpen, activeTab, user]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
