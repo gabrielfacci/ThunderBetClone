@@ -116,9 +116,9 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="p-0 border-0 bg-transparent max-w-lg w-full">
-        <div className="relative z-50 w-full max-w-lg mx-4 bg-gray-900 border border-gray-700 rounded-lg shadow-xl">
-          <div className="p-6 max-w-lg bg-gradient-to-br from-slate-900/98 via-purple-900/95 to-blue-900/98 border border-purple-500/30 backdrop-blur-2xl shadow-2xl rounded-lg">
+      <DialogContent className="p-0 border-0 bg-transparent max-w-lg w-full max-h-[95vh] overflow-y-auto">
+        <div className="relative z-50 w-full max-w-lg mx-2 sm:mx-4 bg-gray-900 border border-gray-700 rounded-lg shadow-xl">
+          <div className="p-3 sm:p-6 max-w-lg bg-gradient-to-br from-slate-900/98 via-purple-900/95 to-blue-900/98 border border-purple-500/30 backdrop-blur-2xl shadow-2xl rounded-lg">
             {/* Background Effects */}
             <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-blue-600/5 to-cyan-600/10 rounded-lg"></div>
             <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
@@ -134,13 +134,13 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
               </button>
             </div>
 
-            <div className="relative z-10 p-6">
+            <div className="relative z-10 p-3 sm:p-6">
               {/* Header */}
-              <div className="flex flex-col sm:text-left text-center space-y-6 mb-8">
+              <div className="flex flex-col sm:text-left text-center space-y-4 sm:space-y-6 mb-6 sm:mb-8">
                 <div className="flex justify-center">
                   <div className="relative">
                     <div className="relative flex items-center gap-2 transition-all duration-700 ease-out group hover:scale-110 cursor-pointer">
-                      <div className="relative transition-all duration-700 w-20 h-20 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_40px_rgba(255,215,0,0.8)] group-hover:brightness-125">
+                      <div className="relative transition-all duration-700 w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] filter brightness-110 group-hover:drop-shadow-[0_0_40px_rgba(255,215,0,0.8)] group-hover:brightness-125">
                         <div className="absolute inset-0 bg-gradient-radial from-yellow-400/40 via-orange-500/20 to-transparent rounded-full blur-xl -z-30 animate-pulse"></div>
                         <div className="absolute inset-0 bg-gradient-conic from-yellow-300/30 via-amber-400/20 to-orange-500/30 rounded-full blur-lg -z-20 animate-spin-slow"></div>
                         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/25 via-transparent to-amber-500/25 rounded-lg blur-md -z-10"></div>
