@@ -87,16 +87,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function loadUserProfile(supabaseUser: SupabaseUser) {
     try {
-      let profile = await authHelpers.getUserProfile(supabaseUser.id);
+      let profile = await getUserProfile(supabaseUser.id);
       
       // If profile doesn't exist, create it from auth metadata
       if (!profile) {
         const metadata = supabaseUser.user_metadata;
-        profile = await authHelpers.createUserProfile(
-          supabaseUser.id,
-          metadata.phone || '',
-          metadata.full_name || ''
-        );
+        profile = await createUserProfile({
+          id: supabaseUser.id,
+          phone: metadata.phone || '',
+          full_name: metadata.full_name || 'User',
+          account_mode: 'national'
+        });
       }
 
       if (profile) {
@@ -145,8 +146,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!user) return;
     
     try {
-      await authHelpers.updateUserBalance(user.id, newBalance);
-      setUser(prev => prev ? { ...prev, balance: newBalance } : null);
+      const success = await updateUserBalance(user.id, newBalance);
+      if (success) {
+        setUser(prev => prev ? { ...prev, balance: newBalance } : null);
+      }
     } catch (error) {
       console.error('Error updating balance:', error);
     }

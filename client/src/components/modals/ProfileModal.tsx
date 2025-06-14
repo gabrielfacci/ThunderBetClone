@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { User, Phone, Globe, X, Save, MapPin, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
-// Remove this import since AccountMode is not exported
+import { updateUserProfile } from '@/lib/supabaseQueries';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -16,18 +17,46 @@ interface ProfileModalProps {
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { t } = useTranslation();
   const { user, refreshUser } = useAuth();
+  const { toast } = useToast();
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [selectedMode, setSelectedMode] = useState<'national' | 'international'>(user?.accountMode || 'national');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
-    if (fullName.trim() && user) {
-      try {
-        // In a real implementation, this would update the user profile in Supabase
-        await refreshUser();
-        onClose();
-      } catch (error) {
-        console.error('Error updating profile:', error);
+    if (!fullName.trim() || !user) return;
+    
+    setIsLoading(true);
+    try {
+      const updates: { full_name?: string; account_mode?: 'national' | 'international' } = {};
+      
+      if (fullName !== user.fullName) {
+        updates.full_name = fullName;
       }
+      
+      if (selectedMode !== user.accountMode) {
+        updates.account_mode = selectedMode;
+      }
+      
+      if (Object.keys(updates).length > 0) {
+        await updateUserProfile(user.id, updates);
+        await refreshUser();
+        
+        toast({
+          title: "Perfil atualizado",
+          description: "Suas informações foram salvas com sucesso.",
+        });
+      }
+      
+      onClose();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar perfil. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,7 +157,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-10 px-4 py-2 flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50" 
                     type="submit"
                     onClick={handleSave}
-                    disabled={false}
+                    disabled={isLoading}
                   >
                     <Save className="w-4 h-4 mr-2" />
                     Salvar Alterações
