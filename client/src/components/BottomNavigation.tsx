@@ -35,64 +35,69 @@ export function BottomNavigation() {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="px-2 sm:px-4 max-w-md mx-auto py-2 sm:py-3">
-          <div className="grid grid-cols-5 h-20 sm:h-24">
+        <div className="relative h-full flex items-end justify-around px-3 pb-2">
           <button 
-            className="flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 transition-colors text-gray-400 hover:text-gray-300 touch-manipulation active:scale-95 py-2"
+            className="relative flex flex-col items-center cursor-pointer transition-all duration-300 text-gray-400 hover:text-gray-300 touch-manipulation active:scale-95 mb-2"
             onClick={() => openModal('deposit')}
           >
-            <Wallet className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="text-[10px] sm:text-xs leading-tight">{t('Deposit')}</span>
+            <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
+              <Wallet className="w-6 h-6" />
+            </div>
+            <span className="text-xs leading-tight mt-1">{t('Deposit')}</span>
           </button>
           
           <button 
-            className={`flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 transition-colors touch-manipulation active:scale-95 py-2 ${
+            className={`relative flex flex-col items-center cursor-pointer transition-all duration-300 touch-manipulation active:scale-95 mb-2 ${
               activeTab === 'withdrawal' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => openModal('withdrawal')}
           >
-            <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="text-[10px] sm:text-xs leading-tight">{t('Withdrawal')}</span>
+            <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
+              <TrendingDown className="w-6 h-6" />
+            </div>
+            <span className="text-xs leading-tight mt-1">{t('Withdrawal')}</span>
           </button>
           
           <button 
-            className={`flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 transition-colors relative -mt-2 sm:-mt-4 touch-manipulation active:scale-95 ${
+            className={`relative flex flex-col items-center cursor-pointer transition-all duration-300 touch-manipulation active:scale-95 ${
               activeTab === 'home' ? 'text-white' : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab('home')}
           >
-            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center">
+            <div className="relative w-12 h-12 rounded-full flex items-center justify-center mb-2">
               <div className="absolute inset-0 transition-all duration-300 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 shadow-lg shadow-orange-500/40"></div>
-              <Home className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />
+              <Home className="w-7 h-7 relative z-10" />
             </div>
-            <span className="text-[10px] sm:text-xs leading-tight">{t('Home')}</span>
+            <span className="text-xs leading-tight">{t('Home')}</span>
           </button>
           
           <button 
-            className={`flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 transition-colors relative touch-manipulation active:scale-95 py-2 ${
+            className={`relative flex flex-col items-center cursor-pointer transition-all duration-300 touch-manipulation active:scale-95 mb-2 ${
               activeTab === 'promotion' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => openModal('promotion')}
           >
-            <Gift className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="text-[10px] sm:text-xs leading-tight">{t('Promotion')}</span>
-            <div className="absolute top-1 right-2 sm:right-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full"></div>
+            <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
+              <Gift className="w-6 h-6" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+            </div>
+            <span className="text-xs leading-tight mt-1">{t('Promotion')}</span>
           </button>
           
           <button 
-            className={`flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 transition-colors relative touch-manipulation active:scale-95 py-2 ${
+            className={`relative flex flex-col items-center cursor-pointer transition-all duration-300 touch-manipulation active:scale-95 mb-2 ${
               activeTab === 'profile' ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => openModal('profile')}
           >
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-white bg-[#f9731605]">
-              <User className="w-3 h-3 sm:w-4 sm:h-4" />
+            <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10 rounded-full text-white bg-[#f9731605]">
+              <User className="w-5 h-5" />
             </div>
-            <span className="text-[10px] sm:text-xs leading-tight">{t('Profile')}</span>
+            <span className="text-xs leading-tight mt-1">{t('Profile')}</span>
           </button>
-          </div>
         </div>
       </nav>
+      
       {/* Modals */}
       <DepositModal isOpen={activeModal === 'deposit'} onClose={closeModal} />
       <WithdrawalModal isOpen={activeModal === 'withdrawal'} onClose={closeModal} />
