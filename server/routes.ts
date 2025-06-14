@@ -62,23 +62,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user transactions
+  app.get("/api/user/:id/transactions", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const transactions = await storage.getUserTransactions(userId);
+      res.json(transactions);
+    } catch (error) {
+      console.error('Error getting user transactions:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Create deposit transaction
   app.post("/api/transactions/deposit", async (req, res) => {
     try {
-      const { userId, amount } = req.body;
+      const { userId, amount, pixKey } = req.body;
       
-      // Mock deposit creation
-      const transaction = {
-        id: Date.now(),
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const currentBalance = parseFloat(user.balance.toString());
+      const depositAmount = parseFloat(amount);
+      const newBalance = currentBalance + depositAmount;
+
+      const transaction = await storage.createTransaction({
         userId,
-        type: "deposit",
-        amount,
-        status: "pending",
-        createdAt: new Date().toISOString()
-      };
+        type: 'deposit',
+        amount: depositAmount,
+        status: 'completed',
+        description: `Depósito via PIX`,
+        pixKey,
+        balanceBefore: currentBalance,
+        balanceAfter: newBalance
+      });
+
+      await storage.updateUser(userId, { balance: newBalance.toString() });
       
       res.json(transaction);
     } catch (error) {
+      console.error('Error creating deposit:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -88,19 +113,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, amount, pixKey } = req.body;
       
-      // Mock withdrawal creation
-      const transaction = {
-        id: Date.now(),
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const currentBalance = parseFloat(user.balance.toString());
+      const withdrawalAmount = parseFloat(amount);
+
+      if (currentBalance < withdrawalAmount) {
+        return res.status(400).json({ error: "Insufficient balance" });
+      }
+
+      const newBalance = currentBalance - withdrawalAmount;
+
+      const transaction = await storage.createTransaction({
         userId,
-        type: "withdrawal",
-        amount,
+        type: 'withdrawal',
+        amount: -withdrawalAmount,
+        status: 'pending',
+        description: `Saque via PIX para chave: ${pixKey}`,
         pixKey,
-        status: "pending",
-        createdAt: new Date().toISOString()
-      };
+        balanceBefore: currentBalance,
+        balanceAfter: newBalance
+      });
+
+      await storage.updateUser(userId, { balance: newBalance.toString() });
       
       res.json(transaction);
     } catch (error) {
+      console.error('Error creating withdrawal:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });

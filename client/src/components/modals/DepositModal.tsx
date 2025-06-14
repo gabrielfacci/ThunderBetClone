@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard, History, QrCode, DollarSign } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAppContext } from '@/contexts/AppContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -13,8 +15,12 @@ interface DepositModalProps {
 
 export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const { t } = useTranslation();
+  const { user, updateBalance } = useAppContext();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'pix' | 'history'>('pix');
   const [amount, setAmount] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   const quickAmounts = [35, 50, 100, 200, 500, 1000];
 
@@ -31,6 +37,72 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
   const handleAmountChange = (value: string) => {
     setAmount(formatCurrency(value));
+  };
+
+  const handleDeposit = async () => {
+    if (!user || !amount) return;
+    
+    const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
+    if (numericAmount < 10) {
+      toast({
+        title: "Valor mínimo",
+        description: "O valor mínimo para depósito é R$ 10,00",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/transactions/deposit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          amount: numericAmount,
+          pixKey: `usuario${user.id}@pix.com`
+        }),
+      });
+
+      if (response.ok) {
+        const transaction = await response.json();
+        await updateBalance(parseFloat(transaction.balanceAfter));
+        
+        toast({
+          title: "Depósito realizado!",
+          description: `R$ ${numericAmount.toFixed(2).replace('.', ',')} foi adicionado ao seu saldo`,
+        });
+        
+        setAmount('');
+        onClose();
+      } else {
+        throw new Error('Erro ao processar depósito');
+      }
+    } catch (error) {
+      toast({
+        title: "Erro no depósito",
+        description: "Não foi possível processar o depósito. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const loadTransactions = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`/api/user/${user.id}/transactions`);
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data.filter((t: any) => t.type === 'deposit'));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar transações:', error);
+    }
   };
 
   return (
@@ -101,17 +173,46 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
               </div>
 
               {/* Generate PIX Button */}
-              <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 text-sm sm:h-12 sm:text-base touch-manipulation">
+              <Button 
+                onClick={handleDeposit}
+                disabled={!amount || isProcessing}
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 text-sm sm:h-12 sm:text-base touch-manipulation disabled:opacity-50"
+              >
                 <QrCode className="w-4 h-4 mr-2" />
-                {t('Generate PIX QR Code')}
+                {isProcessing ? 'Processando...' : t('Generate PIX QR Code')}
               </Button>
             </div>
           )}
 
           {activeTab === 'history' && (
-            <div className="text-center py-8">
-              <p className="text-base text-gray-400 font-medium">{t('History')}</p>
-              <p className="text-sm text-gray-500 mt-2">No deposits found</p>
+            <div className="space-y-3">
+              {transactions.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-base text-gray-400 font-medium">{t('History')}</p>
+                  <p className="text-sm text-gray-500 mt-2">Nenhum depósito encontrado</p>
+                </div>
+              ) : (
+                transactions.map((transaction) => (
+                  <div key={transaction.id} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-white font-medium">R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}</p>
+                        <p className="text-gray-400 text-sm">{transaction.description}</p>
+                        <p className="text-gray-500 text-xs">
+                          {new Date(transaction.created_at || transaction.createdAt).toLocaleString('pt-BR')}
+                        </p>
+                      </div>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        transaction.status === 'completed' 
+                          ? 'bg-green-500/20 text-green-400' 
+                          : 'bg-yellow-500/20 text-yellow-400'
+                      }`}>
+                        {transaction.status === 'completed' ? 'Concluído' : 'Pendente'}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
