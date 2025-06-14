@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Mail, Lock, Sparkles, X } from 'lucide-react';
@@ -84,6 +84,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="fixed left-[50%] top-[50%] z-50 grid translate-x-[-50%] translate-y-[-50%] gap-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg p-0 border-0 bg-transparent max-w-sm sm:max-w-md w-full pl-[20px] pr-[20px]">
         <DialogTitle className="sr-only">Entrar na Conta</DialogTitle>
+        <DialogDescription className="sr-only">Formulário de login para acessar sua conta no ThunderBet</DialogDescription>
         <div className="relative w-full bg-gradient-to-br from-slate-900/98 via-purple-900/95 to-blue-900/98 border border-purple-500/30 backdrop-blur-2xl shadow-2xl rounded-lg max-h-[90vh] overflow-hidden">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-blue-600/5 to-cyan-600/10 rounded-lg"></div>
