@@ -37,39 +37,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   async function loadUserProfile(authUser: SupabaseUser) {
     try {
       const { data: profile, error } = await supabase
-        .from('user_profiles')
+        .from('users')
         .select('*')
         .eq('id', authUser.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Erro ao carregar perfil:', error);
         return;
       }
 
       if (profile) {
         setUser(profile);
-      } else {
-        // Criar perfil se não existir
-        const phoneFromMetadata = authUser.user_metadata?.phone || authUser.phone || '';
-        const nameFromMetadata = authUser.user_metadata?.full_name || 'Usuário';
-        
-        const { data: newProfile, error: createError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: authUser.id,
-            phone: phoneFromMetadata,
-            full_name: nameFromMetadata,
-            balance: 0
-          })
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Erro ao criar perfil:', createError);
-        } else if (newProfile) {
-          setUser(newProfile);
-        }
       }
     } catch (error) {
       console.error('Erro inesperado ao carregar perfil:', error);
@@ -137,9 +116,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      console.log('Tentando cadastrar:', { email: email.trim(), fullName });
+      console.log('Iniciando cadastro:', { email: email.trim(), fullName });
       
-      const { data, error } = await supabase.auth.signUp({
+      // Primeiro, fazer signup no Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
         options: {
@@ -149,18 +129,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       });
 
-      if (error) {
-        console.error('Erro detalhado do Supabase:', error);
-        throw error;
+      if (authError) {
+        console.error('Erro de autenticação:', authError);
+        throw authError;
       }
+
+      console.log('Cadastro de auth bem-sucedido:', authData);
       
-      console.log('Cadastro bem-sucedido:', data);
+      // O trigger do banco vai criar automaticamente o perfil na tabela users
       
-      // Não precisa fazer mais nada - onAuthStateChange vai lidar com o resto
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
       
-      // Melhorar mensagens de erro
       let errorMessage = 'Erro ao criar conta';
       if (error.code === 'email_address_invalid') {
         errorMessage = 'Email inválido. Verifique o formato do email.';
