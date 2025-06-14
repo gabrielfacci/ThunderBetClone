@@ -208,7 +208,7 @@ export function Home() {
             <div className="flex items-center space-x-2 sm:space-x-3">
               {user ? (
                 // Usuário logado - mostrar saldo e botão refresh
-                <>
+                (<>
                   <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-800/60 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
                     <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                     <span className="text-green-400 font-medium text-xs sm:text-sm">
@@ -227,10 +227,10 @@ export function Home() {
                   >
                     <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
-                </>
+                </>)
               ) : (
                 // Usuário não logado - mostrar botões de login/cadastro
-                <>
+                (<>
                   <Button
                     variant="outline"
                     size="sm"
@@ -246,7 +246,7 @@ export function Home() {
                   >
                     Cadastrar
                   </Button>
-                </>
+                </>)
               )}
             </div>
           </div>
@@ -313,7 +313,7 @@ export function Home() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <span className="text-white text-sm font-medium">{winners[currentWinner].name}</span>
+                      <span className="text-white font-medium text-[12px] ml-[0px] mr-[0px]">{winners[currentWinner].name}</span>
                       <span className={`text-sm font-bold ${
                         isHighValue ? 'text-yellow-300' : 'text-green-300'
                       }`}>{winners[currentWinner].amount}</span>
@@ -537,7 +537,6 @@ export function Home() {
         isOpen={showDepositFromGame}
         onClose={handleCloseDeposit}
       />
-      
       {/* Auth Modals */}
       <LoginModal 
         isOpen={showLoginModal} 
@@ -547,7 +546,6 @@ export function Home() {
           setShowRegisterModal(true);
         }}
       />
-      
       <RegisterModal 
         isOpen={showRegisterModal} 
         onClose={() => setShowRegisterModal(false)}
