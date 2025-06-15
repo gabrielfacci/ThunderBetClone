@@ -164,7 +164,17 @@ export class ZyonPayService {
       
       console.log('ZyonPay transaction created successfully:', result.id);
       console.log('Full ZyonPay response:', JSON.stringify(result, null, 2));
-      return result;
+      
+      // Get PIX payment details with QR code
+      const pixDetails = await this.getPixPaymentDetails(result.id);
+      
+      // Combine transaction data with PIX details
+      return {
+        ...result,
+        qrCode: pixDetails.qrCode,
+        url: pixDetails.url,
+        transactionId: result.id
+      };
     } catch (error) {
       console.error('Error creating PIX transaction:', error);
       throw error;
@@ -200,8 +210,34 @@ export class ZyonPayService {
     }
   }
 
-  generateQRCodeImageUrl(qrCodeData: string): string {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrCodeData)}`;
+  async getPixPaymentDetails(transactionId: number): Promise<{ qrCode: string; url: string }> {
+    try {
+      const response = await fetch(`${ZYONPAY_API_URL}/${transactionId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': this.getAuthHeader()
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get PIX payment details: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('PIX payment details response:', JSON.stringify(data, null, 2));
+      
+      // Extract PIX data from response
+      const pixCode = data.payment?.pix?.code || data.pix?.code;
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode || '')}`;
+      
+      return {
+        qrCode: qrCodeUrl,
+        url: pixCode || ''
+      };
+    } catch (error) {
+      console.error('Error getting PIX payment details:', error);
+      throw error;
+    }
   }
 
   async checkTransactionStatus(transactionId: string): Promise<any> {
