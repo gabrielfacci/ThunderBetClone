@@ -1,0 +1,929 @@
+Introdução
+Bem vindo a nossa documentação de API!
+
+Introdução
+Nossa API segue os padrões REST. Sendo assim, todas as respostas serão enviadas no formato JSON.
+
+Para autenticar com nossa API, você deve passar sua chave secreta seguindo o padrão Basic Access Authentication.
+
+Você pode encontrar suas chaves acessando o menu Configurações -> Credenciais de API.
+
+Após encontrar suas chaves, você deve passar a chave secreta nos headers da requisição no campo authorization, seguindo o padrão abaixo:
+
+Node.js
+
+const options = {
+    method: "POST",
+    url: "https://api.zyonpay.com/v1/transactions",
+    headers: {
+        authorization: 'Basic ' + new Buffer("{SECRET_KEY}:x").toString('base64')
+    }
+}
+
+Formato dos postbacks
+Ao criar uma transação, você pode passar uma URL para receber eventos em seu servidor quando uma transação for atualizada, através do campo postbackUrl. O formato do payload que você receberá nessa URL segue o formato abaixo:
+
+Transação
+TRANSAÇÃO
+
+{
+    "id": 686401,
+    "type": "transaction",
+    "objectId": "282",
+    "url": "https://test.com",
+    "data": {
+        "id": 282,
+        "amount": 10000,
+        "refundedAmount": 0,
+        "companyId": 2,
+        "installments": 12,
+        "paymentMethod": "credit_card",
+        "status": "paid",
+        "postbackUrl": null,
+        "metadata": null,
+        "traceable": false,
+        "secureId": "a4594817-be48-4a23-81aa-4bb01f95fe78",
+        "secureUrl": "https://link.compra.com.br/pagar/a4594817-be48-4a23-81aa-4bb01f95fe78",
+        "createdAt": "2022-07-18T09:54:22.000Z",
+        "updatedAt": "2022-07-18T09:54:22.000Z",
+        "paidAt": "2022-07-18T09:54:22.000Z",
+        "ip": null,
+        "externalRef": null,
+        "customer": {
+            "id": 1,
+            "externalRef": null,
+            "name": "Gabryel",
+            "email": "gabryel@hotmail.com",
+            "phone": "11999999999",
+            "birthdate": null,
+            "createdAt": "2022-05-26T19:17:48.000Z",
+            "document": {
+                "number": "12345678910",
+                "type": "cpf"
+            },
+            "address": {
+                "street": "Rua República Argentina",
+                "streetNumber": "4214",
+                "complement": null,
+                "zipCode": "11065030",
+                "neighborhood": "Pompéia",
+                "city": "Santos",
+                "state": "SP",
+                "country": "BR"
+            }
+        },
+        "card": {
+            "id": 147,
+            "brand": "visa",
+            "holderName": "GABRYEL FERREIRA",
+            "lastDigits": "1111",
+            "expirationMonth": 3,
+            "expirationYear": 2028,
+            "reusable": true,
+            "createdAt": "2022-07-17T18:08:11.000Z"
+        },
+        "boleto": null,
+        "pix": null,
+        "shipping": null,
+        "refusedReason": null,
+        "items": [
+            {
+                "externalRef": null,
+                "title": "b456",
+                "unitPrice": 100,
+                "quantity": 1,
+                "tangible": false
+            }
+        ],
+        "splits": [
+            {
+                "recipientId": 1,
+                "amount": 10000,
+                "netAmount": 9400
+            }
+        ],
+        "refunds": [],
+        "delivery": null,
+        "fee": {
+            "fixedAmount": 200,
+            "spreadPercentage": 4,
+            "estimatedFee": 600,
+            "netAmount": 9400
+        }
+    }
+}
+Checkout
+JSON
+
+{
+    "id": 686401,
+    "type": "checkout",
+    "objectId": "3",
+    "url": "https://test.com",
+    "data": {
+        "id": 3,
+        "companyId": 2,
+        "description": null,
+        "amount": 1000,
+        "secureId": "019c2702-6fbe-4199-b21c-c9342888d6ec",
+        "secureUrl": "https://link.compra.com.br/checkout/019c2702-6fbe-4199-b21c-c9342888d6ec",
+        "postbackUrl": "https://test.com",
+        "createdAt": "2022-08-02T18:04:04.000Z",
+        "settings": {
+            "defaultPaymentMethod": "credit_card",
+            "requestAddress": false,
+            "requestPhone": true,
+            "requestDocument": true,
+            "traceable": false,
+            "card": {
+                "enabled": true,
+                "freeInstallments": 1,
+                "maxInstallments": 12
+            },
+            "boleto": {
+                "enabled": false,
+                "expiresInDays": 2
+            },
+            "pix": {
+                "enabled": true,
+                "expiresInDays": 2
+            }
+        },
+        "items": [
+            {
+                "externalRef": null,
+                "title": "Hamburgão",
+                "unitPrice": 3000,
+                "quantity": 1,
+                "tangible": true
+            }
+        ],
+        "splits": [],
+        "transaction": {
+            "id": 282,
+            "amount": 10000,
+            "refundedAmount": 0,
+            "companyId": 2,
+            "installments": 12,
+            "paymentMethod": "credit_card",
+            "status": "paid",
+            "postbackUrl": null,
+            "metadata": null,
+            "traceable": false,
+            "secureId": "a4594817-be48-4a23-81aa-4bb01f95fe78",
+            "secureUrl": "https://link.compra.com.br/pagar/a4594817-be48-4a23-81aa-4bb01f95fe78",
+            "createdAt": "2022-07-18T09:54:22.000Z",
+            "updatedAt": "2022-07-18T09:54:22.000Z",
+            "paidAt": "2022-07-18T09:54:22.000Z",
+            "ip": null,
+            "externalRef": null,
+            "customer": {
+                "id": 1,
+                "externalRef": null,
+                "name": "Gabryel",
+                "email": "gabryel@hotmail.com",
+                "phone": "11999999999",
+                "birthdate": null,
+                "createdAt": "2022-05-26T19:17:48.000Z",
+                "document": {
+                    "number": "12345678910",
+                    "type": "cpf"
+                },
+                "address": {
+                    "street": "Rua República Argentina",
+                    "streetNumber": "4214",
+                    "complement": null,
+                    "zipCode": "11065030",
+                    "neighborhood": "Pompéia",
+                    "city": "Santos",
+                    "state": "SP",
+                    "country": "BR"
+                }
+            },
+            "card": {
+                "id": 147,
+                "brand": "visa",
+                "holderName": "GABRYEL FERREIRA",
+                "lastDigits": "1111",
+                "expirationMonth": 3,
+                "expirationYear": 2028,
+                "reusable": true,
+                "createdAt": "2022-07-17T18:08:11.000Z"
+            },
+            "boleto": null,
+            "pix": null,
+            "shipping": null,
+            "refusedReason": null,
+            "items": [
+                {
+                    "externalRef": null,
+                    "title": "b456",
+                    "unitPrice": 100,
+                    "quantity": 1,
+                    "tangible": false
+                }
+            ],
+            "splits": [
+                {
+                    "recipientId": 1,
+                    "amount": 10000,
+                    "netAmount": 9400
+                }
+            ],
+            "refunds": [],
+            "delivery": null,
+            "fee": {
+                "fixedAmount": 200,
+                "spreadPercentage": 4,
+                "estimatedFee": 600,
+                "netAmount": 9400
+            }
+        }
+    }
+}
+Transferência
+JSON
+
+{
+    "id": 388,
+    "type": "transfer",
+    "objectId": "237",
+    "url": "https://test.com",
+    "data": {
+        "id": 237,
+        "amount": 500,
+        "status": "bank_processing",
+        "pixKey": "12345678900",
+        "fee": 0,
+        "bankAccount": null,
+        "metadata": null,
+        "createdAt": "2022-10-18T16:43:42.000Z",
+        "updatedAt": "2022-10-18T16:43:44.000Z",
+        "failReason": null,
+        "receiptUrl": null,
+        "description": "Transferência Teste",
+        "externalRef": null,
+        "postbackUrl": "https://test.com",
+        "processedAt": "2022-10-18T16:43:44.000Z",
+        "recipientId": 1,
+        "pixEnd2EndId": "E277287121G6I8886MF02JNCUGGLELRP",
+        "transferredAt": null
+    }
+}
+
+Objeto transaction
+Ao criar uma transação, este é o objeto que você recebe como resposta. Você também receberá esse objeto quando ocorrer uma atualização de status da transação no seu postbackUrl.
+
+Propriedade	Descrição
+id
+int	ID da transação.
+status
+string	Status da transação.
+Valores possíveis: processing, authorized, paid, refunded, waiting_payment, refused, chargedback, canceled, in_protest, partially_paid
+amount
+string	Valor da transação em centavos.
+Exemplo: R$ 5,00 = 500
+authorizedAmount
+int	Valor autorizado em centavos.
+paidAmount
+int	Valor pago em centavos.
+refundedAmount
+int	Valor estornado em centavos.
+paymentMethod
+string	Meio de pagamento utilizado na transação.
+Valores possíveis: credit_card, pix, boleto
+installments
+int	Quantidade de parcelas da transação.
+acquirerType
+string	Adquirente responsável pelo processamento da transação.
+externalId
+string	ID da transação na adquirente.
+customer
+object	Dados do cliente. Consulte o objeto customer
+shipping
+object	Dados referente ao endereço de entrega. Consulte o objeto shipping
+card
+object	Dados do cartão de crédito. Consulte o objeto card
+pix
+object	Dados do PIX. Consulte o objeto pix
+boleto
+object	Dados do boleto bancário. Consulte o objeto boleto
+sendEmail
+boolean	Se será enviado um e-mail pela plataforma.
+companyId
+int	ID da empresa que criou a transação.
+subscriptionId
+int	Quando uma transação for criada a partir de uma assinatura da plataforma, esse campo estará preenchido com o ID dessa assinatura.
+billingId
+int	Quando uma transação for criada a partir de uma cobrança interna do painel de cobrança da plataforma, esse campo estará preenchido com o ID dessa cobrança.
+postbackUrl
+string	URL de postback que receberá as atualizações de status da transação.
+metadata
+object	Objeto com dados adicionais informados na criação da transação.
+traceable
+boolean	Se o status de entrega do pedido será gerenciado pela plataforma.
+secureId
+string	ID seguro da transação, para visualizá-la no próprio checkout da plataforma sem precisar de autenticação.
+secureUrl
+string	URL pós compra, para acessar os detalhes da transação sem autenticação.
+createdAt
+datetime	Data de criação da transação.
+updatedAt
+datetime	Data da última atualização da transação.
+ip
+string	IP de origem que criou a transação, podendo ser diretamente de seu cliente, caso a requisição venha diretamente do client-side, ou de seus servidores, caso tudo esteja centralizando em sua aplicação no server-side.
+refusedReason
+object	Quando uma transação no cartão de crédito for recusada, esse campo estará preenchido com o motivo da recusa. Consulte o objeto refusedReason
+items
+array	Dados sobre os produtos comprados. Consulte o objeto item
+refunds
+array	Caso seja realizado um estorno de uma transação, esse estorno estará contido nesse array. Consulte o objeto refund
+delivery
+object	Caso a propriedade traceable seja true, esse objeto estará preenchido com o status da entrega e código de rastreio. Consulte o objeto delivery
+fee
+object	Dados sobre as taxas cobradas na transação. Consulte o objeto fee
+splits
+object	Regras de divisão da transação. Consulte o objeto splits
+
+Objeto pix
+Ao criar uma transação no PIX, a propriedade pix estará preenchida no formato abaixo:
+
+Propriedade	Descrição
+qrcode
+string	QR code do PIX.
+url
+string	URL do PIX.
+expirationDate
+date	Data de expiração do PIX, no formato AAAA-MM-DD
+createdAt
+date	Data de criação.
+
+Criar transação
+post
+https://api.zyonpay.com/v1/transactions
+Para criar uma transação, use a rota /transactions, tanto para cartão de crédito, boleto ou PIX.
+
+Body Params
+amount
+int32
+required
+Valor em centavos (500 = R$ 5,00)
+
+paymentMethod
+string
+required
+Meio de pagamento. Valores possíveis: credit_card, boleto, pix.
+
+card
+object
+Informações do cartão do cliente. Obrigatório caso paymentMethod seja credit_card.
+
+
+card object
+installments
+int32
+Quantidade de parcelas. Obrigatório caso paymentMethod seja credit_card.
+
+customer
+object
+required
+Dados do cliente.
+
+
+customer object
+shipping
+object
+Dados de entrega.
+
+
+shipping object
+items
+array of objects
+required
+Lista de itens da transação.
+
+
+ADD object
+boleto
+object
+Informações sobre a expiração do boleto.
+
+
+boleto object
+pix
+object
+Informações sobre a expiração do PIX.
+
+
+pix object
+postbackUrl
+string
+URL em sua API que receberá atualizações da transação.
+
+metadata
+string
+Metadados para facilitar a visualização e controle das transações.
+
+traceable
+boolean
+Se o status de entrega será gerenciado pelo painel. O padrão é false
+
+
+ip
+string
+IP do cliente.
+
+splits
+array of objects
+Regras de divisão da transação.
+
+
+ADD object
+Responses
+
+200
+200
+
+Response body
+object
+id
+integer
+Defaults to 0
+amount
+integer
+Defaults to 0
+refundedAmount
+integer
+Defaults to 0
+companyId
+integer
+Defaults to 0
+installments
+integer
+Defaults to 0
+paymentMethod
+string
+status
+string
+postbackUrl
+string
+metadata
+string
+traceable
+boolean
+Defaults to true
+secureId
+string
+secureUrl
+string
+createdAt
+string
+updatedAt
+string
+paidAt
+string
+ip
+string
+externalRef
+string
+customer
+object
+id
+integer
+Defaults to 0
+externalRef
+string
+name
+string
+email
+string
+phone
+string
+birthdate
+string
+createdAt
+string
+document
+object
+
+document object
+address
+object
+
+address object
+card
+object
+id
+integer
+Defaults to 0
+brand
+string
+holderName
+string
+lastDigits
+string
+expirationMonth
+integer
+Defaults to 0
+expirationYear
+integer
+Defaults to 0
+reusable
+boolean
+Defaults to true
+createdAt
+string
+boleto
+string
+pix
+string
+shipping
+string
+refusedReason
+string
+items
+array of objects
+object
+externalRef
+string
+title
+string
+unitPrice
+integer
+Defaults to 0
+quantity
+integer
+Defaults to 0
+tangible
+boolean
+Defaults to true
+splits
+array of objects
+object
+recipientId
+integer
+Defaults to 0
+amount
+integer
+Defaults to 0
+netAmount
+integer
+Defaults to 0
+refunds
+array
+delivery
+string
+fee
+object
+fixedAmount
+integer
+Defaults to 0
+spreadPercentage
+integer
+Defaults to 0
+estimatedFee
+integer
+Defaults to 0
+netAmount
+integer
+Defaults to 0
+
+Objeto customer
+Propriedade	Descrição
+id
+int	ID do cliente.
+name
+string	Nome do cliente.
+email
+string	E-mail do cliente.
+phone
+string	Telefone do cliente, no formato 11999999999
+birthdate
+date	Data de nascimento do cliente, no formato AAAA-MM-DD
+createdAt
+datetime	Data de criação do cliente.
+document
+object	Documento do cliente. Consulte o objeto document
+address
+object	Endereço do cliente. Consulte o objeto address
+revenue
+object	Dados de quanto foi gasto/estornado pelo cliente. Consulte o objeto revenue
+
+bjeto document
+Propriedade	Descrição
+id
+int	ID do documento.
+number
+string	Número do documento.
+type
+string	Tipo do documento.
+Valores possíveis: cpf, cnpj
+
+Objeto revenue
+Propriedade	Descrição
+totalAmount
+int	Valor, em centavos, do total em transações pagas.
+Exemplo: R$ 5,00 = 500
+totalCount
+int	Quantidade de transações pagas.
+cardAmount
+int	Valor, em centavos, de transações pagas no cartão de crédito.
+cardCount
+int	Quantidade transações pagas no cartão de crédito.
+pixAmount
+int	Valor, em centavos, de transações pagas no PIX.
+pixCount
+int	Quantidade de transações pagas no PIX.
+boletoAmount
+int	Valor, em centavos, de transações pagas no boleto bancário.
+boletoCount
+int	Quantidade de transações pagas no boleto bancário.
+chargebackAmount
+int	Valor, em centavos, de transações que ocorreram chargeback.
+chargebackCount
+int	Quantidade de transações que ocorreram chargeback.
+refundAmount
+int	Valor, em centavos, de transações estornadas.
+refundCount
+int	Quantidade de transações estornadas.
+
+Criar cliente
+post
+https://api.zyonpay.com/v1/customers
+Para operações de cliente, use a rota /customers.
+
+Body Params
+name
+string
+required
+Nome do cliente.
+
+email
+string
+required
+E-mail do cliente.
+
+document
+object
+required
+Documento do cliente.
+
+
+document object
+phone
+string
+Telefone do cliente.
+
+externalRef
+string
+Referência do cliente em sua API.
+
+address
+object
+Endereço do cliente.
+
+
+address object
+Response
+
+200
+200
+
+Response body
+object
+id
+integer
+Defaults to 0
+externalRef
+string
+name
+string
+email
+string
+phone
+string
+createdAt
+string
+document
+object
+id
+integer
+Defaults to 0
+number
+string
+type
+string
+address
+object
+id
+integer
+Defaults to 0
+street
+string
+streetNumber
+string
+complement
+string
+zipCode
+string
+neighborhood
+string
+city
+string
+state
+string
+country
+string
+revenue
+object
+totalAmount
+integer
+Defaults to 0
+totalCount
+integer
+Defaults to 0
+cardAmount
+integer
+Defaults to 0
+cardCount
+integer
+Defaults to 0
+pixAmount
+integer
+Defaults to 0
+pixCount
+integer
+Defaults to 0
+boletoAmount
+integer
+Defaults to 0
+boletoCount
+integer
+Defaults to 0
+chargebackAmount
+integer
+Defaults to 0
+chargebackCount
+integer
+Defaults to 0
+refundAmount
+integer
+Defaults to 0
+refundCount
+integer
+Defaults to 0
+createdAt
+string
+
+Obter saldo disponível
+get
+https://api.zyonpay.com/v1/balance/available
+Para operações de saldo, use a rota /balance.
+
+Query Params
+recipientId
+int32
+ID do recebedor. Caso não seja enviado, será usado o recebedor principal da empresa.
+
+Responses
+
+200
+200
+
+Response body
+object
+amount
+integer
+Defaults to 0
+recipientId
+integer
+Defaults to 0
+
+Criar checkout
+post
+https://api.zyonpay.com/v1/checkouts
+Para criar um checkout, informe o valor total, os itens do carrinho e os métodos de pagamento que estarão disponíveis. Após isso, redirecione seu usuário para a secureUrl que você receberá como resposta.
+
+Ao passar um postbackUrl, você receberá atualizações em sua API quando uma transação for confirmada nesse checkout. Após isso, nenhuma outra transação poderá ser criada a partir desse checkout, apenas a transação que já foi criada poderá ter o status atualizado.
+
+Você pode consultar o formato que receberá o postback aqui.
+
+Para atualizar o status de transações de teste, consulte aqui.
+
+Body Params
+amount
+int32
+required
+Valor em centavos (500 = R$ 5,00)
+
+postbackUrl
+string
+URL de sua API que receberá atualizações do checkout.
+
+items
+array of objects
+required
+Itens no checkout.
+
+
+ADD object
+settings
+object
+required
+Configurações do checkout.
+
+
+settings object
+description
+string
+Descrição apenas para sua visualização, não aparece para o cliente final.
+
+splits
+array of objects
+required
+Regras de divisão da transação. Obs: Na criação do checkout não é feita a validação do recipientId. Essa validação é feita apenas quando um pagamento for realizado a partir desse checkout.
+
+
+ADD object
+Responses
+
+200
+200
+
+Response body
+object
+id
+integer
+Defaults to 0
+companyId
+integer
+Defaults to 0
+description
+string
+amount
+integer
+Defaults to 0
+secureId
+string
+secureUrl
+string
+postbackUrl
+string
+createdAt
+string
+settings
+object
+defaultPaymentMethod
+string
+requestAddress
+boolean
+Defaults to true
+requestPhone
+boolean
+Defaults to true
+requestDocument
+boolean
+Defaults to true
+traceable
+boolean
+Defaults to true
+card
+object
+
+card object
+boleto
+object
+
+boleto object
+pix
+object
+
+pix object
+items
+array of objects
+object
+externalRef
+string
+title
+string
+unitPrice
+integer
+Defaults to 0
+quantity
+integer
+Defaults to 0
+tangible
+boolean
+Defaults to true
+transaction
+string
+splits
+array of objects
+object
+recipientId
+integer
+Defaults to 0
+amount
+integer
+Defaults to 0
+

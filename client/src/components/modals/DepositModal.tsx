@@ -7,6 +7,7 @@ import { CreditCard, History, QrCode, DollarSign } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { PixPaymentModal } from './PixPaymentModal';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [showPixModal, setShowPixModal] = useState(false);
 
   const quickAmounts = [35, 50, 100, 200, 500, 1000];
 
@@ -52,43 +54,16 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
       return;
     }
 
-    setIsProcessing(true);
-    try {
-      const response = await fetch('/api/transactions/deposit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          amount: numericAmount,
-          pixKey: `usuario${user.id}@pix.com`
-        }),
-      });
+    // Open PIX payment modal with ZyonPay integration
+    setShowPixModal(true);
+  };
 
-      if (response.ok) {
-        const transaction = await response.json();
-        await refreshProfile();
-        
-        toast({
-          title: "Depósito realizado!",
-          description: `R$ ${numericAmount.toFixed(2).replace('.', ',')} foi adicionado ao seu saldo`,
-        });
-        
-        setAmount('');
-        onClose();
-      } else {
-        throw new Error('Erro ao processar depósito');
-      }
-    } catch (error) {
-      toast({
-        title: "Erro no depósito",
-        description: "Não foi possível processar o depósito. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+  const handlePixPaymentSuccess = async () => {
+    // Refresh user profile to update balance
+    await refreshProfile();
+    setAmount('');
+    setShowPixModal(false);
+    onClose();
   };
 
   const loadTransactions = async () => {
@@ -181,11 +156,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
               {/* Generate PIX Button */}
               <Button 
                 onClick={handleDeposit}
-                disabled={!amount || isProcessing}
+                disabled={!amount}
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 text-sm sm:h-12 sm:text-base touch-manipulation disabled:opacity-50"
               >
                 <QrCode className="w-4 h-4 mr-2" />
-                {isProcessing ? 'Processando...' : t('Generate PIX QR Code')}
+                {t('Generate PIX QR Code')}
               </Button>
             </div>
           )}
@@ -223,6 +198,17 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
           )}
         </div>
       </DialogContent>
+
+      {/* PIX Payment Modal */}
+      <PixPaymentModal
+        isOpen={showPixModal}
+        onClose={() => setShowPixModal(false)}
+        amount={parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.')) || 0}
+        userEmail={user?.email || ''}
+        userName={user?.user_metadata?.full_name || 'Usuario ThunderBet'}
+        userPhone={user?.user_metadata?.phone || undefined}
+        onPaymentSuccess={handlePixPaymentSuccess}
+      />
     </Dialog>
   );
 }
