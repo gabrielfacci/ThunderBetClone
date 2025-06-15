@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LoginModal } from '@/components/modals/LoginModal';
 import { RegisterModal } from '@/components/modals/RegisterModal';
 import { LogOut, Wallet } from 'lucide-react';
@@ -8,6 +9,7 @@ import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Header() {
   const { user, isLoading, signOut } = useAuth();
+  const { t } = useLanguage();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
@@ -60,7 +62,7 @@ export function Header() {
                   size="sm"
                   className="text-gray-400 hover:text-white hover:bg-gray-700/50 h-6 w-6 p-0"
                   onClick={handleLogout}
-                  title="Sair"
+                  title={t('header.logout')}
                 >
                   <LogOut className="h-3 w-3" />
                 </Button>
@@ -77,7 +79,7 @@ export function Header() {
                     setShowLoginModal(true);
                   }}
                 >
-                  Entrar
+                  {t('header.login')}
                 </Button>
                 <Button
                   size="sm"
@@ -87,7 +89,7 @@ export function Header() {
                     setShowRegisterModal(true);
                   }}
                 >
-                  Cadastrar
+                  {t('header.register')}
                 </Button>
               </>
             )}

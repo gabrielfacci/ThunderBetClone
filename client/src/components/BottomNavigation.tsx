@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Wallet, TrendingDown, Home, Gift, User } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DepositModal } from './modals/DepositModal';
 import { WithdrawalModal } from './modals/WithdrawalModal';
@@ -16,7 +16,7 @@ interface BottomNavigationProps {
 }
 
 export function BottomNavigation({ onLoginRequest }: BottomNavigationProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [activeTab, setActiveTab] = useState('home');
