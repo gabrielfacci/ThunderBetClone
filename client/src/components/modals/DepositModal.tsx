@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CreditCard, History, QrCode, DollarSign, Copy, Check, AlertCircle, RotateCcw, Clock } from 'lucide-react';
+import { CreditCard, History, QrCode, DollarSign, Copy, Check, AlertCircle, RotateCcw, Clock, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -513,33 +513,103 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
           )}
 
           {activeTab === 'history' && (
-            <div className="space-y-3">
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <History className="w-8 h-8 text-purple-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Histórico de Depósitos</h3>
+                <p className="text-gray-400">Acompanhe suas transações PIX</p>
+              </div>
+
               {transactions.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-base text-gray-400 font-medium">{t('History')}</p>
-                  <p className="text-sm text-gray-500 mt-2">Nenhum depósito encontrado</p>
+                <div className="bg-gray-800/30 rounded-xl p-8 text-center border border-gray-700/30">
+                  <div className="w-12 h-12 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <History className="w-6 h-6 text-gray-400" />
+                  </div>
+                  <h4 className="text-white font-medium mb-2">Nenhum depósito encontrado</h4>
+                  <p className="text-gray-400 text-sm">Suas transações PIX aparecerão aqui</p>
                 </div>
               ) : (
-                transactions.map((transaction) => (
-                  <div key={transaction.id} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-white font-medium">R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}</p>
-                        <p className="text-gray-400 text-sm">{transaction.description}</p>
-                        <p className="text-gray-500 text-xs">
-                          {new Date(transaction.created_at || transaction.createdAt).toLocaleString('pt-BR')}
-                        </p>
+                <div className="space-y-4">
+                  {transactions.map((transaction) => (
+                    <div key={transaction.id} className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 rounded-xl p-4 border border-gray-600/30 hover:border-purple-500/30 transition-colors">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            transaction.status === 'completed' 
+                              ? 'bg-green-500/20 text-green-400' 
+                              : 'bg-yellow-500/20 text-yellow-400'
+                          }`}>
+                            {transaction.status === 'completed' ? (
+                              <Check className="w-5 h-5" />
+                            ) : (
+                              <Clock className="w-5 h-5" />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="text-white font-semibold">Depósito PIX</h4>
+                            <p className="text-gray-400 text-sm">ID: {transaction.zyonpay_transaction_id || transaction.id}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold text-green-400">
+                            R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
+                          </p>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            transaction.status === 'completed' 
+                              ? 'bg-green-500/20 text-green-400' 
+                              : 'bg-yellow-500/20 text-yellow-400'
+                          }`}>
+                            {transaction.status === 'completed' ? 'Concluído' : 'Pendente'}
+                          </span>
+                        </div>
                       </div>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        transaction.status === 'completed' 
-                          ? 'bg-green-500/20 text-green-400' 
-                          : 'bg-yellow-500/20 text-yellow-400'
-                      }`}>
-                        {transaction.status === 'completed' ? 'Concluído' : 'Pendente'}
-                      </span>
+                      
+                      <div className="border-t border-gray-700/50 pt-3 mt-3">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-400">Data</p>
+                            <p className="text-white font-medium">
+                              {new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR')}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Horário</p>
+                            <p className="text-white font-medium">
+                              {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {transaction.zyonpay_secure_url && (
+                          <div className="mt-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:border-purple-400"
+                              onClick={() => window.open(transaction.zyonpay_secure_url, '_blank')}
+                            >
+                              <Check className="w-4 h-4 mr-2" />
+                              Ver Comprovante
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
+              )}
+              
+              {transactions.length > 0 && (
+                <div className="text-center pt-4">
+                  <p className="text-gray-400 text-sm">
+                    Mostrando {transactions.length} transação{transactions.length !== 1 ? 'ões' : ''}
+                  </p>
+                </div>
               )}
             </div>
           )}
