@@ -23,12 +23,12 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   // Form state
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState('');
-  const [accountMode, setAccountMode] = useState<'national' | 'international'>('national');
+  const [accountMode, setAccountMode] = useState<'nacional' | 'internacional'>('nacional');
   const [showModeDropdown, setShowModeDropdown] = useState(false);
   
   // Original values for cancel functionality
   const [originalFullName, setOriginalFullName] = useState('');
-  const [originalAccountMode, setOriginalAccountMode] = useState<'national' | 'international'>('national');
+  const [originalAccountMode, setOriginalAccountMode] = useState<'nacional' | 'internacional'>('nacional');
 
   // Load user profile when modal opens
   useEffect(() => {
@@ -104,7 +104,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     }
   };
 
-  const handleModeSelect = (mode: 'national' | 'international') => {
+  const handleModeSelect = (mode: 'nacional' | 'internacional') => {
     setAccountMode(mode);
     setShowModeDropdown(false);
   };
@@ -214,13 +214,13 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         disabled={!isEditing}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">{accountMode === 'national' ? '🇧🇷' : '🌍'}</span>
+                          <span className="text-lg">{accountMode === 'nacional' ? '🇧🇷' : '🌍'}</span>
                           <div className="flex flex-col items-start">
                             <span className={isEditing ? 'text-white' : 'text-gray-300'}>
-                              {accountMode === 'national' ? 'Nacional' : 'Internacional'}
+                              {accountMode === 'nacional' ? 'Nacional' : 'Internacional'}
                             </span>
                             <span className="text-xs text-gray-400">
-                              {accountMode === 'national' ? 'Brasil' : 'Global'}
+                              {accountMode === 'nacional' ? 'Brasil' : 'Global'}
                             </span>
                           </div>
                         </div>
@@ -235,7 +235,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           <button
                             type="button"
                             className="w-full px-4 py-3 text-left hover:bg-gray-700 flex items-center gap-2"
-                            onClick={() => handleModeSelect('national')}
+                            onClick={() => handleModeSelect('nacional')}
                           >
                             <span className="text-lg">🇧🇷</span>
                             <div className="flex flex-col">
@@ -246,7 +246,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           <button
                             type="button"
                             className="w-full px-4 py-3 text-left hover:bg-gray-700 flex items-center gap-2"
-                            onClick={() => handleModeSelect('international')}
+                            onClick={() => handleModeSelect('internacional')}
                           >
                             <span className="text-lg">🌍</span>
                             <div className="flex flex-col">
@@ -260,7 +260,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
                       <p className="text-xs text-gray-400 mb-1">Sua conta vai estar como:</p>
                       <p className="text-sm text-white font-medium">
-                        {accountMode === 'national' ? 'Nacional' : 'Internacional'}
+                        {accountMode === 'nacional' ? 'Nacional' : 'Internacional'}
                       </p>
                     </div>
                   </div>

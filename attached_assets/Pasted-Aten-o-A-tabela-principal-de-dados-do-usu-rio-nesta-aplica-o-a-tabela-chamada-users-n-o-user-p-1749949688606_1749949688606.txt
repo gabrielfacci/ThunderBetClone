@@ -1,0 +1,94 @@
+Atenção: A tabela principal de dados do usuário nesta aplicação é a tabela chamada users (não user_profiles, nem dados locais ou mockados).
+
+🎯 Objetivo:
+Toda informação referente ao usuário logado deve estar salva e ser carregada a partir da tabela users no Supabase.
+
+✅ O que você precisa fazer agora:
+Utilize exclusivamente a tabela users (personalizada, criada por mim no Supabase) para armazenar todos os dados extras do usuário.
+
+Exemplo de dados que devem estar nesta tabela:
+
+full_name (nome completo)
+
+account_mode (Nacional ou Internacional)
+
+phone_number
+
+balance (saldo em conta)
+
+created_at
+
+etc.
+
+🛠️ 2. Se algum desses campos ainda não existir na tabela users, crie automaticamente:
+Se o campo full_name não existir:
+
+sql
+Copiar
+Editar
+ALTER TABLE users ADD COLUMN full_name TEXT;
+Se o campo account_mode não existir:
+
+sql
+Copiar
+Editar
+ALTER TABLE users ADD COLUMN account_mode TEXT DEFAULT 'Nacional';
+Se o campo balance não existir:
+
+sql
+Copiar
+Editar
+ALTER TABLE users ADD COLUMN balance NUMERIC DEFAULT 0;
+📥 3. Na criação de um novo usuário (logo após o signUp):
+Após cadastrar o usuário no auth.users, insira automaticamente os dados na tabela users, vinculando pelo ID:
+
+ts
+Copiar
+Editar
+await supabase
+  .from('users')
+  .insert({
+    id: user.id,
+    full_name: '',
+    account_mode: 'Nacional',
+    balance: 0
+  });
+🔁 4. Para leitura dos dados do usuário autenticado:
+ts
+Copiar
+Editar
+const { data, error } = await supabase
+  .from('users')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+💾 5. Para salvar edições no modal de perfil:
+ts
+Copiar
+Editar
+await supabase
+  .from('users')
+  .update({
+    full_name,
+    account_mode
+  })
+  .eq('id', user.id);
+🧠 Regras gerais:
+A tabela users é a única responsável por armazenar dados do usuário.
+
+O ID da tabela users deve ser o mesmo do auth.users.id (UUID).
+
+Qualquer dado extra deve ser salvo diretamente nesta tabela.
+
+Remova dependências de contextos falsos, dados mockados, ou tabelas paralelas como user_profiles.
+
+🧩 Bônus — Exemplo de estrutura mínima da tabela users
+Campo	Tipo	Detalhes
+id	UUID	Igual ao auth.users.id
+full_name	TEXT	Nome do usuário
+account_mode	TEXT	Nacional / Internacional
+balance	NUMERIC	Saldo do usuário (default 0)
+created_at	TIMESTAMP	Default now()
+
+Execute agora a verificação dos campos, crie os que faltam, e integre toda a lógica da aplicação com a tabela users.
+A partir deste momento, nenhuma outra tabela deve ser usada para armazenar dados do usuário.

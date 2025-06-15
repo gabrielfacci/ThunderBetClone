@@ -80,6 +80,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     console.log('Cadastro realizado:', data.user?.email);
 
+    // Create user entry in users table
+    if (data.user) {
+      try {
+        await supabase.from('users').insert({
+          id: data.user.id,
+          email: data.user.email,
+          full_name: fullName,
+          account_mode: 'nacional',
+          balance: 1000.00,
+          phone: data.user.user_metadata?.phone || '',
+          created_at: new Date().toISOString()
+        });
+        console.log('Usuário criado na tabela users');
+      } catch (userCreateError: any) {
+        console.log('Erro ao criar usuário na tabela users:', userCreateError.message);
+        // Continue with authentication even if user table creation fails
+      }
+    }
+
     // If signup successful but no session, try auto-login
     if (data.user && !data.session) {
       console.log('Tentando login automático após cadastro...');
