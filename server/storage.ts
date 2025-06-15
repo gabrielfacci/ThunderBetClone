@@ -58,6 +58,27 @@ export class MemStorage implements IStorage {
   constructor() {
     this.users = new Map();
     this.currentId = 1;
+    
+    // Create a test user for PIX transactions
+    this.users.set(1, {
+      id: 1,
+      username: 'teste',
+      email: 'teste22@gmail.com',
+      password: 'hashedPassword',
+      fullName: 'teste',
+      phone: '71979077135',
+      cpf: '62510743708',
+      dateOfBirth: null,
+      accountMode: 'nacional',
+      balance: '100.00',
+      isActive: true,
+      isVerified: true,
+      verificationCode: null,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
   }
 
   async getUser(id: number): Promise<User | undefined> {

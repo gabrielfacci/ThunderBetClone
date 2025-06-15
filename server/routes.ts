@@ -201,6 +201,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Simple in-memory storage for webhook data
+  const webhookTransactions = new Map<string, any>();
+
   // ZyonPay webhook endpoint for payment confirmations
   app.post("/api/webhook/zyonpay", async (req, res) => {
     try {
@@ -208,38 +211,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('ZyonPay webhook received:', JSON.stringify(webhookData, null, 2));
       
       const transactionData = webhookData.data;
-      const transactionId = transactionData.id;
+      const transactionId = transactionData.id.toString();
       const pixCode = transactionData.pix?.qrcode;
       
-      // Update transaction with PIX code in our database
-      const transactions = await storage.getAllTransactions();
-      const transaction = transactions.find(t => 
-        t.zyonPayTransactionId?.toString() === transactionId?.toString()
-      );
+      // Store webhook data directly for immediate access
+      webhookTransactions.set(transactionId, {
+        id: transactionId,
+        pixCode: pixCode,
+        status: transactionData.status,
+        amount: transactionData.amount,
+        createdAt: new Date()
+      });
 
-      if (transaction) {
-        await storage.updateTransaction(transaction.id, {
-          status: transactionData.status === 'paid' ? 'completed' : transactionData.status,
-          pixCode: pixCode,
-          updatedAt: new Date()
-        });
-
-        // If payment is confirmed, update user balance
-        if (transactionData.status === 'paid') {
-          const user = await storage.getUser(transaction.userId);
-          if (user) {
-            const currentBalance = parseFloat(user.balance.toString());
-            const depositAmount = transactionData.amount / 100; // Convert from centavos to reais
-            const newBalance = currentBalance + depositAmount;
-            
-            await storage.updateUser(transaction.userId, {
-              balance: newBalance.toString()
-            });
-            
-            console.log(`Payment confirmed for transaction ${transactionId}, user balance updated`);
-          }
-        }
-      }
+      console.log(`Stored PIX code for transaction ${transactionId}:`, pixCode);
 
       // Always respond with 200 to acknowledge receipt
       res.status(200).json({ received: true });
@@ -254,16 +238,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { zyonPayId } = req.params;
       
-      const transactions = await storage.getAllTransactions();
-      const transaction = transactions.find(t => 
-        t.zyonPayTransactionId?.toString() === zyonPayId.toString()
-      );
-
-      if (!transaction) {
-        return res.status(404).json({ error: "Transaction not found" });
+      // Check webhook data first
+      const webhookData = webhookTransactions.get(zyonPayId.toString());
+      if (webhookData) {
+        return res.json({
+          id: webhookData.id,
+          pixCode: webhookData.pixCode,
+          status: webhookData.status,
+          amount: webhookData.amount
+        });
       }
 
-      res.json(transaction);
+      return res.status(404).json({ error: "Transaction not found" });
     } catch (error) {
       console.error('Error getting ZyonPay transaction:', error);
       res.status(500).json({ error: "Internal server error" });
