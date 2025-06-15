@@ -130,12 +130,24 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setShowModeDropdown(false);
   };
 
+  // Handle modal close with proper cleanup
+  const handleModalClose = () => {
+    setIsEditing(false);
+    setShowModeDropdown(false);
+    onClose();
+  };
+
   // Don't render if user is not authenticated
   if (!user) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 max-w-sm w-[95%] mx-auto bg-transparent border-0 shadow-none fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-h-[85vh]">
+    <Dialog open={isOpen} onOpenChange={handleModalClose}>
+      <DialogContent 
+        className="p-0 max-w-sm w-[95%] mx-auto bg-transparent border-0 shadow-none max-h-[85vh] overflow-hidden"
+        onEscapeKeyDown={handleModalClose}
+        onPointerDownOutside={handleModalClose}
+        onInteractOutside={handleModalClose}
+      >
         <DialogHeader className="sr-only">
           <DialogTitle>{t('profile.title')}</DialogTitle>
           <DialogDescription>{t('profile.subtitle')}</DialogDescription>
@@ -293,7 +305,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         <Button 
                           variant="outline"
                           className="flex-1 h-8 text-xs border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
-                          onClick={onClose}
+                          onClick={handleModalClose}
                         >
                           {t('profile.close')}
                         </Button>
