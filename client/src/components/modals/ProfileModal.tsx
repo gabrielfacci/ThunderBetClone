@@ -230,7 +230,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                               {accountMode === 'nacional' ? t('profile.accountMode.nacional') : t('profile.accountMode.internacional')}
                             </span>
                             <span className="text-xs text-gray-400">
-                              {accountMode === 'nacional' ? t('profile.accountMode.brazil') : t('profile.accountMode.global')}
+                              {accountMode === 'nacional' ? t('profile.accountMode.brasil') : t('profile.accountMode.global')}
                             </span>
                           </div>
                         </div>
@@ -250,7 +250,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                             <span className="text-lg">🇧🇷</span>
                             <div className="flex flex-col">
                               <span className="text-white">{t('profile.accountMode.nacional')}</span>
-                              <span className="text-xs text-gray-400">{t('profile.accountMode.brazil')}</span>
+                              <span className="text-xs text-gray-400">{t('profile.accountMode.brasil')}</span>
                             </div>
                           </button>
                           <button
@@ -268,9 +268,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                       )}
                     </div>
                     <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
-                      <p className="text-xs text-gray-400 mb-1">Sua conta vai estar como:</p>
+                      <p className="text-xs text-gray-400 mb-1">{t('profile.accountMode.description')}</p>
                       <p className="text-sm text-white font-medium">
-                        {accountMode === 'nacional' ? 'Nacional' : 'Internacional'}
+                        {accountMode === 'nacional' ? t('profile.accountMode.nacional') : t('profile.accountMode.internacional')}
                       </p>
                     </div>
                   </div>
@@ -284,7 +284,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
                           onClick={onClose}
                         >
-                          Fechar
+                          {t('profile.close')}
                         </Button>
                         <Button 
                           className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
@@ -296,7 +296,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           }}
                         >
                           <Edit3 className="w-4 h-4 mr-2" />
-                          Editar Perfil
+                          {t('profile.edit')}
                         </Button>
                       </>
                     ) : (
@@ -307,7 +307,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           onClick={handleCancel}
                           disabled={isSaving}
                         >
-                          Cancelar
+                          {t('profile.cancel')}
                         </Button>
                         <Button 
                           className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white disabled:opacity-50"
