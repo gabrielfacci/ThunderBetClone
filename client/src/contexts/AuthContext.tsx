@@ -46,6 +46,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       throw new Error('Email e senha são obrigatórios');
     }
 
+    if (password.length < 6) {
+      throw new Error('A senha deve ter pelo menos 6 caracteres');
+    }
+
     console.log('Cadastro com email:', email);
 
     const { data, error } = await supabase.auth.signUp({
@@ -59,28 +63,50 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     if (error) {
-      console.error('Erro no cadastro:', error.message);
+      console.error('Erro no cadastro:', error.message, error.code);
       
       if (error.code === 'weak_password') {
         throw new Error('Senha muito fraca. Use pelo menos 6 caracteres');
       } else if (error.code === 'email_address_already_in_use') {
         throw new Error('Este email já está cadastrado');
       } else if (error.code === 'signup_disabled') {
-        throw new Error('Cadastro desabilitado temporariamente');
-      } else if (error.message.includes('email_address_invalid')) {
-        throw new Error('Email inválido. Verifique o formato do email');
+        throw new Error('Cadastro desabilitado. Entre em contato com o suporte');
+      } else if (error.message.includes('email_address_invalid') || error.message.includes('invalid')) {
+        throw new Error('Este domínio de email não é permitido. Use um email corporativo ou entre em contato com o suporte');
       } else {
-        throw new Error(error.message);
+        throw new Error(`Erro no cadastro: ${error.message}`);
       }
     }
 
     console.log('Cadastro realizado:', data.user?.email);
 
-    // Handle successful signup - user will receive confirmation email
+    // If signup successful but no session, try auto-login
     if (data.user && !data.session) {
-      console.log('Usuário criado, aguardando confirmação de email');
-      // For development, we'll consider this a successful signup
-      // In production, user would need to confirm email
+      console.log('Tentando login automático após cadastro...');
+      try {
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (loginError) {
+          console.log('Login automático falhou:', loginError.message);
+          if (loginError.message.includes('Email not confirmed')) {
+            throw new Error('Email cadastrado com sucesso! Verifique sua caixa de entrada para confirmar o email antes de fazer login.');
+          }
+          throw new Error(`Login automático falhou: ${loginError.message}`);
+        }
+
+        console.log('Login automático realizado:', loginData.user?.email);
+        setUser(loginData.user);
+      } catch (autoLoginError: any) {
+        console.error('Erro no login automático:', autoLoginError.message);
+        throw autoLoginError;
+      }
+    } else if (data.session) {
+      // Session created immediately
+      console.log('Usuário autenticado imediatamente:', data.user?.email);
+      setUser(data.user);
     }
   };
 
@@ -97,23 +123,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     if (error) {
-      console.error('Erro no login:', error.message);
+      console.error('Erro no login:', error.message, error.code);
       
       if (error.code === 'invalid_credentials') {
         throw new Error('Email ou senha incorretos');
       } else if (error.code === 'email_not_confirmed') {
-        throw new Error('Email não confirmado');
+        throw new Error('Email não confirmado. Verifique sua caixa de entrada');
+      } else if (error.message.includes('Invalid login credentials')) {
+        throw new Error('Email ou senha incorretos');
       } else {
-        throw new Error(error.message);
+        throw new Error(`Erro no login: ${error.message}`);
       }
     }
 
     console.log('Login realizado:', data.user?.email);
     
-    // Force session refresh to ensure user state is updated
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      setUser(session.user);
+    if (data.user) {
+      setUser(data.user);
     }
   };
 

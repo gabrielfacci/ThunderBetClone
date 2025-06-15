@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginModal } from '@/components/modals/LoginModal';
 import { RegisterModal } from '@/components/modals/RegisterModal';
+import { LogOut, Wallet } from 'lucide-react';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Header() {
@@ -33,26 +34,35 @@ export function Header() {
             </span>
           </div>
 
-          {/* Botões de Auth ou Dados do Usuário */}
+          {/* Estado dinâmico baseado na autenticação */}
           <div className="flex items-center space-x-2">
-            {user ? (
+            {isLoading ? (
+              // Loading state
+              <div className="animate-pulse">
+                <div className="h-8 w-20 bg-gray-600 rounded"></div>
+              </div>
+            ) : user ? (
               // Usuário logado - mostrar saldo e logout
-              <div className="flex items-center space-x-3">
-                <div className="text-right">
-                  <p className="text-white text-sm font-medium">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário'}
-                  </p>
-                  <p className="text-green-400 text-xs">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 bg-gray-800/60 rounded-lg px-2 py-1">
+                  <Wallet className="h-3 w-3 text-green-400" />
+                  <span className="text-green-400 font-medium text-xs">
                     R$ 1.000,00
+                  </span>
+                </div>
+                <div className="text-right">
+                  <p className="text-white text-xs font-medium">
+                    {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário'}
                   </p>
                 </div>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  className="bg-transparent border-gray-600 text-white hover:bg-gray-700/50 h-8 px-3 text-xs"
+                  className="text-gray-400 hover:text-white hover:bg-gray-700/50 h-6 w-6 p-0"
                   onClick={handleLogout}
+                  title="Sair"
                 >
-                  Sair
+                  <LogOut className="h-3 w-3" />
                 </Button>
               </div>
             ) : (
