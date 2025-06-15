@@ -217,17 +217,17 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
             setPaymentStage("completed");
             setPaymentCompleted(true);
             
-            // Wait 3 seconds to show success message, then close and refresh
+            // Wait 2-3 seconds to show success message, then redirect to home
             setTimeout(() => {
               onClose();
-              window.location.reload();
-            }, 3000);
+              window.location.href = "/"; // Redirect to home page
+            }, 2500);
           }
         }
       } catch (error) {
         console.error("Error checking payment status:", error);
       }
-    }, 3000); // Check every 3 seconds
+    }, 10000); // Check every 10 seconds as requested
 
     return () => clearInterval(interval);
   }, [showPixPayment, pixData?.transactionId, onClose]);
@@ -393,7 +393,84 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         </div>
                       </div>
 
-                      {/* SECTION TO BE REPLACED - awaiting user instructions */}
+                      {/* Payment Status Tracker */}
+                      <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-gray-300 font-medium text-sm">Status do Pagamento</span>
+                          <div className={`flex items-center space-x-2 ${
+                            paymentStage === "waiting" ? "text-yellow-400" : "text-green-400"
+                          }`}>
+                            {paymentStage === "waiting" ? (
+                              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                            ) : (
+                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            )}
+                            <span className="text-xs font-medium">
+                              {paymentStage === "waiting" ? "Verificando..." : "Confirmado"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Status Steps */}
+                        <div className="space-y-3">
+                          {/* Step 1: Aguardando pagamento */}
+                          <div className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 ${
+                            paymentStage === "waiting" 
+                              ? "bg-yellow-500/10 border border-yellow-500/30" 
+                              : "bg-green-500/10 border border-green-500/30"
+                          }`}>
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                              paymentStage === "waiting" 
+                                ? "bg-yellow-400 animate-pulse" 
+                                : "bg-green-400"
+                            }`}>
+                              {paymentStage === "waiting" ? (
+                                <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
+                              ) : (
+                                <Check className="w-3 h-3 text-gray-900" />
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className={`text-sm font-medium ${
+                                paymentStage === "waiting" ? "text-yellow-400" : "text-green-400"
+                              }`}>
+                                {paymentStage === "waiting" ? "Aguardando pagamento" : "Pagamento detectado"}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {paymentStage === "waiting" 
+                                  ? "Realize o pagamento via PIX para continuar" 
+                                  : "Transação confirmada com sucesso"
+                                }
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Step 2: Pagamento concluído */}
+                          {paymentStage === "completed" && (
+                            <div className="bg-green-500/10 border border-green-500/30 p-3 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
+                                  <Check className="w-3 h-3 text-gray-900" />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-green-400">Pagamento concluído</p>
+                                  <p className="text-xs text-gray-400">Redirecionando em alguns segundos...</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Info text */}
+                        <div className="mt-4 text-center">
+                          <p className="text-xs text-gray-500">
+                            {paymentStage === "waiting" 
+                              ? "Verificamos automaticamente o status do seu pagamento a cada 10 segundos"
+                              : "Saldo creditado em sua conta com sucesso!"
+                            }
+                          </p>
+                        </div>
+                      </div>
 
                       {/* Action Buttons */}
                       <div className="flex space-x-3">
