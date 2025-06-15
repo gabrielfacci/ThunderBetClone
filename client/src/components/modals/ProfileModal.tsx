@@ -1,13 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { User, Phone, Globe, X, Save, MapPin, ChevronDown } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import { User, Phone, Globe, X, Save, MapPin, ChevronDown, Edit3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { updateUserProfile } from '@/lib/supabaseQueries';
 import { useToast } from '@/hooks/use-toast';
+import { profileService, type UserProfile } from '@/lib/supabaseProfile';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -15,35 +12,86 @@ interface ProfileModalProps {
 }
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
-  const { t } = useTranslation();
-  const { user, refreshProfile } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
-  const [selectedMode, setSelectedMode] = useState<'national' | 'international'>('national');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  // Real data state
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Form state
+  const [isEditing, setIsEditing] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [accountMode, setAccountMode] = useState<'national' | 'international'>('national');
+  const [showModeDropdown, setShowModeDropdown] = useState(false);
+  
+  // Original values for cancel functionality
+  const [originalFullName, setOriginalFullName] = useState('');
+  const [originalAccountMode, setOriginalAccountMode] = useState<'national' | 'international'>('national');
+
+  // Load user profile when modal opens
+  useEffect(() => {
+    if (isOpen && user) {
+      loadUserProfile();
+    }
+  }, [isOpen, user]);
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+    
+    setIsLoadingProfile(true);
+    try {
+      const userProfile = await profileService.getOrCreateUserProfile(user.id, user);
+      setProfile(userProfile);
+      setFullName(userProfile.full_name);
+      setAccountMode(userProfile.account_mode);
+      setOriginalFullName(userProfile.full_name);
+      setOriginalAccountMode(userProfile.account_mode);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os dados do perfil.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setFullName(originalFullName);
+    setAccountMode(originalAccountMode);
+    setIsEditing(false);
+    setShowModeDropdown(false);
+  };
 
   const handleSave = async () => {
-    if (!fullName.trim() || !user) return;
+    if (!user || !profile || !fullName.trim()) return;
     
-    setIsLoading(true);
+    setIsSaving(true);
     try {
-      const updates: { full_name?: string; account_mode?: 'national' | 'international' } = {};
+      const updates = {
+        full_name: fullName.trim(),
+        account_mode: accountMode,
+      };
+
+      const updatedProfile = await profileService.updateUserProfile(user.id, updates);
+      setProfile(updatedProfile);
+      setOriginalFullName(updatedProfile.full_name);
+      setOriginalAccountMode(updatedProfile.account_mode);
+      setIsEditing(false);
       
-      if (fullName !== user.user_metadata?.full_name) {
-        updates.full_name = fullName;
-      }
+      toast({
+        title: "Perfil atualizado",
+        description: "Suas informações foram salvas com sucesso.",
+      });
       
-      if (Object.keys(updates).length > 0) {
-        await updateUserProfile(user.id, updates);
-        await refreshProfile();
-        
-        toast({
-          title: "Perfil atualizado",
-          description: "Suas informações foram salvas com sucesso.",
-        });
-      }
-      
-      onClose();
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -52,9 +100,17 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
+
+  const handleModeSelect = (mode: 'national' | 'international') => {
+    setAccountMode(mode);
+    setShowModeDropdown(false);
+  };
+
+  // Don't render if user is not authenticated
+  if (!user) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -66,102 +122,193 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         
         <div className="p-6 max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 via-purple-900/20 to-blue-900/20 border border-purple-500/30 backdrop-blur-xl rounded-lg relative">
           
-          {/* Content */}
-          <div className="pt-4 pb-2">
-            <div className="space-y-4">
-              <div className="text-center space-y-2">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
-                  <User className="w-10 h-10 text-white" />
+          {/* Loading State */}
+          {isLoadingProfile ? (
+            <div className="pt-4 pb-2">
+              <div className="space-y-4">
+                <div className="text-center space-y-2">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
+                    <User className="w-10 h-10 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white">Meu Perfil</h2>
+                  <p className="text-gray-400">Carregando dados...</p>
                 </div>
-                <h2 className="text-2xl font-bold text-white">Meu Perfil</h2>
-                <p className="text-gray-400">Gerencie suas informações pessoais</p>
+                <div className="space-y-4">
+                  <div className="animate-pulse space-y-3">
+                    <div className="h-4 bg-gray-700 rounded w-1/4"></div>
+                    <div className="h-10 bg-gray-700 rounded"></div>
+                  </div>
+                  <div className="animate-pulse space-y-3">
+                    <div className="h-4 bg-gray-700 rounded w-1/3"></div>
+                    <div className="h-10 bg-gray-700 rounded"></div>
+                  </div>
+                </div>
               </div>
-              
-              <form className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    Telefone
-                  </label>
-                  <div className="relative">
-                    <input 
-                      className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800/50 border-gray-700 text-gray-400 cursor-not-allowed" 
-                      disabled 
-                      value="(91) 00000-0000"
-                      readOnly
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">Não editável</span>
+            </div>
+          ) : (
+            /* Profile Content */
+            <div className="pt-4 pb-2">
+              <div className="space-y-4">
+                <div className="text-center space-y-2">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
+                    <User className="w-10 h-10 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white">Meu Perfil</h2>
+                  <p className="text-gray-400">Gerencie suas informações pessoais</p>
+                </div>
+                
+                <form className="space-y-4">
+                  {/* Phone Field - Non-editable */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      Telefone
+                    </label>
+                    <div className="relative">
+                      <input 
+                        className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800/50 border-gray-700 text-gray-400 cursor-not-allowed" 
+                        disabled 
+                        value={user?.user_metadata?.phone || user?.email || 'Não informado'}
+                        readOnly
+                      />
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">Não editável</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Nome Completo
-                  </label>
-                  <input 
-                    className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 bg-gray-800/50 text-white placeholder-gray-500 border-purple-500/50 focus:border-purple-400" 
-                    placeholder="Nome Completo" 
-                    name="name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    Modo de conta
-                  </label>
-                  <div className="relative w-full">
-                    <button 
-                      className="inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border hover:text-white h-10 px-4 py-2 w-full justify-between text-left font-normal bg-gray-800/50 border-gray-700 text-white hover:bg-gray-800/70" 
-                      type="button"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">🇧🇷</span>
-                        <div className="flex flex-col items-start">
-                          <span className="text-white">Nacional</span>
-                          <span className="text-xs text-gray-400">Brasil</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="inline-flex items-center justify-center h-5 w-5 hover:bg-gray-700 text-gray-400 hover:text-white rounded-md cursor-pointer">
-                          <X className="h-3 w-3" />
-                        </div>
-                        <ChevronDown className="h-4 w-4 text-gray-400 transition-transform duration-200" />
-                      </div>
-                    </button>
+                  
+                  {/* Full Name Field */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Nome Completo
+                    </label>
+                    <input 
+                      className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+                        isEditing 
+                          ? 'bg-gray-800/50 text-white placeholder-gray-500 border-purple-500/50 focus:border-purple-400' 
+                          : 'bg-gray-800/30 text-gray-300 border-gray-700 cursor-not-allowed'
+                      }`}
+                      placeholder="Nome Completo" 
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      disabled={!isEditing}
+                    />
                   </div>
-                  <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Sua conta vai estar como:</p>
-                    <p className="text-sm text-white font-medium">Nacional</p>
+                  
+                  {/* Account Mode Field */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Modo de conta
+                    </label>
+                    <div className="relative w-full">
+                      <button 
+                        className={`inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-10 px-4 py-2 w-full justify-between text-left font-normal ${
+                          isEditing 
+                            ? 'bg-gray-800/50 border-gray-700 text-white hover:bg-gray-800/70 hover:text-white' 
+                            : 'bg-gray-800/30 border-gray-700 text-gray-300 cursor-not-allowed'
+                        }`}
+                        type="button"
+                        onClick={() => isEditing && setShowModeDropdown(!showModeDropdown)}
+                        disabled={!isEditing}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{accountMode === 'national' ? '🇧🇷' : '🌍'}</span>
+                          <div className="flex flex-col items-start">
+                            <span className={isEditing ? 'text-white' : 'text-gray-300'}>
+                              {accountMode === 'national' ? 'Nacional' : 'Internacional'}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {accountMode === 'national' ? 'Brasil' : 'Global'}
+                            </span>
+                          </div>
+                        </div>
+                        {isEditing && (
+                          <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${showModeDropdown ? 'rotate-180' : ''}`} />
+                        )}
+                      </button>
+                      
+                      {/* Dropdown */}
+                      {isEditing && showModeDropdown && (
+                        <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg">
+                          <button
+                            type="button"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-700 flex items-center gap-2"
+                            onClick={() => handleModeSelect('national')}
+                          >
+                            <span className="text-lg">🇧🇷</span>
+                            <div className="flex flex-col">
+                              <span className="text-white">Nacional</span>
+                              <span className="text-xs text-gray-400">Brasil</span>
+                            </div>
+                          </button>
+                          <button
+                            type="button"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-700 flex items-center gap-2"
+                            onClick={() => handleModeSelect('international')}
+                          >
+                            <span className="text-lg">🌍</span>
+                            <div className="flex flex-col">
+                              <span className="text-white">Internacional</span>
+                              <span className="text-xs text-gray-400">Global</span>
+                            </div>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
+                      <p className="text-xs text-gray-400 mb-1">Sua conta vai estar como:</p>
+                      <p className="text-sm text-white font-medium">
+                        {accountMode === 'national' ? 'Nacional' : 'Internacional'}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <button 
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-10 px-4 py-2 flex-1 border-gray-600 text-gray-300 hover:bg-gray-800" 
-                    type="button"
-                    onClick={onClose}
-                  >
-                    Cancelar
-                  </button>
-                  <button 
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-10 px-4 py-2 flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50" 
-                    type="submit"
-                    onClick={handleSave}
-                    disabled={isLoading}
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Salvar Alterações
-                  </button>
-                </div>
-              </form>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    {!isEditing ? (
+                      <>
+                        <Button 
+                          variant="outline"
+                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
+                          onClick={onClose}
+                        >
+                          Fechar
+                        </Button>
+                        <Button 
+                          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                          onClick={handleEdit}
+                        >
+                          <Edit3 className="w-4 h-4 mr-2" />
+                          Editar Perfil
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button 
+                          variant="outline"
+                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
+                          onClick={handleCancel}
+                          disabled={isSaving}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button 
+                          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white disabled:opacity-50"
+                          onClick={handleSave}
+                          disabled={isSaving || !fullName.trim()}
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
+          )}
           
           <div className="absolute inset-0 -z-10">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 via-transparent to-blue-600/5 rounded-lg"></div>
