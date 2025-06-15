@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Copy, Check, QrCode, Clock, X, AlertCircle } from 'lucide-react';
+import { Copy, Check, QrCode, Clock, X, AlertCircle, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { zyonPayService } from '@/lib/zyonPayService';
@@ -217,118 +217,164 @@ export function PixPaymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-gray-900/98 backdrop-blur-md border-gray-700/50 text-white w-[95%] max-w-sm mx-auto rounded-2xl max-h-[90vh] overflow-y-auto p-0">
-        <DialogHeader className="p-4 pb-2">
-          <DialogTitle className="text-lg font-bold text-center flex items-center justify-center gap-2">
-            <QrCode className="w-5 h-5 text-yellow-500" />
-            PIX - R$ {amount.toFixed(2).replace('.', ',')}
-          </DialogTitle>
-          <DialogDescription className="text-gray-400 text-sm text-center">
-            Escaneie o QR Code ou copie o código PIX
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="px-4 pb-4">
-          {/* Status */}
-          <div className={`flex items-center justify-center gap-2 p-3 rounded-lg ${statusInfo.bgColor} mb-4`}>
-            <span className={statusInfo.color}>{statusInfo.icon}</span>
-            <span className={`text-sm font-medium ${statusInfo.color}`}>
-              {statusInfo.text}
-            </span>
+      <DialogContent className="relative z-50 w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl shadow-2xl border border-gray-700/50 flex flex-col text-white p-0">
+        <div className="flex-shrink-0 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-sm border-b border-gray-700/50 p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Fazer Depósito</h2>
+              <p className="text-gray-400 text-sm mt-1">Adicione saldo à sua conta via PIX</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              className="text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-full w-8 h-8 p-0"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
+        </div>
 
-          {isLoading && (
-            <div className="text-center py-8">
-              <div className="animate-spin w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-400">Gerando PIX...</p>
-            </div>
-          )}
-
-          {error && (
-            <div className="text-center py-8">
-              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-              <p className="text-red-400 mb-4">{error}</p>
-              <Button
-                onClick={generatePixPayment}
-                variant="outline"
-                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
-              >
-                Tentar novamente
-              </Button>
-            </div>
-          )}
-
-          {pixData && !isLoading && (
-            <div className="space-y-4">
-              {/* QR Code */}
-              <div className="text-center">
-                <div className="bg-white p-4 rounded-lg inline-block mb-4">
-                  <img
-                    src={zyonPayService.generateQRCodeImageUrl(pixData.qrcode)}
-                    alt="QR Code PIX"
-                    className="w-64 h-64 mx-auto"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            {/* Amount Display */}
+            <div className="text-center">
+              <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-center gap-3">
+                  <QrCode className="w-6 h-6 text-blue-400" />
+                  <h3 className="text-xl font-bold text-white">
+                    PIX - R$ {amount.toFixed(2).replace('.', ',')}
+                  </h3>
                 </div>
-                <p className="text-sm text-gray-400 mb-2">
-                  Abra o app do seu banco e escaneie o código
+                <p className="text-blue-300 text-sm mt-2">
+                  Escaneie o QR Code ou copie o código PIX
                 </p>
               </div>
+            </div>
 
-              {/* PIX Code */}
-              <div>
-                <label className="text-sm font-medium text-gray-300 mb-2 block">
-                  Código PIX (Copia e Cola)
-                </label>
+            {/* Status */}
+            <div className={`flex items-center justify-center gap-3 p-4 rounded-xl ${statusInfo.bgColor} border border-opacity-30`}>
+              <span className={statusInfo.color}>{statusInfo.icon}</span>
+              <span className={`text-sm font-medium ${statusInfo.color}`}>
+                {statusInfo.text}
+              </span>
+            </div>
+
+            {isLoading && (
+              <div className="text-center py-12">
                 <div className="relative">
-                  <textarea
-                    value={pixData.url}
-                    readOnly
-                    className="w-full bg-gray-800/50 border border-gray-600/50 rounded-lg p-3 text-sm text-white resize-none h-20"
-                    onClick={(e) => e.currentTarget.select()}
-                  />
+                  <div className="animate-spin w-12 h-12 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-6"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-6 h-6 bg-blue-500 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-lg font-medium">Gerando PIX...</p>
+                <p className="text-gray-400 text-sm mt-2">Aguarde alguns segundos</p>
+              </div>
+            )}
+
+            {error && (
+              <div className="text-center py-12">
+                <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6 mb-6">
+                  <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold text-red-300 mb-2">Erro ao gerar PIX</h4>
+                  <p className="text-red-400 text-sm mb-4">{error}</p>
                   <Button
-                    onClick={copyPixCode}
-                    className={`absolute top-2 right-2 h-8 px-3 text-xs ${
-                      isCopied 
-                        ? 'bg-green-600 hover:bg-green-700' 
-                        : 'bg-yellow-500 hover:bg-yellow-600 text-black'
-                    }`}
+                    onClick={generatePixPayment}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-6 py-2 rounded-lg transition-all duration-200"
                   >
-                    {isCopied ? (
-                      <>
-                        <Check className="w-3 h-3 mr-1" />
-                        Copiado
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3 mr-1" />
-                        Copiar
-                      </>
-                    )}
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Tentar novamente
                   </Button>
                 </div>
               </div>
+            )}
 
-              {/* Expiration Info */}
-              <div className="text-center text-sm text-gray-400">
-                <p>Válido até: {new Date(pixData.expirationDate).toLocaleString('pt-BR')}</p>
-                <p className="mt-1">O pagamento será confirmado automaticamente</p>
+            {pixData && !isLoading && (
+              <div className="space-y-6">
+                {/* QR Code Section */}
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-xl p-6">
+                  <div className="text-center">
+                    <h4 className="text-lg font-semibold text-white mb-4">QR Code PIX</h4>
+                    <div className="bg-white p-6 rounded-xl inline-block shadow-lg">
+                      <img
+                        src={zyonPayService.generateQRCodeImageUrl(pixData.qrcode)}
+                        alt="QR Code PIX"
+                        className="w-48 h-48 mx-auto"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                    <p className="text-gray-300 text-sm mt-4 leading-relaxed">
+                      Abra o app do seu banco e escaneie o código acima
+                    </p>
+                  </div>
+                </div>
+
+                {/* PIX Code Section */}
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-xl p-6">
+                  <h4 className="text-lg font-semibold text-white mb-4">Código PIX (Copia e Cola)</h4>
+                  <div className="relative">
+                    <textarea
+                      value={pixData.url}
+                      readOnly
+                      className="w-full bg-gray-900/70 border border-gray-600/50 rounded-lg p-4 text-sm text-gray-100 resize-none h-24 font-mono leading-relaxed focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
+                      onClick={(e) => e.currentTarget.select()}
+                      placeholder="Código PIX será exibido aqui..."
+                    />
+                    <Button
+                      onClick={copyPixCode}
+                      className={`absolute top-3 right-3 h-10 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
+                        isCopied 
+                          ? 'bg-green-600 hover:bg-green-700 text-white' 
+                          : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+                      }`}
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Copiado!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copiar
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Payment Info */}
+                <div className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border border-yellow-500/30 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-yellow-400 mt-0.5" />
+                    <div>
+                      <p className="text-yellow-100 text-sm font-medium">
+                        Válido até: {new Date(pixData.expirationDate).toLocaleString('pt-BR')}
+                      </p>
+                      <p className="text-yellow-200/80 text-xs mt-1">
+                        O pagamento será confirmado automaticamente após a transferência
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
+            )}
+          </div>
 
-              {/* Close Button */}
-              <Button
-                onClick={handleClose}
-                variant="outline"
-                className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
-              >
-                Fechar
-              </Button>
-            </div>
-          )}
+          {/* Footer */}
+          <div className="flex-shrink-0 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-sm border-t border-gray-700/50 p-6">
+            <Button
+              onClick={handleClose}
+              variant="outline"
+              className="w-full border-gray-600 text-gray-300 hover:bg-gray-700/50 hover:text-white font-medium py-3 rounded-lg transition-all duration-200"
+            >
+              Fechar
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
