@@ -53,8 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       options: {
         data: {
           full_name: fullName
-        },
-        emailRedirectTo: undefined // Disable email confirmation redirect
+        }
       }
     });
 
@@ -65,7 +64,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('Senha muito fraca. Use pelo menos 6 caracteres');
       } else if (error.code === 'email_address_already_in_use') {
         throw new Error('Este email já está cadastrado');
-      } else if (error.code === 'email_address_invalid') {
+      } else if (error.code === 'signup_disabled') {
+        throw new Error('Cadastro desabilitado temporariamente');
+      } else if (error.message.includes('email_address_invalid')) {
         throw new Error('Email inválido. Verifique o formato do email');
       } else {
         throw new Error(error.message);
@@ -74,17 +75,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     console.log('Cadastro realizado:', data.user?.email);
 
-    // Handle successful signup
-    if (data.user) {
-      if (data.session) {
-        // Session created immediately - user is authenticated
-        console.log('Usuário autenticado com sessão:', data.user.email);
-        setUser(data.user);
-      } else {
-        // No session but user exists - set as authenticated anyway
-        console.log('Usuário cadastrado, definindo como autenticado:', data.user.email);
-        setUser(data.user);
-      }
+    // Handle successful signup - user will receive confirmation email
+    if (data.user && !data.session) {
+      console.log('Usuário criado, aguardando confirmação de email');
+      // For development, we'll consider this a successful signup
+      // In production, user would need to confirm email
     }
   };
 

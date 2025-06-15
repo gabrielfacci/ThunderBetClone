@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Phone, Globe, X, Save, MapPin, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/contexts/MockAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { updateUserProfile } from '@/lib/supabaseQueries';
 import { useToast } from '@/hooks/use-toast';
 

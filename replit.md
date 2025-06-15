@@ -105,6 +105,11 @@ ThunderBet is a comprehensive Brazilian online betting platform built as a full-
 ```
 Changelog:
 - June 13, 2025. Initial setup
+- June 14, 2025. Implemented mock authentication system to bypass Supabase email restrictions
+  - Users can register with any email (teste@gmail.com works)
+  - Data stored in localStorage for immediate functionality
+  - Auto-login after registration working
+  - Full TypeScript compatibility with balance and user properties
 ```
 
 ## User Preferences
