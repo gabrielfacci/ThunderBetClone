@@ -163,6 +163,7 @@ export class ZyonPayService {
       const result = await response.json();
       
       console.log('ZyonPay transaction created successfully:', result.id);
+      console.log('Full ZyonPay response:', JSON.stringify(result, null, 2));
       return result;
     } catch (error) {
       console.error('Error creating PIX transaction:', error);
