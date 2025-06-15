@@ -392,10 +392,45 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         </div>
                       </div>
 
-                      {/* Info Section */}
-                      <div className="text-center">
-                        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                          <p className="text-blue-400 font-medium">Escaneie o QR Code ou copie o código PIX para realizar o pagamento</p>
+                      {/* Payment Status Section */}
+                      <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-gray-300 font-medium">Status do Pagamento</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className={`flex items-center space-x-2 ${
+                            paymentStage === "waiting" ? "text-yellow-400" : "text-green-400"
+                          }`}>
+                            <div className={`w-3 h-3 rounded-full ${
+                              paymentStage === "waiting" ? "bg-yellow-400 animate-pulse" : "bg-green-400"
+                            }`}></div>
+                            <span className="text-sm font-medium">Aguardando</span>
+                          </div>
+                          <div className="flex-1 mx-4">
+                            <div className="w-full bg-gray-700 rounded-full h-1">
+                              <div className={`h-1 rounded-full transition-all duration-500 ${
+                                paymentStage === "completed" ? "w-full bg-green-400" : "w-0 bg-gray-700"
+                              }`}></div>
+                            </div>
+                          </div>
+                          <div className={`flex items-center space-x-2 ${
+                            paymentStage === "completed" ? "text-green-400" : "text-gray-500"
+                          }`}>
+                            <div className={`w-3 h-3 rounded-full ${
+                              paymentStage === "completed" ? "bg-green-400" : "bg-gray-500"
+                            }`}></div>
+                            <span className="text-sm font-medium">Pagamento concluído</span>
+                          </div>
+                        </div>
+                        <div className="mt-3 text-center">
+                          <p className={`text-sm ${
+                            paymentStage === "waiting" ? "text-yellow-400" :
+                            paymentStage === "completed" ? "text-green-400" : "text-gray-400"
+                          }`}>
+                            {paymentStage === "waiting" ? "Escaneie o QR Code ou copie o código PIX para realizar o pagamento" :
+                             paymentStage === "completed" ? "Pagamento processado com sucesso!" :
+                             "Processando pagamento..."}
+                          </p>
                         </div>
                       </div>
 
