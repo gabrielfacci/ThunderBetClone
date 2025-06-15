@@ -234,34 +234,42 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900/98 backdrop-blur-md border-gray-700/50 text-white w-[95%] max-w-sm mx-auto rounded-2xl max-h-[85vh] overflow-y-auto p-0 sm:max-w-md ml-[0px] mr-[0px] pl-[12px] pr-[12px] pt-[30px] pb-[30px]">
-        <DialogHeader className="p-4 pb-2 sm:p-4 sm:pb-2">
-          <DialogTitle className="text-lg sm:text-xl font-bold text-center leading-tight">{t('Make Deposit')}</DialogTitle>
-          <DialogDescription className="text-gray-400 text-sm sm:text-base text-center leading-tight mt-1">
-            {t('Add balance to your account')}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="px-4 pb-4">
-          {/* Tabs */}
-          <div className="flex space-x-2 mb-4">
-            <Button
-              variant={activeTab === 'pix' ? 'default' : 'secondary'}
-              className={`flex-1 h-10 text-sm sm:h-12 sm:text-base touch-manipulation ${activeTab === 'pix' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
-              onClick={() => setActiveTab('pix')}
-            >
-              <CreditCard className="w-4 h-4 mr-2" />
-              PIX
-            </Button>
-            <Button
-              variant={activeTab === 'history' ? 'default' : 'secondary'}
-              className={`flex-1 h-10 text-sm sm:h-12 sm:text-base touch-manipulation ${activeTab === 'history' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
-              onClick={() => setActiveTab('history')}
-            >
-              <History className="w-4 h-4 mr-2" />
-              {t('History')}
-            </Button>
+      <DialogContent className="bg-gray-900/98 backdrop-blur-md border-gray-700/50 text-white w-[95%] max-w-md mx-auto rounded-2xl h-[90vh] max-h-[600px] overflow-hidden p-0 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        {/* Fixed Header */}
+        <div className="sticky top-0 bg-gray-900/98 backdrop-blur-md border-b border-gray-700/30 z-10">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="text-xl font-bold text-center leading-tight">{t('Make Deposit')}</DialogTitle>
+            <DialogDescription className="text-gray-400 text-sm text-center leading-tight mt-1">
+              {t('Add balance to your account')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {/* Fixed Tabs */}
+          <div className="px-4 pb-3">
+            <div className="flex space-x-2">
+              <Button
+                variant={activeTab === 'pix' ? 'default' : 'secondary'}
+                className={`flex-1 h-12 text-base touch-manipulation ${activeTab === 'pix' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+                onClick={() => setActiveTab('pix')}
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                PIX
+              </Button>
+              <Button
+                variant={activeTab === 'history' ? 'default' : 'secondary'}
+                className={`flex-1 h-12 text-base touch-manipulation ${activeTab === 'history' ? 'bg-yellow-500 text-black font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+                onClick={() => setActiveTab('history')}
+              >
+                <History className="w-4 h-4 mr-2" />
+                {t('History')}
+              </Button>
+            </div>
           </div>
+        </div>
+
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
+          <div className="py-2"></div>
 
           {activeTab === 'pix' && (
             <div>
@@ -350,14 +358,14 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
                       {/* QR Code */}
                       <div className="flex justify-center">
-                        <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <div className="bg-white p-4 rounded-2xl shadow-lg">
                           <img
                             src={pixData.qrCode}
                             alt="QR Code PIX"
-                            className="w-48 h-48 rounded-lg"
+                            className="w-32 h-32 rounded-lg"
                             onError={(e) => {
                               console.error('QR Code failed to load');
-                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjZjNmNGY2Ii8+CiAgICA8dGV4dCB4PSI5NiIgeT0iOTYiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2Nzg5ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcnJlZ2FuZG88L3RleHQ+Cjwvc3ZnPg==';
+                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjZjNmNGY2Ii8+CiAgICA8dGV4dCB4PSI2NCIgeT0iNjQiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzY2Nzg5ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcnJlZ2FuZG88L3RleHQ+Cjwvc3ZnPg==';
                             }}
                           />
                         </div>
