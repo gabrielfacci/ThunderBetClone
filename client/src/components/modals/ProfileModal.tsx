@@ -276,18 +276,18 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   </div>
                   
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  <div className="flex gap-2 pt-3">
                     {!isEditing ? (
                       <>
                         <Button 
                           variant="outline"
-                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
+                          className="flex-1 h-8 text-xs border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
                           onClick={onClose}
                         >
                           {t('profile.close')}
                         </Button>
                         <Button 
-                          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                          className="flex-1 h-8 text-xs bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                           onClick={(e) => {
                             e.preventDefault();
                             console.log('Botão editar clicado, isEditing atual:', isEditing);
@@ -295,7 +295,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                             console.log('Após handleEdit, isEditing deveria ser true');
                           }}
                         >
-                          <Edit3 className="w-4 h-4 mr-2" />
+                          <Edit3 className="w-3 h-3 mr-1" />
                           {t('profile.edit')}
                         </Button>
                       </>
@@ -303,18 +303,18 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                       <>
                         <Button 
                           variant="outline"
-                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
+                          className="flex-1 h-8 text-xs border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" 
                           onClick={handleCancel}
                           disabled={isSaving}
                         >
                           {t('profile.cancel')}
                         </Button>
                         <Button 
-                          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white disabled:opacity-50"
+                          className="flex-1 h-8 text-xs bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white disabled:opacity-50"
                           onClick={handleSave}
                           disabled={isSaving || !fullName.trim()}
                         >
-                          <Save className="w-4 h-4 mr-2" />
+                          <Save className="w-3 h-3 mr-1" />
                           {isSaving ? t('profile.saving') : t('profile.save')}
                         </Button>
                       </>
