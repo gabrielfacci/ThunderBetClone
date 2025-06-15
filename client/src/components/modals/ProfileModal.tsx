@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { User, Phone, Globe, X, Save, MapPin, ChevronDown, Edit3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { profileService, type UserProfile } from '@/lib/supabaseProfile';
 
@@ -13,6 +14,7 @@ interface ProfileModalProps {
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { toast } = useToast();
   
   // Real data state
@@ -90,16 +92,21 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       setOriginalAccountMode(updatedProfile.account_mode);
       setIsEditing(false);
       
+      // Show language change notification if account mode changed
+      const languageChanged = originalAccountMode !== accountMode;
+      
       toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram salvas com sucesso.",
+        title: t('message.profileUpdated'),
+        description: languageChanged 
+          ? (accountMode === 'internacional' ? t('message.languageChanged').replace('português', 'English') : t('message.languageChanged'))
+          : t('message.profileUpdatedDesc'),
       });
       
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao atualizar perfil. Tente novamente.",
+        title: t('message.error'),
+        description: t('message.errorLoadingProfile'),
         variant: "destructive",
       });
     } finally {
@@ -119,8 +126,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="p-0 max-w-md w-full mx-4 bg-transparent border-0 shadow-none">
         <DialogHeader className="sr-only">
-          <DialogTitle>Meu Perfil</DialogTitle>
-          <DialogDescription>Gerencie suas informações pessoais</DialogDescription>
+          <DialogTitle>{t('profile.title')}</DialogTitle>
+          <DialogDescription>{t('profile.subtitle')}</DialogDescription>
         </DialogHeader>
         
         <div className="p-6 max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 via-purple-900/20 to-blue-900/20 border border-purple-500/30 backdrop-blur-xl rounded-lg relative">
@@ -156,8 +163,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
                     <User className="w-10 h-10 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Meu Perfil</h2>
-                  <p className="text-gray-400">Gerencie suas informações pessoais</p>
+                  <h2 className="text-2xl font-bold text-white">{t('profile.title')}</h2>
+                  <p className="text-gray-400">{t('profile.subtitle')}</p>
                 </div>
                 
                 <form className="space-y-4">
@@ -165,7 +172,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
                       <Phone className="w-4 h-4" />
-                      Telefone
+                      {t('profile.phone')}
                     </label>
                     <div className="relative">
                       <input 
