@@ -52,8 +52,8 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
     const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
     if (numericAmount < 20) {
       toast({
-        title: "Valor mínimo",
-        description: "O valor mínimo para saque é R$ 20,00",
+        title: t("Minimum amount"),
+        description: t("Minimum withdrawal amount is R$ 20.00"),
         variant: "destructive",
       });
       return;
@@ -61,8 +61,8 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
     if (numericAmount > 1000.00) { // Default balance for Supabase users
       toast({
-        title: "Saldo insuficiente",
-        description: "Você não possui saldo suficiente para este saque",
+        title: t("Insufficient balance"),
+        description: t("You do not have enough balance for this withdrawal"),
         variant: "destructive",
       });
       return;
@@ -87,8 +87,8 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
         await refreshProfile();
         
         toast({
-          title: "Saque solicitado!",
-          description: `Seu saque de R$ ${numericAmount.toFixed(2).replace('.', ',')} está sendo processado`,
+          title: t("Withdrawal requested!"),
+          description: `${t("Your withdrawal of R$")} ${numericAmount.toFixed(2).replace('.', ',')} ${t("is being processed")}`,
         });
         
         setAmount('');
@@ -96,12 +96,12 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
         onClose();
       } else {
         const error = await response.json();
-        throw new Error(error.error || 'Erro ao processar saque');
+        throw new Error(error.error || t('Could not process withdrawal'));
       }
     } catch (error) {
       toast({
-        title: "Erro no saque",
-        description: error instanceof Error ? error.message : "Não foi possível processar o saque",
+        title: t("Withdrawal error"),
+        description: error instanceof Error ? error.message : t("Could not process withdrawal"),
         variant: "destructive",
       });
     } finally {
@@ -119,7 +119,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
         setTransactions(data.filter((t: any) => t.type === 'withdrawal'));
       }
     } catch (error) {
-      console.error('Erro ao carregar transações:', error);
+      console.error(t('Error loading transactions:'), error);
     }
   };
 

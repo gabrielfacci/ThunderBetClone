@@ -117,6 +117,10 @@ Changelog:
   - Real-time language updates without page reload
   - Complete ProfileModal with Supabase integration
   - Translation system supporting all UI text
+  - Updated all modals (Deposit, Withdrawal, Promotion) to use translation system
+  - Fixed all Portuguese text in Home page for 100% English in internacional mode
+  - Added complete translation dictionaries for all components and error messages
+  - Toast notifications and form validation messages now fully internationalized
 ```
 
 ## User Preferences
