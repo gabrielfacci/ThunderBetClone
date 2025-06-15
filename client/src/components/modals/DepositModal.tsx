@@ -210,9 +210,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         if (response.ok) {
           const transaction = await response.json();
           
-          if (transaction.status === "processing") {
-            setPaymentStage("processing");
-          } else if (transaction.status === "completed") {
+          // Map ZyonPay statuses to our payment stages
+          if (transaction.status === "waiting_payment") {
+            setPaymentStage("waiting");
+          } else if (transaction.status === "paid") {
             setPaymentStage("completed");
             setPaymentCompleted(true);
             

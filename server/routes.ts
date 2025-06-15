@@ -233,6 +233,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test endpoint to simulate payment completion
+  app.post("/api/zyonpay/test-payment/:zyonPayId", async (req, res) => {
+    try {
+      const { zyonPayId } = req.params;
+      
+      // Update the webhook data to simulate payment completion
+      const webhookData = webhookTransactions.get(zyonPayId.toString());
+      if (webhookData) {
+        webhookData.status = "paid";
+        webhookTransactions.set(zyonPayId.toString(), webhookData);
+        console.log(`Test: Updated transaction ${zyonPayId} status to "paid"`);
+        return res.json({ success: true, status: "paid" });
+      }
+      
+      res.status(404).json({ error: "Transaction not found" });
+    } catch (error) {
+      console.error('Error in test payment:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Check ZyonPay transaction status
   app.get("/api/zyonpay/transaction/:zyonPayId", async (req, res) => {
     try {
