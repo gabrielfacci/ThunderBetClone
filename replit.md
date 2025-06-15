@@ -121,6 +121,8 @@ Changelog:
   - Fixed all Portuguese text in Home page for 100% English in internacional mode
   - Added complete translation dictionaries for all components and error messages
   - Toast notifications and form validation messages now fully internationalized
+  - Optimized ProfileModal for mobile responsiveness with centered layout
+  - Eliminated scrolling requirement and improved visual hierarchy
 ```
 
 ## User Preferences

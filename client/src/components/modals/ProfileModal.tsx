@@ -267,9 +267,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         </div>
                       )}
                     </div>
-                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
-                      <p className="text-xs text-gray-400 mb-1">{t('profile.accountMode.description')}</p>
-                      <p className="text-sm text-white font-medium">
+                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-4">
+                      <p className="text-sm text-gray-400 mb-2">{t('profile.accountMode.description')}</p>
+                      <p className="text-base text-white font-medium">
                         {accountMode === 'nacional' ? t('profile.accountMode.nacional') : t('profile.accountMode.internacional')}
                       </p>
                     </div>
