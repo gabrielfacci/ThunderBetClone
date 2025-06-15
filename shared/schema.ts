@@ -70,6 +70,14 @@ export const transactions = pgTable("transactions", {
   balanceBefore: decimal("balance_before", { precision: 10, scale: 2 }),
   balanceAfter: decimal("balance_after", { precision: 10, scale: 2 }),
   metadata: text("metadata"), // JSON string for additional data
+  // ZyonPay specific fields
+  zyonPayTransactionId: text("zyonpay_transaction_id"), // ZyonPay transaction ID
+  zyonPaySecureId: text("zyonpay_secure_id"), // ZyonPay secure ID
+  zyonPaySecureUrl: text("zyonpay_secure_url"), // ZyonPay secure URL
+  zyonPayPixQrCode: text("zyonpay_pix_qrcode"), // PIX QR Code from ZyonPay
+  zyonPayPixUrl: text("zyonpay_pix_url"), // PIX copy-paste code from ZyonPay
+  zyonPayPixExpiration: timestamp("zyonpay_pix_expiration"), // PIX expiration date
+  zyonPayStatus: text("zyonpay_status"), // ZyonPay specific status
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -39,6 +39,8 @@ export interface IStorage {
   
   // Transaction operations for deposits/withdrawals
   createTransaction(transaction: any): Promise<any>;
+  updateTransaction(id: number, updates: any): Promise<any>;
+  getAllTransactions(): Promise<any[]>;
   getUserTransactions(userId: number): Promise<any[]>;
 }
 

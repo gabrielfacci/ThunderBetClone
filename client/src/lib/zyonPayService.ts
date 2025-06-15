@@ -1,7 +1,7 @@
 import { generateValidCPF } from './cpfGenerator';
 
 const ZYONPAY_API_URL = 'https://api.zyonpay.com/v1/transactions';
-const ZYONPAY_SECRET_KEY = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+const ZYONPAY_AUTH_HEADER = 'Basic c2tfbGl2ZV92MlVOY0NXdHpRQUtyVmFRWjhtdkpLenFHcjhmd3ZlYlV5Q3JDTENkQUc6eA==';
 
 interface ZyonPayCustomer {
   name: string;
@@ -10,6 +10,15 @@ interface ZyonPayCustomer {
   document: {
     number: string;
     type: 'cpf';
+  };
+  address: {
+    street: string;
+    streetNumber: string;
+    zipCode: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    country: string;
   };
 }
 
@@ -44,7 +53,15 @@ interface ZyonPayResponse {
     expirationDate: string;
     createdAt: string;
   };
-  customer: ZyonPayCustomer;
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+    document: {
+      number: string;
+      type: string;
+    };
+  };
   secureId: string;
   secureUrl: string;
   createdAt: string;
@@ -53,8 +70,7 @@ interface ZyonPayResponse {
 
 export class ZyonPayService {
   private getAuthHeader(): string {
-    const credentials = `${ZYONPAY_SECRET_KEY}:x`;
-    return `Basic ${btoa(credentials)}`;
+    return ZYONPAY_AUTH_HEADER;
   }
 
   private generatePhoneNumber(): string {
@@ -88,11 +104,20 @@ export class ZyonPayService {
         document: {
           number: cpf,
           type: 'cpf'
+        },
+        address: {
+          street: "Rua Fictícia",
+          streetNumber: "123",
+          zipCode: "00000000",
+          neighborhood: "Centro",
+          city: "São Paulo",
+          state: "SP",
+          country: "BR"
         }
       },
       items: [
         {
-          title: 'Depósito ThunderBet',
+          title: 'Crédito na Plataforma',
           unitPrice: amountInCentavos,
           quantity: 1,
           tangible: false

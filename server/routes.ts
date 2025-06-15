@@ -100,10 +100,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create deposit transaction
-  app.post("/api/transactions/deposit", async (req, res) => {
+  // Create ZyonPay PIX transaction
+  app.post("/api/zyonpay/create-transaction", async (req, res) => {
     try {
-      const { userId, amount, pixKey } = req.body;
+      const { 
+        userId, 
+        amount, 
+        zyonPayTransactionId, 
+        zyonPaySecureId, 
+        zyonPaySecureUrl,
+        zyonPayPixQrCode,
+        zyonPayPixUrl,
+        zyonPayPixExpiration,
+        zyonPayStatus
+      } = req.body;
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -112,24 +122,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const currentBalance = parseFloat(user.balance.toString());
       const depositAmount = parseFloat(amount);
-      const newBalance = currentBalance + depositAmount;
 
       const transaction = await storage.createTransaction({
         userId,
         type: 'deposit',
         amount: depositAmount,
-        status: 'completed',
-        description: `Depósito via PIX`,
-        pixKey,
+        status: 'pending',
+        description: `Depósito PIX via ZyonPay`,
         balanceBefore: currentBalance,
-        balanceAfter: newBalance
+        balanceAfter: currentBalance, // Will be updated when payment is confirmed
+        zyonPayTransactionId: zyonPayTransactionId.toString(),
+        zyonPaySecureId,
+        zyonPaySecureUrl,
+        zyonPayPixQrCode,
+        zyonPayPixUrl,
+        zyonPayPixExpiration: new Date(zyonPayPixExpiration),
+        zyonPayStatus
       });
-
-      await storage.updateUser(userId, { balance: newBalance.toString() });
       
       res.json(transaction);
     } catch (error) {
-      console.error('Error creating deposit:', error);
+      console.error('Error creating ZyonPay transaction:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // ZyonPay postback endpoint
+  app.post("/api/zyonpay/postback", async (req, res) => {
+    try {
+      const { data } = req.body;
+      
+      if (!data || !data.id) {
+        return res.status(400).json({ error: "Invalid postback data" });
+      }
+
+      // Find transaction by ZyonPay ID
+      const transactions = await storage.getAllTransactions();
+      const transaction = transactions.find(t => 
+        t.zyonPayTransactionId === data.id.toString()
+      );
+
+      if (!transaction) {
+        console.error(`Transaction not found for ZyonPay ID: ${data.id}`);
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+
+      // Update transaction status
+      const updatedTransaction = await storage.updateTransaction(transaction.id, {
+        zyonPayStatus: data.status,
+        status: data.status === 'paid' ? 'completed' : 'pending'
+      });
+
+      // If payment is confirmed, update user balance
+      if (data.status === 'paid') {
+        const user = await storage.getUser(transaction.userId);
+        if (user) {
+          const currentBalance = parseFloat(user.balance.toString());
+          const depositAmount = parseFloat(transaction.amount.toString());
+          const newBalance = currentBalance + depositAmount;
+
+          await storage.updateUser(transaction.userId, { 
+            balance: newBalance.toString() 
+          });
+
+          // Update transaction with new balance
+          await storage.updateTransaction(transaction.id, {
+            balanceAfter: newBalance,
+            status: 'completed'
+          });
+        }
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error processing ZyonPay postback:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Check ZyonPay transaction status
+  app.get("/api/zyonpay/transaction/:zyonPayId", async (req, res) => {
+    try {
+      const { zyonPayId } = req.params;
+      
+      const transactions = await storage.getAllTransactions();
+      const transaction = transactions.find(t => 
+        t.zyonPayTransactionId === zyonPayId
+      );
+
+      if (!transaction) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+
+      res.json(transaction);
+    } catch (error) {
+      console.error('Error getting ZyonPay transaction:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
