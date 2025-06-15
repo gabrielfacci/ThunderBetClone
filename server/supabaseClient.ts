@@ -115,20 +115,43 @@ export async function getAllTransactionsFromSupabase() {
 
 export async function getUserTransactionsFromSupabase(userId: string) {
   try {
+    // Use text search in JSON metadata for the UUID
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
-      .eq('user_id', userId)
+      .textSearch('metadata', userId)
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('❌ Supabase error fetching user transactions:', error);
-      throw error;
+      // Fallback to getting all transactions and filtering manually
+      const { data: allData, error: fallbackError } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (fallbackError) {
+        console.error('❌ Supabase fallback error:', fallbackError);
+        return [];
+      }
+      
+      // Filter transactions that contain the userId in metadata
+      const filteredData = allData?.filter(transaction => {
+        try {
+          const metadata = JSON.parse(transaction.metadata || '{}');
+          return metadata.supabaseUserId === userId || metadata.userEmail?.includes(userId);
+        } catch {
+          return false;
+        }
+      }) || [];
+      
+      console.log(`Found ${filteredData.length} transactions for UUID ${userId} (via fallback)`);
+      return filteredData;
     }
 
-    return data;
+    console.log(`Found ${data?.length || 0} transactions for UUID ${userId}`);
+    return data || [];
   } catch (error) {
     console.error('❌ Error fetching user transactions from Supabase:', error);
-    throw error;
+    return [];
   }
 }

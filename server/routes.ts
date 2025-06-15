@@ -90,12 +90,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user transactions
+  // Get user transactions - handle both integer IDs and UUIDs
   app.get("/api/user/:id/transactions", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
-      const transactions = await storage.getUserTransactions(userId);
-      res.json(transactions);
+      const userIdParam = req.params.id;
+      
+      // Check if it's a UUID (contains hyphens) or numeric ID
+      if (userIdParam.includes('-')) {
+        // It's a UUID, get transactions from Supabase by user metadata
+        const transactions = await getUserTransactionsFromSupabase(userIdParam);
+        res.json(transactions);
+      } else {
+        // It's a numeric ID, use regular storage
+        const userId = parseInt(userIdParam);
+        if (isNaN(userId)) {
+          return res.status(400).json({ error: "Invalid user ID format" });
+        }
+        const transactions = await storage.getUserTransactions(userId);
+        res.json(transactions);
+      }
     } catch (error) {
       console.error('Error getting user transactions:', error);
       res.status(500).json({ error: "Internal server error" });

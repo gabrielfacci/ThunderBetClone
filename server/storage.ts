@@ -295,6 +295,12 @@ export class PostgresStorage implements IStorage {
 
   async getUserTransactions(userId: number): Promise<any[]> {
     try {
+      // Validate that userId is a valid number
+      if (isNaN(userId)) {
+        console.log('Invalid numeric user ID provided:', userId);
+        return [];
+      }
+      
       const result = await this.db.select().from(transactions).where(eq(transactions.userId, userId));
       return result;
     } catch (error) {
