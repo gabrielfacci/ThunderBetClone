@@ -6,6 +6,8 @@ import {
   bonuses,
   userPreferences,
   auditLogs,
+  chatConversations,
+  chatMessages,
   type User, 
   type InsertUser,
   type Game,

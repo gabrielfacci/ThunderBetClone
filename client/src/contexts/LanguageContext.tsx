@@ -139,6 +139,12 @@ const translations = {
     'message.errorLoadingProfile': 'Não foi possível carregar os dados do perfil.',
     'message.languageChanged': 'Idioma alterado para português.',
     
+    // Chat support translations
+    'chat.support': 'Suporte',
+    'chat.welcomeMessage': 'Olá! Como podemos ajudá-lo hoje?',
+    'chat.typePlaceholder': 'Digite sua mensagem...',
+    'chat.disconnected': 'Desconectado. Tentando reconectar...',
+    
     // Validation
     'validation.required': 'Campo obrigatório',
     'validation.invalidEmail': 'Email inválido',
