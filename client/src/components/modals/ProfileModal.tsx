@@ -182,7 +182,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         readOnly
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">Não editável</span>
+                        <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">{t('profile.phone.notEditable')}</span>
                       </div>
                     </div>
                   </div>
@@ -191,7 +191,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
                       <User className="w-4 h-4" />
-                      Nome Completo
+                      {t('profile.fullName')}
                     </label>
                     <input 
                       className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
@@ -199,7 +199,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           ? 'bg-gray-800/50 text-white placeholder-gray-500 border-purple-500/50 focus:border-purple-400' 
                           : 'bg-gray-800/30 text-gray-300 border-gray-700 cursor-not-allowed'
                       }`}
-                      placeholder="Nome Completo" 
+                      placeholder={t('profile.fullName')} 
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       disabled={!isEditing}
@@ -210,7 +210,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Modo de conta
+                      {t('profile.accountMode')}
                     </label>
                     <div className="relative w-full">
                       <button 
@@ -227,10 +227,10 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           <span className="text-lg">{accountMode === 'nacional' ? '🇧🇷' : '🌍'}</span>
                           <div className="flex flex-col items-start">
                             <span className={isEditing ? 'text-white' : 'text-gray-300'}>
-                              {accountMode === 'nacional' ? 'Nacional' : 'Internacional'}
+                              {accountMode === 'nacional' ? t('profile.accountMode.nacional') : t('profile.accountMode.internacional')}
                             </span>
                             <span className="text-xs text-gray-400">
-                              {accountMode === 'nacional' ? 'Brasil' : 'Global'}
+                              {accountMode === 'nacional' ? t('profile.accountMode.brazil') : t('profile.accountMode.global')}
                             </span>
                           </div>
                         </div>
@@ -249,8 +249,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           >
                             <span className="text-lg">🇧🇷</span>
                             <div className="flex flex-col">
-                              <span className="text-white">Nacional</span>
-                              <span className="text-xs text-gray-400">Brasil</span>
+                              <span className="text-white">{t('profile.accountMode.nacional')}</span>
+                              <span className="text-xs text-gray-400">{t('profile.accountMode.brazil')}</span>
                             </div>
                           </button>
                           <button
@@ -260,8 +260,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           >
                             <span className="text-lg">🌍</span>
                             <div className="flex flex-col">
-                              <span className="text-white">Internacional</span>
-                              <span className="text-xs text-gray-400">Global</span>
+                              <span className="text-white">{t('profile.accountMode.internacional')}</span>
+                              <span className="text-xs text-gray-400">{t('profile.accountMode.global')}</span>
                             </div>
                           </button>
                         </div>
