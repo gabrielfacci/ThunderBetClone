@@ -200,7 +200,7 @@ export class PostgresStorage implements IStorage {
       port: 6543,
       database: 'postgres',
       username: 'postgres.kgpmvqfehzkeyrtexdkb',
-      password: 'Jo#83321666',
+      password: 'Jo%2383321666', // URL encoded password
       ssl: 'require',
       max: 1,
     });
@@ -369,6 +369,5 @@ export class PostgresStorage implements IStorage {
   }
 }
 
-// Use PostgreSQL storage when DATABASE_URL is available, fallback to memory storage
-// Use MemStorage for now since PostgreSQL schema doesn't match our transaction requirements
-export const storage = new MemStorage();
+// Use PostgreSQL storage directly to store all transactions in Supabase
+export const storage = process.env.DATABASE_URL ? new PostgresStorage() : new MemStorage();
