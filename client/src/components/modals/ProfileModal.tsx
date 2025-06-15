@@ -124,77 +124,77 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 max-w-md w-full mx-4 bg-transparent border-0 shadow-none">
+      <DialogContent className="p-0 max-w-sm w-[95%] mx-auto bg-transparent border-0 shadow-none fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-h-[85vh]">
         <DialogHeader className="sr-only">
           <DialogTitle>{t('profile.title')}</DialogTitle>
           <DialogDescription>{t('profile.subtitle')}</DialogDescription>
         </DialogHeader>
         
-        <div className="p-6 max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 via-purple-900/20 to-blue-900/20 border border-purple-500/30 backdrop-blur-xl rounded-lg relative">
+        <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-gray-900/95 via-purple-900/20 to-blue-900/20 border border-purple-500/30 backdrop-blur-xl rounded-lg relative">
           
           {/* Loading State */}
           {isLoadingProfile ? (
-            <div className="pt-4 pb-2">
-              <div className="space-y-4">
-                <div className="text-center space-y-2">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
-                    <User className="w-10 h-10 text-white" />
+            <div className="py-2">
+              <div className="space-y-3">
+                <div className="text-center space-y-1">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
+                    <User className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Meu Perfil</h2>
-                  <p className="text-gray-400">Carregando dados...</p>
+                  <h2 className="text-xl font-bold text-white">Meu Perfil</h2>
+                  <p className="text-sm text-gray-400">Carregando dados...</p>
                 </div>
-                <div className="space-y-4">
-                  <div className="animate-pulse space-y-3">
-                    <div className="h-4 bg-gray-700 rounded w-1/4"></div>
-                    <div className="h-10 bg-gray-700 rounded"></div>
+                <div className="space-y-3">
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-3 bg-gray-700 rounded w-1/4"></div>
+                    <div className="h-8 bg-gray-700 rounded"></div>
                   </div>
-                  <div className="animate-pulse space-y-3">
-                    <div className="h-4 bg-gray-700 rounded w-1/3"></div>
-                    <div className="h-10 bg-gray-700 rounded"></div>
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-3 bg-gray-700 rounded w-1/3"></div>
+                    <div className="h-8 bg-gray-700 rounded"></div>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             /* Profile Content */
-            <div className="pt-4 pb-2">
-              <div className="space-y-4">
-                <div className="text-center space-y-2">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
-                    <User className="w-10 h-10 text-white" />
+            <div className="py-2">
+              <div className="space-y-3">
+                <div className="text-center space-y-1">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
+                    <User className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">{t('profile.title')}</h2>
-                  <p className="text-gray-400">{t('profile.subtitle')}</p>
+                  <h2 className="text-xl font-bold text-white">{t('profile.title')}</h2>
+                  <p className="text-sm text-gray-400">{t('profile.subtitle')}</p>
                 </div>
                 
-                <form className="space-y-4">
+                <form className="space-y-3">
                   {/* Phone Field - Non-editable */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Phone className="w-4 h-4" />
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-300 flex items-center gap-1">
+                      <Phone className="w-3 h-3" />
                       {t('profile.phone')}
                     </label>
                     <div className="relative">
                       <input 
-                        className="flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800/50 border-gray-700 text-gray-400 cursor-not-allowed" 
+                        className="flex h-8 w-full rounded-md border px-2 py-1 text-xs ring-offset-background file:border-0 file:bg-transparent file:text-xs file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800/50 border-gray-700 text-gray-400 cursor-not-allowed" 
                         disabled 
                         value={user?.user_metadata?.phone || user?.email || 'Não informado'}
                         readOnly
                       />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">{t('profile.phone.notEditable')}</span>
+                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <span className="text-xs text-gray-500 bg-gray-700 px-1 py-0.5 rounded text-xs">{t('profile.phone.notEditable')}</span>
                       </div>
                     </div>
                   </div>
                   
                   {/* Full Name Field */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <User className="w-4 h-4" />
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-300 flex items-center gap-1">
+                      <User className="w-3 h-3" />
                       {t('profile.fullName')}
                     </label>
                     <input 
-                      className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+                      className={`flex h-8 w-full rounded-md border px-2 py-1 text-xs ring-offset-background file:border-0 file:bg-transparent file:text-xs file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
                         isEditing 
                           ? 'bg-gray-800/50 text-white placeholder-gray-500 border-purple-500/50 focus:border-purple-400' 
                           : 'bg-gray-800/30 text-gray-300 border-gray-700 cursor-not-allowed'
@@ -207,14 +207,14 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   </div>
                   
                   {/* Account Mode Field */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-300 flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
                       {t('profile.accountMode')}
                     </label>
                     <div className="relative w-full">
                       <button 
-                        className={`inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-10 px-4 py-2 w-full justify-between text-left font-normal ${
+                        className={`inline-flex items-center whitespace-nowrap rounded-md text-xs ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-8 px-2 py-1 w-full justify-between text-left font-normal ${
                           isEditing 
                             ? 'bg-gray-800/50 border-gray-700 text-white hover:bg-gray-800/70 hover:text-white' 
                             : 'bg-gray-800/30 border-gray-700 text-gray-300 cursor-not-allowed'
