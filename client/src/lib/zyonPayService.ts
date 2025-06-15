@@ -151,10 +151,43 @@ export class ZyonPayService {
       }
 
       const result = await response.json();
+      
+      // Store transaction in backend database
+      await this.storeTransactionInDatabase(result, amount, userEmail);
+      
       return result;
     } catch (error) {
       console.error('Error creating PIX transaction:', error);
       throw error;
+    }
+  }
+
+  private async storeTransactionInDatabase(zyonPayResponse: ZyonPayResponse, amount: number, userEmail: string): Promise<void> {
+    try {
+      // Get user ID from current session or user context
+      const response = await fetch('/api/zyonpay/create-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 1, // This should be dynamic based on logged user
+          amount: amount,
+          zyonPayTransactionId: zyonPayResponse.id,
+          zyonPaySecureId: zyonPayResponse.secureId,
+          zyonPaySecureUrl: zyonPayResponse.secureUrl,
+          zyonPayPixQrCode: zyonPayResponse.pix.qrcode,
+          zyonPayPixUrl: zyonPayResponse.pix.url,
+          zyonPayPixExpiration: zyonPayResponse.pix.expirationDate,
+          zyonPayStatus: zyonPayResponse.status
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to store transaction in database');
+      }
+    } catch (error) {
+      console.error('Error storing transaction:', error);
     }
   }
 

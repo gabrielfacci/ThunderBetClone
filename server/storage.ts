@@ -115,6 +115,16 @@ export class MemStorage implements IStorage {
     return { id: Date.now(), ...transaction, createdAt: new Date() };
   }
 
+  async updateTransaction(id: number, updates: any): Promise<any> {
+    // Mock implementation for in-memory storage
+    return { id, ...updates, updatedAt: new Date() };
+  }
+
+  async getAllTransactions(): Promise<any[]> {
+    // Mock implementation for in-memory storage
+    return [];
+  }
+
   async getUserTransactions(userId: number): Promise<any[]> {
     // Mock implementation for in-memory storage
     return [];
@@ -208,6 +218,29 @@ export class PostgresStorage implements IStorage {
     } catch (error) {
       console.error('Error creating transaction:', error);
       throw error;
+    }
+  }
+
+  async updateTransaction(id: number, updates: any): Promise<any> {
+    try {
+      const result = await this.db.update(transactions)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(eq(transactions.id, id))
+        .returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+      throw error;
+    }
+  }
+
+  async getAllTransactions(): Promise<any[]> {
+    try {
+      const result = await this.db.select().from(transactions);
+      return result;
+    } catch (error) {
+      console.error('Error getting all transactions:', error);
+      return [];
     }
   }
 

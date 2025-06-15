@@ -71,6 +71,25 @@ export function PixPaymentModal({
         userPhone
       );
 
+      // Store transaction data in backend
+      await fetch('/api/zyonpay/create-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 1, // This should be the actual logged user ID
+          amount: amount,
+          zyonPayTransactionId: response.id,
+          zyonPaySecureId: response.secureId,
+          zyonPaySecureUrl: response.secureUrl,
+          zyonPayPixQrCode: response.pix.qrcode,
+          zyonPayPixUrl: response.pix.url,
+          zyonPayPixExpiration: response.pix.expirationDate,
+          zyonPayStatus: response.status
+        }),
+      });
+
       setPixData({
         qrcode: response.pix.qrcode,
         url: response.pix.url,
@@ -79,29 +98,33 @@ export function PixPaymentModal({
         amount: response.amount / 100 // Convert back to reais
       });
 
-      // Start checking payment status every 5 seconds
+      // Start monitoring payment status every 10 seconds
       const interval = setInterval(async () => {
         try {
-          const status = await zyonPayService.checkTransactionStatus(response.id.toString());
-          setPaymentStatus(status.status);
-          
-          if (status.status === 'paid') {
-            clearInterval(interval);
-            setPaymentStatus('paid');
-            toast({
-              title: "Pagamento aprovado!",
-              description: `Depósito de R$ ${amount.toFixed(2).replace('.', ',')} confirmado`,
-            });
-            onPaymentSuccess?.();
-            setTimeout(() => onClose(), 2000);
-          } else if (status.status === 'expired' || status.status === 'canceled') {
-            clearInterval(interval);
-            setPaymentStatus('expired');
+          // Check status via our backend API
+          const statusResponse = await fetch(`/api/zyonpay/transaction/${response.id}`);
+          if (statusResponse.ok) {
+            const transaction = await statusResponse.json();
+            setPaymentStatus(transaction.zyonPayStatus || 'pending');
+            
+            if (transaction.zyonPayStatus === 'paid') {
+              clearInterval(interval);
+              setPaymentStatus('paid');
+              toast({
+                title: "Pagamento aprovado!",
+                description: `Depósito de R$ ${amount.toFixed(2).replace('.', ',')} confirmado`,
+              });
+              onPaymentSuccess?.();
+              setTimeout(() => onClose(), 2000);
+            } else if (transaction.zyonPayStatus === 'expired' || transaction.zyonPayStatus === 'canceled') {
+              clearInterval(interval);
+              setPaymentStatus('expired');
+            }
           }
         } catch (error) {
           console.error('Error checking payment status:', error);
         }
-      }, 5000);
+      }, 10000);
 
       setStatusCheckInterval(interval);
 
