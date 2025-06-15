@@ -124,9 +124,12 @@ Changelog:
   - Optimized ProfileModal for mobile responsiveness with centered layout
   - Eliminated scrolling requirement and improved visual hierarchy
   - Completed automatic Supabase transaction storage for PIX payments
-  - Every PIX transaction now automatically stored with user linking
+  - Every PIX transaction now automatically stored with user linking  
   - Full ZyonPay webhook integration with real PIX codes and status updates
   - Comprehensive transaction history tracking in Supabase database
+  - Direct Supabase API integration bypassing intermediate storage layers
+  - All PIX transactions stored in transactions table with complete ZyonPay data
+  - User linking via metadata with Supabase UUID and email preservation
 ```
 
 ## User Preferences

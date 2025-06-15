@@ -34,27 +34,27 @@ export async function storeTransactionInSupabase(transactionData: {
       .from('transactions')
       .insert([
         {
-          userId: 1, // Use a default numeric user ID since our schema expects integer
+          user_id: 1, // Use a default numeric user ID since our schema expects integer
           type: 'deposit',
           amount: transactionData.amount,
           status: 'pending',
           description: `Depósito PIX via ZyonPay - R$ ${transactionData.amount.toFixed(2)}`,
-          balanceBefore: 0,
-          balanceAfter: 0,
-          zyonPayTransactionId: transactionData.zyonPayTransactionId,
-          zyonPaySecureId: transactionData.zyonPaySecureId,
-          zyonPaySecureUrl: transactionData.zyonPaySecureUrl,
-          zyonPayPixQrCode: transactionData.zyonPayPixQrCode,
-          zyonPayPixUrl: transactionData.zyonPayPixUrl,
-          zyonPayPixExpiration: transactionData.zyonPayPixExpiration,
-          zyonPayStatus: transactionData.zyonPayStatus,
+          balance_before: 0,
+          balance_after: 0,
+          zyonpay_transaction_id: transactionData.zyonPayTransactionId,
+          zyonpay_secure_id: transactionData.zyonPaySecureId,
+          zyonpay_secure_url: transactionData.zyonPaySecureUrl,
+          zyonpay_pix_qrcode: transactionData.zyonPayPixQrCode,
+          zyonpay_pix_url: transactionData.zyonPayPixUrl,
+          zyonpay_pix_expiration: transactionData.zyonPayPixExpiration,
+          zyonpay_status: transactionData.zyonPayStatus,
           metadata: JSON.stringify({
             ...JSON.parse(transactionData.metadata),
             supabaseUserId: transactionData.userId,
             userEmail: transactionData.userEmail
           }),
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         }
       ])
       .select();
