@@ -171,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             balance: '0.00'
           });
         }
-        numericUserId = user.id;
+        numericUserId = user!.id;
       } else {
         numericUserId = parseInt(userId.toString());
         user = await storage.getUser(numericUserId);

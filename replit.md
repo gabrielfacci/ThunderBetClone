@@ -123,6 +123,10 @@ Changelog:
   - Toast notifications and form validation messages now fully internationalized
   - Optimized ProfileModal for mobile responsiveness with centered layout
   - Eliminated scrolling requirement and improved visual hierarchy
+  - Completed automatic Supabase transaction storage for PIX payments
+  - Every PIX transaction now automatically stored with user linking
+  - Full ZyonPay webhook integration with real PIX codes and status updates
+  - Comprehensive transaction history tracking in Supabase database
 ```
 
 ## User Preferences

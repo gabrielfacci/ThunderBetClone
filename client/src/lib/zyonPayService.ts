@@ -180,17 +180,15 @@ export class ZyonPayService {
     }
   }
 
-  private async storeTransactionInDatabase(zyonPayResponse: ZyonPayResponse, amount: number, userEmail: string, userId?: string): Promise<void> {
+  private async storeTransactionInDatabase(zyonPayResponse: any, amount: number, userEmail: string, userId?: string): Promise<void> {
     try {
-      // Get user data from Supabase if userId is provided
-      let supabaseUserId = null;
-      if (userId) {
-        const userResponse = await fetch(`/api/supabase/user/${userId}`);
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          supabaseUserId = userData.id;
-        }
-      }
+      console.log('📝 Attempting to store transaction in Supabase database...');
+      console.log('Transaction data:', {
+        zyonPayId: zyonPayResponse.id,
+        amount: amount,
+        userEmail: userEmail,
+        userId: userId
+      });
 
       const response = await fetch('/api/zyonpay/create-transaction', {
         method: 'POST',
@@ -198,7 +196,7 @@ export class ZyonPayService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: supabaseUserId || userId || userEmail, // Use Supabase user ID, fallback to provided userId or email
+          userId: userId,
           amount: amount,
           userEmail: userEmail,
           zyonPayTransactionId: zyonPayResponse.id,
@@ -210,19 +208,24 @@ export class ZyonPayService {
           zyonPayStatus: zyonPayResponse.status,
           metadata: JSON.stringify({
             customerEmail: userEmail,
-            zyonPayResponse: zyonPayResponse,
-            transactionDate: new Date().toISOString()
+            supabaseUserId: userId,
+            transactionDate: new Date().toISOString(),
+            zyonPayCustomerId: zyonPayResponse.customer?.id
           })
         }),
       });
 
+      console.log('💾 Database storage request sent, status:', response.status);
+
       if (!response.ok) {
-        console.error('Failed to store transaction in database');
+        const errorText = await response.text();
+        console.error('❌ Failed to store transaction in database:', response.status, errorText);
       } else {
-        console.log('✅ Transaction successfully stored in Supabase');
+        const result = await response.json();
+        console.log('✅ Transaction successfully stored in Supabase:', result.id);
       }
     } catch (error) {
-      console.error('Error storing transaction:', error);
+      console.error('❌ Error storing transaction:', error);
     }
   }
 
