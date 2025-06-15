@@ -7,6 +7,7 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
+  isTransitioning: boolean;
 }
 
 const translations = {
@@ -288,6 +289,7 @@ interface LanguageProviderProps {
 
 export function LanguageProvider({ children }: LanguageProviderProps) {
   const [language, setLanguageState] = useState<Language>('pt');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { user, profile } = useAuth();
 
   // Update language based on user's account_mode
@@ -296,14 +298,26 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       const newLanguage = profile.account_mode === 'internacional' ? 'en' : 'pt';
       if (newLanguage !== language) {
         console.log('Changing language to:', newLanguage, 'based on account_mode:', profile.account_mode);
+        setIsTransitioning(true);
         setLanguageState(newLanguage);
+        
+        // Remove transition state after language change is complete
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 200);
       }
     }
   }, [profile?.account_mode, language]);
 
   const setLanguage = (lang: Language) => {
     console.log('Manual language change to:', lang);
+    setIsTransitioning(true);
     setLanguageState(lang);
+    
+    // Remove transition state after language change is complete
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 200);
   };
 
   const t = (key: string): string => {
@@ -316,7 +330,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isTransitioning }}>
       {children}
     </LanguageContext.Provider>
   );

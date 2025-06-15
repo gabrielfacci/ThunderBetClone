@@ -14,7 +14,7 @@ interface ProfileModalProps {
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, setLanguage } = useLanguage();
   const { toast } = useToast();
   
   // Real data state
@@ -92,15 +92,35 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       setOriginalAccountMode(updatedProfile.account_mode);
       setIsEditing(false);
       
-      // Show language change notification if account mode changed
+      // Check if language changed and update immediately
       const languageChanged = originalAccountMode !== accountMode;
-      
-      toast({
-        title: t('message.profileUpdated'),
-        description: languageChanged 
-          ? (accountMode === 'internacional' ? t('message.languageChanged').replace('português', 'English') : t('message.languageChanged'))
-          : t('message.profileUpdatedDesc'),
-      });
+      if (languageChanged) {
+        // Update language context immediately for smooth transition
+        const newLanguage = accountMode === 'internacional' ? 'en' : 'pt';
+        
+        // Close modal first to avoid content jumping
+        onClose();
+        
+        // Update language with a small delay for smoother transition
+        setTimeout(() => {
+          setLanguage(newLanguage);
+          
+          // Show success notification after language change
+          setTimeout(() => {
+            toast({
+              title: accountMode === 'internacional' ? 'Profile Updated' : 'Perfil Atualizado',
+              description: accountMode === 'internacional' 
+                ? 'Language changed to English successfully' 
+                : 'Idioma alterado para Português com sucesso',
+            });
+          }, 150);
+        }, 50);
+      } else {
+        toast({
+          title: t('message.profileUpdated'),
+          description: t('message.profileUpdatedDesc'),
+        });
+      }
       
     } catch (error) {
       console.error('Error updating profile:', error);
