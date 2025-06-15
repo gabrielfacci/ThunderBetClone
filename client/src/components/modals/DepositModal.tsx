@@ -264,14 +264,18 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                             src={pixData.qrCode} 
                             alt="QR Code PIX" 
                             className="w-full h-auto rounded-lg"
+                            onError={(e) => {
+                              console.error('QR Code failed to load');
+                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjZjNmNGY2Ii8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjE1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY3ODllIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UVIgQ29kZSBQSVg8L3RleHQ+Cjwvc3ZnPg==';
+                            }}
                           />
                         </div>
                       </div>
 
-                      {/* PIX Code */}
+                      {/* Payment Link */}
                       <div className="bg-gradient-to-br from-gray-800/80 via-gray-900/80 to-gray-800/80 rounded-xl p-4 border border-gray-700/50">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-300">Código PIX:</span>
+                          <span className="text-sm font-medium text-gray-300">Link de Pagamento:</span>
                           <Button
                             onClick={copyPixCode}
                             variant="ghost"
@@ -286,6 +290,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                             {pixData.url}
                           </p>
                         </div>
+                        <Button
+                          onClick={() => window.open(pixData.url, '_blank')}
+                          className="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white"
+                          size="sm"
+                        >
+                          Abrir Página de Pagamento
+                        </Button>
                       </div>
 
                       {/* Payment Instructions */}

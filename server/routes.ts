@@ -201,6 +201,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ZyonPay webhook endpoint for payment confirmations
+  app.post("/api/webhook/zyonpay", async (req, res) => {
+    try {
+      const webhookData = req.body;
+      console.log('ZyonPay webhook received:', JSON.stringify(webhookData, null, 2));
+      
+      const { id: transactionId, status, amount } = webhookData;
+      
+      // Update transaction status in our database
+      const transactions = await storage.getAllTransactions();
+      const transaction = transactions.find(t => 
+        t.zyonPayTransactionId?.toString() === transactionId?.toString()
+      );
+
+      if (transaction) {
+        await storage.updateTransaction(transaction.id, {
+          status: status === 'paid' ? 'completed' : status,
+          updatedAt: new Date()
+        });
+
+        // If payment is confirmed, update user balance
+        if (status === 'paid') {
+          const user = await storage.getUser(transaction.userId);
+          if (user) {
+            const currentBalance = parseFloat(user.balance.toString());
+            const depositAmount = amount / 100; // Convert from centavos to reais
+            const newBalance = currentBalance + depositAmount;
+            
+            await storage.updateUser(transaction.userId, {
+              balance: newBalance
+            });
+            
+            console.log(`Payment confirmed for transaction ${transactionId}, user balance updated`);
+          }
+        }
+      }
+
+      // Always respond with 200 to acknowledge receipt
+      res.status(200).json({ received: true });
+    } catch (error) {
+      console.error('Error processing ZyonPay webhook:', error);
+      res.status(200).json({ received: true }); // Still acknowledge to prevent retries
+    }
+  });
+
   // Check ZyonPay transaction status
   app.get("/api/zyonpay/transaction/:zyonPayId", async (req, res) => {
     try {
