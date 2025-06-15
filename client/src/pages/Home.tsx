@@ -252,14 +252,14 @@ export function Home() {
                     className="bg-transparent border-gray-600 text-white hover:bg-gray-700/50 h-8 px-3 text-xs"
                     onClick={() => setShowLoginModal(true)}
                   >
-                    Entrar
+{t('header.login')}
                   </Button>
                   <Button
                     size="sm"
                     className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white h-8 px-3 text-xs font-semibold"
                     onClick={() => setShowRegisterModal(true)}
                   >
-                    Cadastrar
+{t('header.register')}
                   </Button>
                 </>)
               )}
@@ -363,7 +363,7 @@ export function Home() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-black/20 border-gray-600/30 text-white placeholder-gray-400 pl-10 pr-4 py-3 rounded-xl backdrop-blur-sm"
-                placeholder="Buscar jogos por nome ou provedor"
+                placeholder={t('Search games by name or provider')}
               />
             </div>
 
@@ -419,9 +419,9 @@ export function Home() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Flame className="w-4 h-4 text-orange-500" />
-                <span className="font-medium text-white">{filteredGames.length} jogos</span>
+                <span className="font-medium text-white">{filteredGames.length} {t('games')}</span>
               </div>
-              <button className="text-gray-400 text-sm">Game Lobby →</button>
+              <button className="text-gray-400 text-sm">{t('Game Lobby')} →</button>
             </div>
 
             {/* Games Grid */}
