@@ -70,8 +70,10 @@ interface ZyonPayResponse {
 
 export class ZyonPayService {
   private getAuthHeader(): string {
-    // Use the pre-encoded auth header provided
-    return 'Basic c2tfbGl2ZV92MlVOY0NXdHpRQUtyVmFRWjhtdkpLelFHcjhmd3ZlYlV5Q3JDTENkQUc6';
+    // ZyonPay requires :x suffix after secret key
+    const secretKey = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+    const authString = `${secretKey}:x`;
+    return 'Basic ' + btoa(authString);
   }
 
   private generatePhoneNumber(): string {
@@ -139,6 +141,7 @@ export class ZyonPayService {
       recipientId: 106198
     });
     
+    console.log('Auth header format:', this.getAuthHeader().substring(0, 20) + '...');
     console.log('Full transaction payload:', JSON.stringify(transactionData, null, 2));
 
     try {

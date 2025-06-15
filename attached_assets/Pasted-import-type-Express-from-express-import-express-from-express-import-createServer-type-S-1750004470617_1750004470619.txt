@@ -1,0 +1,1868 @@
+import type { Express } from "express";
+import express from "express";
+import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
+import { storage } from "./supabase-storage";
+import { createClient } from "@supabase/supabase-js";
+import bcrypt from "bcryptjs";
+import session from "express-session";
+import { insertUserSchema, insertPredictionSchema, insertBetSchema, insertCommentSchema, insertWalletDepositSchema } from "@shared/schema";
+import { z } from "zod";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL!;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Configuração do multer para upload de imagens
+const uploadStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(process.cwd(), 'uploads', 'predictions');
+    // Criar diretório se não existir
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    // Gerar nome único para o arquivo
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'prediction-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: uploadStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limite
+  },
+  fileFilter: (req, file, cb) => {
+    // Aceitar apenas imagens
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Apenas arquivos de imagem são permitidos!'));
+    }
+  }
+});
+
+// Cliente Supabase admin com service role key para operações administrativas
+const supabaseAdmin = createClient(
+  supabaseUrl, 
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+);
+
+
+declare module "express-session" {
+  interface SessionData {
+    userId?: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  const server = createServer(app);
+
+  // PERFORMANCE OPTIMIZATION: Rate limiting for API endpoints
+  const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: { message: "Too many requests, please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // limit each IP to 5 auth attempts per windowMs
+    message: { message: "Too many authentication attempts, please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Apply rate limiting to API routes
+  app.use('/api/', apiLimiter);
+  app.use('/api/auth/login', authLimiter);
+  app.use('/api/auth/register', authLimiter);
+
+  // Session middleware
+  app.use(session({
+    secret: process.env.SESSION_SECRET || "your-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax'
+    },
+    name: 'connect.sid'
+  }));
+
+  // Servir arquivos estáticos de upload
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+  // Upload de imagem para previsões
+  app.post("/api/upload/prediction-image", upload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Nenhum arquivo foi enviado" });
+      }
+
+      // Retornar o caminho da imagem
+      const imageUrl = `/uploads/predictions/${req.file.filename}`;
+      
+      res.json({
+        message: "Imagem enviada com sucesso",
+        imageUrl: imageUrl,
+        filename: req.file.filename
+      });
+    } catch (error) {
+      console.error('Erro no upload da imagem:', error);
+      res.status(500).json({ message: "Erro ao fazer upload da imagem" });
+    }
+  });
+
+  // Rota alternativa para compatibilidade
+  app.post("/api/upload-prediction-image", upload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Nenhum arquivo foi enviado" });
+      }
+
+      // Retornar o caminho da imagem
+      const imageUrl = `/uploads/predictions/${req.file.filename}`;
+      
+      res.json({
+        message: "Imagem enviada com sucesso",
+        url: imageUrl,
+        imageUrl: imageUrl,
+        filename: req.file.filename
+      });
+    } catch (error) {
+      console.error('Erro no upload da imagem:', error);
+      res.status(500).json({ message: "Erro ao fazer upload da imagem" });
+    }
+  });
+
+  // Authentication middleware
+  const requireAuth = async (req: any, res: any, next: any) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    const user = await storage.getUser(req.session.userId);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+    
+    req.user = user;
+    next();
+  };
+
+  const requireAdmin = (req: any, res: any, next: any) => {
+    if (!req.user?.isAdmin) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    next();
+  };
+
+  // Auth routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      console.log("🔐 [SERVER] Tentativa de registro para:", req.body.email);
+      
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        console.log("🔐 [SERVER] Usuário já existe:", userData.email);
+        return res.status(400).json({ message: "Este email já está em uso" });
+      }
+
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+        balance: "0.00",
+      });
+      
+      req.session.userId = user.id;
+      console.log("✅ [SERVER] Registro realizado com sucesso para:", userData.email, "| ID:", user.id);
+      
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        console.log("🔐 [SERVER] Dados inválidos no registro:", error.errors);
+        return res.status(400).json({ message: "Dados inválidos", errors: error.errors });
+      }
+      console.error("🔐 [SERVER] Erro no registro:", error?.message);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      console.log("🔐 [SERVER] Tentativa de login para:", req.body.email);
+      
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        console.log("🔐 [SERVER] Dados de login incompletos");
+        return res.status(400).json({ message: "Email e senha são obrigatórios" });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        console.log("🔐 [SERVER] Usuário não encontrado:", email);
+        return res.status(401).json({ message: "Email ou senha incorretos" });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        console.log("🔐 [SERVER] Senha incorreta para:", email);
+        console.log("🔐 [SERVER] Password hash preview:", user.password.substring(0, 20));
+        console.log("🔐 [SERVER] Input password length:", password.length);
+        
+        // Check if this is a corrupted password from double-hashing issue
+        // If user was created recently and password doesn't work, suggest password reset
+        const userCreatedAt = new Date(user.createdAt);
+        const isRecentUser = (Date.now() - userCreatedAt.getTime()) < (7 * 24 * 60 * 60 * 1000); // Within 7 days
+        
+        if (isRecentUser) {
+          console.log("🔧 [SERVER] Detected potentially corrupted password for recent user:", email);
+          return res.status(401).json({ 
+            message: "Email ou senha incorretos",
+            shouldResetPassword: true,
+            userEmail: email
+          });
+        }
+        
+        return res.status(401).json({ message: "Email ou senha incorretos" });
+      }
+
+      req.session.userId = user.id;
+      console.log("✅ [SERVER] Login realizado com sucesso para:", email, "| ID:", user.id);
+      
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error("🔐 [SERVER] Erro no login:", error?.message);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    const userId = req.session.userId;
+    console.log("🔐 [SERVER] Realizando logout para usuário ID:", userId);
+    
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("🔐 [SERVER] Erro no logout:", err);
+        return res.status(500).json({ message: "Erro ao fazer logout" });
+      }
+      res.clearCookie('connect.sid');
+      console.log("✅ [SERVER] Logout realizado com sucesso para ID:", userId);
+      res.json({ message: "Logout realizado com sucesso" });
+    });
+  });
+
+  // Password reset endpoint for users with corrupted passwords
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { email, newPassword } = req.body;
+      
+      if (!email || !newPassword) {
+        return res.status(400).json({ message: "Email e nova senha são obrigatórios" });
+      }
+      
+      console.log("🔧 [SERVER] Tentativa de reset de senha para:", email);
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        console.log("🔧 [SERVER] Usuário não encontrado para reset:", email);
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Check if user was created recently (within 7 days) - security measure
+      const userCreatedAt = new Date(user.createdAt);
+      const isRecentUser = (Date.now() - userCreatedAt.getTime()) < (7 * 24 * 60 * 60 * 1000);
+      
+      if (!isRecentUser) {
+        console.log("🔧 [SERVER] Reset negado - usuário não é recente:", email);
+        return res.status(403).json({ message: "Reset de senha não disponível para este usuário" });
+      }
+      
+      // Hash the new password properly
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUserPassword(user.id, hashedPassword);
+      
+      console.log("✅ [SERVER] Senha resetada com sucesso para:", email);
+      
+      // Auto-login the user after successful password reset
+      req.session.userId = user.id;
+      
+      const { password, ...userWithoutPassword } = user;
+      res.json({ 
+        message: "Senha resetada com sucesso",
+        user: userWithoutPassword
+      });
+    } catch (error: any) {
+      console.error("🔧 [SERVER] Erro no reset de senha:", error?.message);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/auth/me", requireAuth, (req, res) => {
+    console.log("🔐 [SERVER] Verificação de sessão para:", req.user.email);
+    const { password, ...userWithoutPassword } = req.user;
+    res.json(userWithoutPassword);
+  });
+
+  // Rota de teste para debug de sessão
+  app.get("/api/auth/session-debug", (req, res) => {
+    res.json({
+      sessionId: req.session?.id,
+      userId: req.session?.userId,
+      hasSession: !!req.session,
+      sessionData: req.session
+    });
+  });
+
+  // PERFORMANCE OPTIMIZATION: Enhanced predictions endpoint with caching headers
+  app.get("/api/predictions", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const offset = (page - 1) * limit;
+      
+      // Set cache headers for better performance
+      res.set('Cache-Control', 'public, max-age=30, s-maxage=60');
+      res.set('ETag', `predictions-${page}-${limit}-${Date.now()}`);
+      
+      const allPredictions = await storage.getPredictions(limit, offset);
+      
+      // Filter out predictions that have ended and are awaiting results
+      const now = new Date();
+      const activePredictions = allPredictions.filter(prediction => {
+        const endDate = new Date(prediction.endDate);
+        const hasEnded = endDate < now;
+        const hasResult = prediction.result !== null && prediction.result !== undefined;
+        const isFinished = prediction.status === "finished";
+        
+        return !hasEnded || hasResult || isFinished;
+      });
+      
+      // PERFORMANCE OPTIMIZATION: Batch process stats instead of individual queries
+      const predictionIds = activePredictions.map(p => p.id);
+      const [statsResults, likesResults, commentsResults] = await Promise.all([
+        Promise.all(predictionIds.map(id => storage.getPredictionStats(id))),
+        Promise.all(predictionIds.map(id => storage.getLikesByPrediction(id))),
+        Promise.all(predictionIds.map(id => storage.getCommentsByPrediction(id)))
+      ]);
+      
+      const predictionsWithStats = activePredictions.map((prediction, index) => ({
+        ...prediction,
+        stats: statsResults[index],
+        likesCount: likesResults[index].length,
+        commentsCount: commentsResults[index].length,
+      }));
+      
+      res.json(predictionsWithStats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch predictions" });
+    }
+  });
+
+  app.get("/api/predictions/:id", async (req, res) => {
+    try {
+      const prediction = await storage.getPrediction(req.params.id);
+      if (!prediction) {
+        return res.status(404).json({ message: "Prediction not found" });
+      }
+
+      const stats = await storage.getPredictionStats(prediction.id);
+      const likes = await storage.getLikesByPrediction(prediction.id);
+      const comments = await storage.getCommentsByPrediction(prediction.id);
+
+      res.json({
+        ...prediction,
+        stats,
+        likesCount: likes.length,
+        commentsCount: comments.length,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch prediction" });
+    }
+  });
+
+  app.post("/api/predictions", requireAuth, requireAdmin, async (req, res) => {
+    try {
+      console.log("[CREATE PREDICTION] Received data:", JSON.stringify(req.body, null, 2));
+      
+      // Converter campos snake_case para camelCase para o schema do Drizzle
+      const dataForSchema = {
+        title: req.body.title,
+        category: req.body.category,
+        imageUrl: req.body.image_url,
+        rules: req.body.rules,
+        startDate: new Date(req.body.start_date),
+        endDate: new Date(req.body.end_date),
+        resultDate: new Date(req.body.result_date),
+        totalQuotas: Number(req.body.total_quotas),
+        status: req.body.status || "open",
+        result: req.body.result,
+        resultPeriod: req.body.result_period,
+        initialYesProbability: req.body.initial_yes_probability,
+        initialNoProbability: req.body.initial_no_probability,
+        blockchain: req.body.blockchain || "general"
+      };
+      
+      const predictionData = insertPredictionSchema.parse(dataForSchema);
+      console.log("[CREATE PREDICTION] Data parsed successfully:", JSON.stringify(predictionData, null, 2));
+      
+      const prediction = await storage.createPrediction(predictionData);
+      console.log("[CREATE PREDICTION] Prediction created successfully:", prediction.id);
+      
+      res.json(prediction);
+    } catch (error: any) {
+      console.error("[CREATE PREDICTION] Error:", error);
+      console.error("[CREATE PREDICTION] Error message:", error.message);
+      
+      if (error.name === 'ZodError') {
+        console.error("[CREATE PREDICTION] Zod validation errors:", error.errors);
+        return res.status(400).json({ 
+          message: "Invalid prediction data", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(400).json({ 
+        message: "Invalid prediction data", 
+        error: error.message 
+      });
+    }
+  });
+
+  app.patch("/api/predictions/:id", requireAuth, requireAdmin, async (req, res) => {
+    try {
+      await storage.updatePrediction(req.params.id, req.body);
+      res.json({ message: "Prediction updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update prediction" });
+    }
+  });
+
+  app.post("/api/predictions/:id/finalize", requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const { result } = req.body;
+      if (!["yes", "no"].includes(result)) {
+        return res.status(400).json({ message: "Result must be 'yes' or 'no'" });
+      }
+
+      const predictionId = req.params.id;
+      console.log(`🎯 [FINALIZE] Iniciando finalização automática da previsão ${predictionId} com resultado: ${result}`);
+
+      // Use Supabase client directly for reliable operations
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!supabaseServiceKey) {
+        throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
+      }
+      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+      // 1. Update prediction with result and status
+      const { error: predictionError } = await supabaseAdmin
+        .from('predictions')
+        .update({ 
+          result: result,
+          status: 'finished'
+        })
+        .eq('id', predictionId);
+
+      if (predictionError) {
+        throw new Error(`Failed to update prediction: ${predictionError.message}`);
+      }
+
+      console.log(`✅ [FINALIZE] Previsão atualizada com resultado: ${result}`);
+
+      // 2. Get all bets for this prediction
+      const { data: bets, error: betsError } = await supabaseAdmin
+        .from('bets')
+        .select('id, user_id, amount, option, potential_payout, status')
+        .eq('prediction_id', predictionId);
+
+      if (betsError) {
+        throw new Error(`Failed to get bets: ${betsError.message}`);
+      }
+
+      console.log(`📊 [FINALIZE] Total de apostas encontradas: ${bets?.length || 0}`);
+
+      if (!bets || bets.length === 0) {
+        console.log(`ℹ️ [FINALIZE] Nenhuma aposta encontrada para processar`);
+        return res.json({ 
+          message: "Prediction finalized successfully",
+          summary: { totalBets: 0, winners: 0, losers: 0, totalPayout: "0.00" }
+        });
+      }
+
+      // 3. Separate winning and losing bets
+      const winningBets = bets.filter(bet => bet.option === result);
+      const losingBets = bets.filter(bet => bet.option !== result);
+      
+      console.log(`🏆 [FINALIZE] Apostas vencedoras: ${winningBets.length}`);
+      console.log(`💸 [FINALIZE] Apostas perdedoras: ${losingBets.length}`);
+
+      let totalPayout = 0;
+      let processedWinners = 0;
+
+      // 4. Process winning bets - add winnings to user balance and mark as won
+      for (const bet of winningBets) {
+        try {
+          const payout = parseFloat(bet.potential_payout);
+          
+          // Get current user balance
+          const { data: user, error: userError } = await supabaseAdmin
+            .from('users')
+            .select('balance')
+            .eq('id', bet.user_id)
+            .single();
+
+          if (userError || !user) {
+            console.error(`❌ [FINALIZE] Usuário ${bet.user_id} não encontrado:`, userError);
+            continue;
+          }
+
+          const currentBalance = parseFloat(user.balance) || 0;
+          const newBalance = currentBalance + payout;
+          
+          // Update user balance
+          const { error: balanceError } = await supabaseAdmin
+            .from('users')
+            .update({ balance: newBalance.toFixed(2) })
+            .eq('id', bet.user_id);
+
+          if (balanceError) {
+            console.error(`❌ [FINALIZE] Erro ao atualizar saldo do usuário ${bet.user_id}:`, balanceError);
+            continue;
+          }
+
+          // Mark bet as won
+          const { error: betError } = await supabaseAdmin
+            .from('bets')
+            .update({ status: 'won' })
+            .eq('id', bet.id);
+
+          if (betError) {
+            console.error(`❌ [FINALIZE] Erro ao marcar aposta ${bet.id} como vencedora:`, betError);
+            continue;
+          }
+          
+          totalPayout += payout;
+          processedWinners++;
+          
+          console.log(`💰 [FINALIZE] Usuário ${bet.user_id} recebeu R$ ${payout.toFixed(2)} - Novo saldo: R$ ${newBalance.toFixed(2)}`);
+        } catch (error) {
+          console.error(`❌ [FINALIZE] Erro ao processar vencedor ${bet.id}:`, error);
+        }
+      }
+
+      // 5. Process losing bets - mark as lost
+      let processedLosers = 0;
+      for (const bet of losingBets) {
+        try {
+          const { error: betError } = await supabaseAdmin
+            .from('bets')
+            .update({ status: 'lost' })
+            .eq('id', bet.id);
+
+          if (betError) {
+            console.error(`❌ [FINALIZE] Erro ao marcar aposta ${bet.id} como perdedora:`, betError);
+            continue;
+          }
+
+          processedLosers++;
+          console.log(`💸 [FINALIZE] Aposta ${bet.id} marcada como perdedora`);
+        } catch (error) {
+          console.error(`❌ [FINALIZE] Erro ao processar perdedora ${bet.id}:`, error);
+        }
+      }
+
+      console.log(`🎉 [FINALIZE] Finalização automática concluída:`);
+      console.log(`   - ${processedWinners} vencedores processados`);
+      console.log(`   - ${processedLosers} perdedores processados`);
+      console.log(`   - R$ ${totalPayout.toFixed(2)} distribuídos em prêmios`);
+      
+      res.json({ 
+        message: "Prediction finalized and all bets processed successfully",
+        summary: {
+          totalBets: bets.length,
+          winners: processedWinners,
+          losers: processedLosers,
+          totalPayout: totalPayout.toFixed(2)
+        }
+      });
+    } catch (error) {
+      console.error(`❌ [FINALIZE] Erro na finalização automática:`, error);
+      res.status(500).json({ 
+        message: "Failed to finalize prediction automatically", 
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Admin endpoint to fix pending bets using direct Supabase queries
+  app.post("/api/admin/fix-pending-bets", requireAuth, requireAdmin, async (req, res) => {
+    try {
+      console.log('🔧 [FIX] Iniciando correção de apostas pendentes...');
+
+      // Use Supabase client directly to avoid executeRawSQL issues
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!supabaseServiceKey) {
+        throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
+      }
+      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+      // Get all finished predictions
+      const { data: predictions, error: predError } = await supabaseAdmin
+        .from('predictions')
+        .select('id, title, result, status')
+        .eq('status', 'finished')
+        .not('result', 'is', null);
+
+      if (predError) {
+        console.error('❌ [FIX] Erro ao buscar previsões:', predError);
+        throw new Error(`Failed to get predictions: ${predError.message}`);
+      }
+
+      console.log(`📊 [FIX] Previsões finalizadas encontradas: ${predictions?.length || 0}`);
+
+      let totalFixed = 0;
+      let totalPayout = 0;
+
+      for (const prediction of predictions || []) {
+        console.log(`\n🎯 [FIX] Processando: ${prediction.title}`);
+
+        // Get pending bets for this prediction
+        const { data: pendingBets, error: betsError } = await supabaseAdmin
+          .from('bets')
+          .select('id, user_id, amount, option, potential_payout')
+          .eq('prediction_id', prediction.id)
+          .eq('status', 'pending');
+
+        if (betsError) {
+          console.error(`❌ [FIX] Erro ao buscar apostas para ${prediction.id}:`, betsError);
+          continue;
+        }
+
+        if (!pendingBets || pendingBets.length === 0) {
+          console.log(`   ✅ [FIX] Nenhuma aposta pendente`);
+          continue;
+        }
+
+        console.log(`   ⚠️ [FIX] ${pendingBets.length} apostas pendentes encontradas`);
+
+        const winningBets = pendingBets.filter((bet: any) => bet.option === prediction.result);
+        const losingBets = pendingBets.filter((bet: any) => bet.option !== prediction.result);
+
+        // Process winning bets
+        for (const bet of winningBets) {
+          try {
+            const payout = parseFloat(bet.potential_payout);
+            const user = await storage.getUser(bet.user_id);
+            
+            if (user) {
+              const currentBalance = parseFloat(user.balance) || 0;
+              const newBalance = currentBalance + payout;
+
+              // Update user balance
+              await storage.updateUserBalance(bet.user_id, newBalance.toFixed(2));
+
+              // Mark bet as won
+              await supabaseAdmin
+                .from('bets')
+                .update({ status: 'won' })
+                .eq('id', bet.id);
+
+              totalPayout += payout;
+              totalFixed++;
+              console.log(`   💰 [FIX] Usuário ${bet.user_id}: +R$ ${payout.toFixed(2)}`);
+            }
+          } catch (error) {
+            console.error(`   ❌ [FIX] Erro ao processar vencedor:`, error);
+          }
+        }
+
+        // Process losing bets
+        for (const bet of losingBets) {
+          try {
+            await supabaseAdmin
+              .from('bets')
+              .update({ status: 'lost' })
+              .eq('id', bet.id);
+            
+            totalFixed++;
+            console.log(`   ❌ [FIX] Aposta ${bet.id} marcada como perdedora`);
+          } catch (error) {
+            console.error(`   ❌ [FIX] Erro ao processar perdedora:`, error);
+          }
+        }
+      }
+
+      console.log(`\n✅ [FIX] Correção concluída - ${totalFixed} apostas corrigidas, R$ ${totalPayout.toFixed(2)} distribuídos`);
+
+      res.json({
+        message: "Pending bets fixed successfully",
+        summary: {
+          totalFixed,
+          totalPayout: totalPayout.toFixed(2)
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ [FIX] Erro na correção:', error);
+      res.status(500).json({ message: "Failed to fix pending bets", error: error.message });
+    }
+  });
+
+  // Bet routes
+  app.post("/api/bets", requireAuth, async (req, res) => {
+    try {
+      const betData = insertBetSchema.parse({
+        ...req.body,
+        userId: req.user.id,
+      });
+
+      // Calculate potential payout based on current odds
+      const stats = await storage.getPredictionStats(betData.predictionId);
+      const amount = parseFloat(betData.amount);
+      
+      let multiplier = 1.0;
+      if (betData.option === "yes") {
+        multiplier = stats.noAmount > 0 ? (stats.totalAmount / stats.yesAmount) : 2.0;
+      } else {
+        multiplier = stats.yesAmount > 0 ? (stats.totalAmount / stats.noAmount) : 2.0;
+      }
+      
+      const potentialPayout = (amount * multiplier).toFixed(2);
+
+      const bet = await storage.createBet({
+        ...betData,
+        potentialPayout,
+      });
+
+      // In a real implementation, you would process the payment here
+      // and update the user's balance
+
+      res.json(bet);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid bet data" });
+    }
+  });
+
+  app.get("/api/bets/user", requireAuth, async (req, res) => {
+    try {
+      const bets = await storage.getBetsByUser(req.user.id);
+      res.json(bets);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user bets" });
+    }
+  });
+
+  // Social routes
+  app.post("/api/predictions/:id/like", requireAuth, async (req, res) => {
+    try {
+      const like = await storage.createLike({
+        userId: req.user.id,
+        predictionId: req.params.id,
+      });
+      res.json(like);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to like prediction" });
+    }
+  });
+
+  app.delete("/api/predictions/:id/like", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteLike(req.user.id, req.params.id);
+      res.json({ message: "Like removed successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to remove like" });
+    }
+  });
+
+  app.get("/api/predictions/:id/comments", async (req, res) => {
+    try {
+      const comments = await storage.getCommentsByPrediction(req.params.id);
+      res.json(comments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
+  app.post("/api/predictions/:id/comments", requireAuth, async (req, res) => {
+    try {
+      const commentData = insertCommentSchema.parse({
+        userId: req.user.id,
+        predictionId: req.params.id,
+        content: req.body.content,
+      });
+
+      const comment = await storage.createComment(commentData);
+      res.json(comment);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid comment data" });
+    }
+  });
+
+  // User profile routes
+  app.patch("/api/user/pix-key", requireAuth, async (req, res) => {
+    try {
+      const { pixKey } = req.body;
+      await storage.updateUserPixKey(req.user.id, pixKey);
+      res.json({ message: "PIX key updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update PIX key" });
+    }
+  });
+
+  // Rotas para depósitos PIX
+
+
+  // Rota para listar depósitos do usuário
+  app.get("/api/deposits", requireAuth, async (req, res) => {
+    try {
+      console.log("📋 Buscando histórico de depósitos para:", req.user.email);
+      const deposits = await storage.getWalletDepositsByEmail(req.user.email);
+      console.log("✅ Encontrados", deposits.length, "depósitos");
+      res.json(deposits);
+    } catch (error) {
+      console.error("❌ Erro ao buscar depósitos:", error);
+      res.status(500).json({ message: "Erro ao buscar histórico" });
+    }
+  });
+
+  // Rota para criar depósito PIX
+  app.post("/api/deposits/pix", requireAuth, async (req, res) => {
+    try {
+      // Buscar usuário autenticado para verificar CPF existente
+      const user = await storage.getUserByEmail(req.user.email);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Usar CPF fornecido na requisição e atualizar o perfil do usuário na coluna pix_key
+      const cpfToUse = req.body.cpf;
+      
+      // Atualizar CPF do usuário na coluna pix_key se não estiver cadastrado
+      if (!user.pixKey && req.body.cpf) {
+        try {
+          await storage.updateUserPixKey(user.id, req.body.cpf);
+          console.log(`[${new Date().toISOString()}] local.INFO: CPF cadastrado na pix_key para o usuário`, JSON.stringify({
+            user_id: user.id,
+            cpf_masked: req.body.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.***.***-$4")
+          }));
+        } catch (error: any) {
+          console.log(`[${new Date().toISOString()}] local.WARNING: Não foi possível salvar o CPF na pix_key:`, error?.message || error);
+        }
+      }
+
+      const depositData = insertWalletDepositSchema.parse({
+        userEmail: user.email,
+        cpf: cpfToUse,
+        amount: req.body.amount,
+        status: "waiting_payment"
+      });
+
+      console.log(`[${new Date().toISOString()}] local.INFO: Iniciando processo de pagamento`, JSON.stringify({
+        user_email: depositData.userEmail,
+        user_name: user.name,
+        gateway: "zyonpay",
+        amount: (depositData.amount / 100).toFixed(2)
+      }));
+
+      console.log(`[${new Date().toISOString()}] local.INFO: Iniciando processamento de depósito ZyonPay`, JSON.stringify({
+        user_email: depositData.userEmail,
+        user_name: user.name,
+        amount: depositData.amount / 100,
+        cpf: depositData.cpf
+      }));
+
+      // Integração com ZyonPay - usando Basic Authentication conforme documentação
+      const zyonpaySecretKey = process.env.ZYONPAY_SECRET_KEY || 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+      
+      console.log(`[${new Date().toISOString()}] local.DEBUG: Usando chave ZyonPay:`, zyonpaySecretKey.substring(0, 10) + '...');
+      console.log(`[${new Date().toISOString()}] local.DEBUG: Header de autorização Basic Authentication gerado`);
+      
+      const postbackUrl = `https://workspace.oevilmortyofc.repl.co/api/deposits/pix/callback`;
+      console.log(`[${new Date().toISOString()}] local.DEBUG: URL de callback:`, postbackUrl);
+      
+      // Payload exatamente conforme o código PHP de referência
+      const requestPayload = {
+        amount: depositData.amount, // já está em centavos
+        paymentMethod: "pix",
+        postbackUrl: postbackUrl,
+        customer: {
+          name: user.name,
+          email: depositData.userEmail,
+          phone: "11999999999",
+          document: {
+            number: depositData.cpf,
+            type: "cpf"
+          },
+          address: {
+            street: "Rua Teste",
+            streetNumber: "123",
+            zipCode: "01001000",
+            neighborhood: "Centro",
+            city: "São Paulo",
+            state: "SP",
+            country: "BR"
+          }
+        },
+        items: [
+          {
+            title: "Depósito",
+            unitPrice: depositData.amount,
+            quantity: 1,
+            tangible: false
+          }
+        ],
+        splits: [
+          {
+            recipientId: 106198,
+            amount: depositData.amount
+          }
+        ],
+        pix: {
+          expirationDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        }
+      };
+
+      console.log(`[${new Date().toISOString()}] local.DEBUG: Payload enviado para ZyonPay API:`, JSON.stringify(requestPayload));
+
+      // Headers usando Basic Authentication conforme documentação ZyonPay
+      const basicAuth = Buffer.from(`${zyonpaySecretKey}:x`).toString('base64');
+      const headers = {
+        "Authorization": `Basic ${basicAuth}`,
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      };
+
+      console.log(`[${new Date().toISOString()}] local.DEBUG: Headers da requisição:`, JSON.stringify(headers, null, 2));
+
+      // Primeiro, vamos testar a conectividade com a API
+      console.log(`[${new Date().toISOString()}] local.DEBUG: Testando conectividade com ZyonPay API...`);
+      
+      const zyonPayResponse = await fetch("https://api.zyonpay.com/v1/transactions", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(requestPayload)
+      });
+
+      if (!zyonPayResponse.ok) {
+        const errorText = await zyonPayResponse.text();
+        console.error(`[${new Date().toISOString()}] local.ERROR: ZyonPay API Error:`, JSON.stringify({
+          status: zyonPayResponse.status,
+          statusText: zyonPayResponse.statusText,
+          response: errorText
+        }));
+        
+        // Log adicional para debug da autenticação
+        console.error(`[${new Date().toISOString()}] local.ERROR: Detalhes da falha de autenticação:`, {
+          secret_key_format: zyonpaySecretKey.startsWith('sk_'),
+          endpoint: 'https://api.zyonpay.com/v1/transactions',
+          payload_size: JSON.stringify(requestPayload).length
+        });
+        
+        // Check for specific error messages
+        if (errorText.includes('invalid cpf')) {
+          throw new Error('CPF inválido. Por favor, verifique se o CPF informado está correto e é válido.');
+        }
+        
+        throw new Error(`ZyonPay API Error: ${zyonPayResponse.statusText} - A chave de API fornecida (${zyonpaySecretKey.substring(0, 10)}...) não está funcionando. Verifique se a chave está correta e ativa no painel da ZyonPay.`);
+      }
+
+      const zyonPayData = await zyonPayResponse.json();
+      console.log(`[${new Date().toISOString()}] local.DEBUG: Resposta da ZyonPay API:`, JSON.stringify(zyonPayData));
+
+      // Extrair dados PIX da resposta baseado no código PHP de referência
+      const pixCode = zyonPayData.pix?.qrcode || zyonPayData.data?.pix?.qrcode;
+      const secureId = zyonPayData.secureId || zyonPayData.data?.secureId;
+      const secureUrl = zyonPayData.secureUrl || zyonPayData.data?.secureUrl;
+
+      if (!pixCode || !secureUrl || !secureId) {
+        console.error(`[${new Date().toISOString()}] local.ERROR: ZyonPay API - Dados incompletos retornados`, JSON.stringify(zyonPayData));
+        throw new Error("ZyonPay API - Dados incompletos retornados");
+      }
+
+      // Salvar no banco de dados
+      console.log("💾 Salvando depósito no banco de dados:", {
+        userEmail: depositData.userEmail,
+        cpf: depositData.cpf,
+        amount: depositData.amount,
+        status: "waiting_payment",
+        zyonpayTransactionId: secureId
+      });
+      
+      let walletDeposit;
+      try {
+        walletDeposit = await storage.createWalletDeposit({
+          userEmail: depositData.userEmail,
+          cpf: depositData.cpf,
+          amount: depositData.amount,
+          status: "waiting_payment",
+          zyonpayTransactionId: secureId
+        });
+        
+        console.log("✅ Depósito salvo com ID:", walletDeposit.id);
+      } catch (depositError: any) {
+        console.error("❌ Erro ao salvar depósito no banco:", depositError);
+        throw new Error(`Falha ao salvar depósito: ${depositError?.message || depositError}`);
+      }
+
+      console.log(`[${new Date().toISOString()}] local.INFO: Depósito processado com sucesso pela ZyonPay`, JSON.stringify({
+        deposit_id: walletDeposit.id,
+        user_name: user.name,
+        trx: secureId,
+        secureUrl: secureUrl
+      }));
+
+      console.log(`[${new Date().toISOString()}] local.INFO: Gateway - Processando pagamento`, JSON.stringify({
+        gateway: "zyonpay",
+        user_name: user.name,
+        payment_data: {
+          success: true,
+          paymentCode: pixCode,
+          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode)}`
+        }
+      }));
+
+      res.json({
+        success: true,
+        qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode)}`,
+        pixCode: pixCode,
+        amount: depositData.amount, // Already in cents, keep as is
+        transactionId: secureId,
+        secureUrl: secureUrl
+      });
+    } catch (error) {
+      console.error("❌ Erro ao criar depósito:", error);
+      res.status(500).json({ message: "Erro ao processar depósito" });
+    }
+  });
+
+  // Rota de teste para verificar conectividade com ZyonPay
+  app.get("/api/test/zyonpay", async (req, res) => {
+    try {
+      const zyonpaySecretKey = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+      const authHeader = 'Basic ' + Buffer.from(`${zyonpaySecretKey}:x`).toString('base64');
+      
+      // Teste simples - tentar acessar endpoint de informações da conta
+      const testResponse = await fetch("https://api.zyonpay.com/v1/account", {
+        method: "GET",
+        headers: {
+          "Authorization": authHeader,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      });
+      
+      const responseText = await testResponse.text();
+      
+      res.json({
+        status: testResponse.status,
+        statusText: testResponse.statusText,
+        headers: Object.fromEntries(testResponse.headers.entries()),
+        response: responseText,
+        authHeaderLength: authHeader.length
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Callback da ZyonPay para atualizar status dos depósitos
+  app.post("/api/deposits/pix/callback", async (req, res) => {
+    try {
+      console.log("🔔 Callback recebido da ZyonPay:", JSON.stringify(req.body));
+      
+      // ZyonPay envia os dados dentro do objeto 'data'
+      const { data } = req.body;
+      if (!data) {
+        console.error("❌ Dados não encontrados no callback");
+        res.status(400).json({ message: "Dados inválidos" });
+        return;
+      }
+      
+      const { id, status, secureId } = data;
+      const transactionId = secureId || id;
+      
+      if (status === "paid" || status === "completed" || status === "approved") {
+        console.log("💰 Pagamento confirmado para transação:", transactionId);
+        
+        // Buscar o depósito pelo zyonpay_transaction_id
+        console.log("🔍 Buscando depósito para transação:", transactionId);
+        const deposits = await storage.getWalletDepositsByTransactionId(transactionId);
+        console.log("📋 Depósitos encontrados:", deposits);
+        
+        if (deposits.length === 0) {
+          console.error("❌ Depósito não encontrado para transação:", transactionId);
+          res.status(404).json({ message: "Depósito não encontrado" });
+          return;
+        }
+        
+        const deposit = deposits[0];
+        console.log("💳 Dados do depósito:", deposit);
+        
+        if (deposit.status === "completed") {
+          console.log("ℹ️ Depósito já foi processado anteriormente:", deposit.id);
+          res.status(200).json({ message: "Depósito já processado" });
+          return;
+        }
+        
+        // Buscar o usuário pelo email (usando o campo correto do schema)
+        const userEmail = deposit.userEmail;
+        const user = await storage.getUserByEmail(userEmail);
+        if (!user) {
+          console.error("❌ Usuário não encontrado:", userEmail);
+          res.status(404).json({ message: "Usuário não encontrado" });
+          return;
+        }
+        
+        // Converter valor de centavos para decimal
+        const depositAmountInReal = deposit.amount / 100;
+        const newBalance = parseFloat(user.balance) + depositAmountInReal;
+        
+        console.log(`💳 Creditando R$ ${depositAmountInReal.toFixed(2)} na conta de ${user.name}`);
+        console.log(`📊 Saldo anterior: R$ ${parseFloat(user.balance).toFixed(2)} | Novo saldo: R$ ${newBalance.toFixed(2)}`);
+        
+        // Atualizar saldo do usuário e status do depósito em uma transação
+        await storage.updateUserBalance(user.id, newBalance.toString());
+        await storage.updateWalletDepositStatus(deposit.id, "completed", transactionId);
+        
+        console.log(`✅ Depósito processado com sucesso: ${deposit.id} | Usuário: ${user.name} | Valor: R$ ${depositAmountInReal.toFixed(2)}`);
+        
+      } else if (status === "failed" || status === "expired" || status === "cancelled") {
+        console.log("❌ Pagamento falhou/expirou/cancelado para transação:", transactionId);
+        
+        const failedDeposits = await storage.getWalletDepositsByTransactionId(transactionId);
+        if (failedDeposits && failedDeposits.length > 0) {
+          await storage.updateWalletDepositStatus(failedDeposits[0].id, "failed", transactionId);
+        }
+      }
+
+      res.status(200).json({ message: "Callback processado com sucesso" });
+    } catch (error) {
+      console.error("❌ Erro ao processar callback da ZyonPay:", error);
+      res.status(500).json({ message: "Erro no callback" });
+    }
+  });
+
+  // Rota para processar saque PIX - Implementação limpa sem validações automáticas
+  app.post("/api/withdrawals/pix", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserByEmail(req.user.email);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      const { amount, pixKey } = req.body;
+
+      // Validações básicas
+      if (!amount || !pixKey) {
+        return res.status(400).json({ message: "Valor e chave PIX são obrigatórios" });
+      }
+
+      const amountInCents = Math.round(parseFloat(amount) * 100);
+      const userBalance = parseFloat(user.balance);
+      const amountInReal = amountInCents / 100;
+
+      // Verificar se o usuário tem saldo suficiente
+      if (userBalance < amountInReal) {
+        return res.status(400).json({ message: "Saldo insuficiente" });
+      }
+
+      // Valor mínimo para saque
+      if (amountInReal < 30.00) {
+        return res.status(400).json({ message: "Valor mínimo para saque é R$ 30,00" });
+      }
+
+      // Calcular taxa de 9%
+      const feePercentage = 0.09;
+      const feeAmount = amountInReal * feePercentage;
+      const netAmount = amountInReal - feeAmount;
+      const feeInCents = Math.round(feeAmount * 100);
+      const netAmountInCents = Math.round(netAmount * 100);
+
+      console.log(`[ADMIN] Nova solicitação de saque recebida`, JSON.stringify({
+        user_email: user.email,
+        user_name: user.name,
+        amount_requested: amountInReal,
+        fee_amount: feeAmount,
+        net_amount: netAmount,
+        pix_key: pixKey.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.***.***-$4")
+      }));
+
+      // Debitar o valor solicitado do saldo do usuário imediatamente
+      const newBalance = userBalance - amountInReal;
+      await storage.updateUserBalance(user.id, newBalance.toString());
+      console.log(`[ADMIN] Saldo debitado: R$ ${amountInReal.toFixed(2)} | Taxa: R$ ${feeAmount.toFixed(2)} | Valor líquido: R$ ${netAmount.toFixed(2)} | Novo saldo: R$ ${newBalance.toFixed(2)}`);
+
+      // Salvar solicitação no banco com status "pending" (aguardando aprovação do admin)
+      try {
+        const withdrawalData = {
+          userEmail: user.email,
+          pixKey: pixKey,
+          amount: netAmountInCents, // Valor líquido após taxa
+          status: "pending", // Status inicial: aguardando aprovação
+          zyonpayTransferId: null, // Será preenchido apenas após aprovação
+          failReason: null,
+          fee: feeInCents // Taxa em centavos
+        };
+
+        const withdrawal = await storage.createWalletWithdrawal(withdrawalData);
+        console.log(`[ADMIN] Solicitação de saque salva com ID: ${withdrawal.id} - Aguardando aprovação administrativa`);
+
+        res.json({
+          message: "Solicitação de saque enviada com sucesso! Aguarde a aprovação do administrador.",
+          withdrawal_id: withdrawal.id,
+          status: "pending",
+          amount_requested: amountInReal,
+          fee_amount: feeAmount,
+          net_amount: netAmount
+        });
+        return;
+
+      } catch (dbError: any) {
+        console.error(`[ADMIN] Erro ao salvar solicitação de saque:`, dbError);
+        
+        // Reverter o débito do saldo em caso de erro
+        await storage.updateUserBalance(user.id, userBalance.toString());
+        console.log(`[ADMIN] Saldo revertido devido ao erro: R$ ${userBalance.toFixed(2)}`);
+        
+        throw new Error("Erro interno ao processar solicitação de saque");
+      }
+
+    } catch (error: any) {
+      console.error("[ADMIN] Erro ao processar solicitação de saque:", error);
+      res.status(500).json({ 
+        message: error?.message || "Erro interno do servidor",
+        success: false 
+      });
+    }
+  });
+
+  // Rotas administrativas para controle de saques
+  app.get("/api/admin/withdrawal-requests", async (req, res) => {
+    try {
+      console.log(`[ADMIN] Buscando saques pendentes com service role...`);
+      
+      // Usar cliente admin com service role key para acessar todos os dados
+      const { data: pendingWithdrawalsData, error } = await supabaseAdmin
+        .from("wallet_withdrawals")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(`[ADMIN] Erro na consulta:`, error);
+        return res.status(500).json({ message: "Erro ao buscar solicitações de saque" });
+      }
+
+      console.log(`[ADMIN] Dados encontrados:`, pendingWithdrawalsData?.length || 0);
+      
+      if (pendingWithdrawalsData && pendingWithdrawalsData.length > 0) {
+        console.log(`[ADMIN] Primeiro item:`, pendingWithdrawalsData[0]);
+      }
+
+      console.log(`[ADMIN] Admin visualizou ${pendingWithdrawalsData?.length || 0} solicitações pendentes`);
+      
+      res.json({
+        withdrawals: pendingWithdrawalsData || [],
+        total: pendingWithdrawalsData?.length || 0
+      });
+    } catch (error: any) {
+      console.error("[ADMIN] Erro ao buscar solicitações de saque:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Rota para aprovar saque
+  app.post("/api/admin/approve-withdrawal/:id", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserByEmail(req.user.email);
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const withdrawalId = req.params.id;
+      
+      // Buscar a solicitação de saque usando cliente admin
+      const withdrawalResult = await supabaseAdmin
+        .from("wallet_withdrawals")
+        .select("*")
+        .eq("id", withdrawalId)
+        .eq("status", "pending")
+        .single();
+
+      if (withdrawalResult.error || !withdrawalResult.data) {
+        return res.status(404).json({ message: "Solicitação não encontrada ou já processada" });
+      }
+
+      const withdrawal = withdrawalResult.data;
+      
+      console.log(`[ADMIN] Autorizando saque ID: ${withdrawalId}`);
+      console.log(`[ADMIN] Detalhes: ${withdrawal.user_email} - R$ ${(withdrawal.amount / 100).toFixed(2)} - PIX: ${withdrawal.pix_key}`);
+
+      // Processar saque na ZyonPay
+      const zyonpaySecretKey = process.env.ZYONPAY_SECRET_KEY || 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+      const authHeader = `Basic ${Buffer.from(`${zyonpaySecretKey}:x`).toString('base64')}`;
+
+      const transferPayload = {
+        amount: withdrawal.amount,
+        pixKey: withdrawal.pix_key,
+        postbackUrl: "https://d6f88724-b6f9-45fc-a939-f8f900fb883c-00-2wm3vouenwzkj.spock.replit.dev/api/withdrawals/pix/callback",
+        recipientId: 106198,
+        externalRef: `withdrawal_${withdrawalId}_${Date.now()}`
+      };
+
+      const response = await fetch('https://api.zyonpay.com/v1/transfers', {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transferPayload)
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error(`[ADMIN] Erro na ZyonPay para saque ${withdrawalId}:`, responseData);
+        return res.status(400).json({ 
+          message: `Erro ao processar saque na ZyonPay: ${responseData?.message || 'Erro desconhecido'}` 
+        });
+      }
+
+      const transferId = responseData.id;
+      const transferStatus = responseData.status || "processing";
+
+      // Atualizar status no banco - mudar para "processing" ou "completed" para remover do painel pending
+      const finalStatus = transferStatus === "pending" ? "processing" : transferStatus;
+      await storage.updateWalletWithdrawalStatus(
+        withdrawalId,
+        finalStatus,
+        transferId.toString()
+      );
+      
+      console.log(`[ADMIN] Status atualizado de 'pending' para '${finalStatus}' - Transfer ID: ${transferId}`);
+
+      console.log(`[ADMIN] Saque ${withdrawalId} autorizado com sucesso - Transfer ID: ${transferId}`);
+
+      res.json({
+        message: "Saque autorizado com sucesso",
+        transferId: transferId,
+        status: transferStatus
+      });
+
+    } catch (error: any) {
+      console.error(`[ADMIN] Erro ao autorizar saque:`, error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Rota para rejeitar saque
+  app.post("/api/admin/reject-withdrawal/:id", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUserByEmail(req.user.email);
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const withdrawalId = req.params.id;
+      const { reason } = req.body;
+      
+      // Buscar a solicitação de saque usando cliente admin
+      const withdrawalResult = await supabaseAdmin
+        .from("wallet_withdrawals")
+        .select("*")
+        .eq("id", withdrawalId)
+        .eq("status", "pending")
+        .single();
+
+      if (withdrawalResult.error || !withdrawalResult.data) {
+        return res.status(404).json({ message: "Solicitação não encontrada ou já processada" });
+      }
+
+      const withdrawal = withdrawalResult.data;
+      
+      console.log(`[ADMIN] Rejeitando saque ID: ${withdrawalId}`);
+      console.log(`[ADMIN] Motivo: ${reason || 'Não especificado'}`);
+      
+      // Buscar usuário para reembolsar o saldo
+      const withdrawalUser = await storage.getUserByEmail(withdrawal.user_email);
+      if (withdrawalUser) {
+        const currentBalance = parseFloat(withdrawalUser.balance);
+        const refundAmount = withdrawal.amount / 100;
+        const newBalance = currentBalance + refundAmount;
+        
+        await storage.updateUserBalance(withdrawalUser.id, newBalance.toString());
+        console.log(`[ADMIN] Saldo reembolsado para ${withdrawal.user_email}: +R$ ${refundAmount.toFixed(2)} | Novo saldo: R$ ${newBalance.toFixed(2)}`);
+      }
+
+      // Atualizar status no banco para "cancelado"
+      await storage.updateWalletWithdrawalStatus(
+        withdrawalId,
+        "cancelado",
+        undefined,
+        reason || "Rejeitado pelo administrador"
+      );
+
+      console.log(`[ADMIN] Saque ${withdrawalId} rejeitado com sucesso`);
+
+      res.json({
+        message: "Saque rejeitado com sucesso",
+        refunded: withdrawal.amount / 100
+      });
+
+    } catch (error: any) {
+      console.error(`[ADMIN] Erro ao rejeitar saque:`, error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Rota para listar saques do usuário
+  app.get("/api/withdrawals", requireAuth, async (req, res) => {
+    try {
+      console.log("📋 Buscando histórico de saques para:", req.user.email);
+      const withdrawals = await storage.getWalletWithdrawalsByEmail(req.user.email);
+      console.log("✅ Encontrados", withdrawals.length, "saques");
+      console.log("📊 Dados dos saques:", JSON.stringify(withdrawals, null, 2));
+      
+      // Verificar status de saques pending na ZyonPay
+      const zyonpaySecretKey = process.env.ZYONPAY_SECRET_KEY || 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+      const authHeader = `Basic ${Buffer.from(`${zyonpaySecretKey}:x`).toString('base64')}`;
+      
+      for (const withdrawal of withdrawals) {
+        if (withdrawal.status === 'pending' && withdrawal.zyonpay_transfer_id) {
+          try {
+            const response = await fetch(`https://api.zyonpay.com/v1/transfers/${withdrawal.zyonpay_transfer_id}`, {
+              headers: {
+                'Authorization': authHeader,
+                'Accept': 'application/json'
+              }
+            });
+            
+            if (response.ok) {
+              const transferData = await response.json();
+              console.log(`🔄 Status da transferência ${withdrawal.zyonpay_transfer_id}:`, transferData.status);
+              
+              if (transferData.status !== 'pending') {
+                console.log(`📝 Atualizando status do saque ${withdrawal.id} para:`, transferData.status);
+                await storage.updateWalletWithdrawalStatus(
+                  withdrawal.id, 
+                  transferData.status === 'success' ? 'completed' : transferData.status,
+                  withdrawal.zyonpay_transfer_id,
+                  transferData.failReason
+                );
+                
+                // Atualizar o objeto local para retornar o status correto
+                withdrawal.status = transferData.status === 'success' ? 'completed' : transferData.status;
+              }
+            }
+          } catch (syncError) {
+            console.error(`❌ Erro ao sincronizar status da transferência ${withdrawal.zyonpay_transfer_id}:`, syncError);
+          }
+        }
+      }
+      
+      res.json(withdrawals);
+    } catch (error) {
+      console.error("❌ Erro ao buscar saques:", error);
+      res.status(500).json({ message: "Erro ao buscar histórico de saques" });
+    }
+  });
+
+  // Callback da ZyonPay para atualizar status dos saques
+  app.post("/api/withdrawals/pix/callback", async (req, res) => {
+    try {
+      console.log("🔔 Callback de saque recebido da ZyonPay:", JSON.stringify(req.body));
+      
+      const { data } = req.body;
+      if (!data) {
+        console.error("❌ Dados não encontrados no callback de saque");
+        res.status(400).json({ message: "Dados inválidos" });
+        return;
+      }
+      
+      const { id, status, failReason } = data;
+      
+      console.log("📊 Status da transferência:", status, "ID:", id);
+      
+      // Buscar o saque pelo zyonpay_transfer_id
+      const withdrawals = await storage.getWalletWithdrawalsByTransferId(id);
+      
+      if (withdrawals.length === 0) {
+        console.error("❌ Saque não encontrado para transferência:", id);
+        res.status(404).json({ message: "Saque não encontrado" });
+        return;
+      }
+      
+      const withdrawal = withdrawals[0];
+      console.log("💳 Dados do saque:", withdrawal);
+      
+      // Atualizar status do saque
+      await storage.updateWalletWithdrawalStatus(withdrawal.id, status, id, failReason);
+      
+      // Se a transferência falhou, reembolsar o usuário
+      if (status === "failed") {
+        console.log("❌ Transferência falhou, reembolsando usuário");
+        
+        const user = await storage.getUserByEmail(withdrawal.userEmail);
+        if (user) {
+          const refundAmount = withdrawal.amount / 100;
+          const newBalance = parseFloat(user.balance) + refundAmount;
+          await storage.updateUserBalance(user.id, newBalance.toString());
+          
+          console.log(`💰 Usuário ${user.name} reembolsado: R$ ${refundAmount.toFixed(2)}`);
+        }
+      }
+      
+      console.log(`✅ Callback de saque processado: ${withdrawal.id} | Status: ${status}`);
+      res.status(200).json({ message: "Callback de saque processado com sucesso" });
+      
+    } catch (error) {
+      console.error("❌ Erro ao processar callback de saque da ZyonPay:", error);
+      res.status(500).json({ message: "Erro no callback de saque" });
+    }
+  });
+
+
+
+  const httpServer = createServer(app);
+
+  // Verificação periódica do status dos saques na ZyonPay (backup dos callbacks)
+  setInterval(async () => {
+    try {
+      const withdrawals = await storage.getWalletWithdrawalsByEmail('');
+      const processingWithdrawals = withdrawals.filter(w => 
+        w.status === 'processing' && 
+        w.zyonpayTransferId && 
+        w.zyonpayTransferId.trim() !== ''
+      );
+
+      for (const withdrawal of processingWithdrawals) {
+        try {
+          const response = await fetch(`https://api.zyonpay.com/v1/transfers/${withdrawal.zyonpayTransferId}`, {
+            headers: {
+              'Authorization': `Bearer ${process.env.ZYONPAY_SECRET_KEY}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            const transferData = await response.json();
+            if (transferData.status === 'completed' && withdrawal.status === 'processing') {
+              await storage.updateWalletWithdrawalStatus(withdrawal.id, 'completed');
+              console.log(`🔄 Status atualizado automaticamente: ${withdrawal.id} → completed`);
+            } else if (transferData.status === 'failed' && withdrawal.status === 'processing') {
+              await storage.updateWalletWithdrawalStatus(withdrawal.id, 'cancelado', undefined, transferData.failReason || 'Falha na transferência');
+              // Reembolsar o valor para o usuário
+              const user = await storage.getUserByEmail(withdrawal.userEmail);
+              if (user) {
+                const newBalance = (parseFloat(user.balance) + withdrawal.amount).toString();
+                await storage.updateUserBalance(user.id, newBalance);
+                console.log(`💰 Valor reembolsado: ${withdrawal.amount} centavos para ${withdrawal.userEmail}`);
+              }
+              console.log(`❌ Saque falhou automaticamente: ${withdrawal.id} → cancelado`);
+            }
+          }
+        } catch (error) {
+          console.error(`❌ Erro ao verificar status do saque ${withdrawal.id}:`, (error as Error).message);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erro na verificação periódica de saques:', (error as Error).message);
+    }
+  }, 120000); // Verifica a cada 2 minutos
+
+  // Endpoint para estatísticas de carteira (Admin)
+  app.get("/api/admin/wallet-stats", async (req, res) => {
+    try {
+      // Temporarily removing all auth checks for testing
+      console.log("🔍 Admin wallet stats endpoint accessed");
+
+      // Buscar todos os depósitos e saques usando o service role key
+      const supabaseAdmin = createClient(
+        process.env.VITE_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
+      const { data: allDeposits, error: depositsError } = await supabaseAdmin
+        .from('wallet_deposits')
+        .select('status, amount');
+      
+      const { data: allWithdrawals, error: withdrawalsError } = await supabaseAdmin
+        .from('wallet_withdrawals')
+        .select('status, amount');
+
+      console.log("🔍 Depósitos encontrados:", allDeposits?.length || 0, depositsError ? `Erro: ${depositsError.message}` : "");
+      console.log("🔍 Saques encontrados:", allWithdrawals?.length || 0, withdrawalsError ? `Erro: ${withdrawalsError.message}` : "");
+      
+      if (allWithdrawals && allWithdrawals.length > 0) {
+        console.log("📋 Primeiros 3 saques:", allWithdrawals.slice(0, 3));
+      }
+
+      // Calcular totais
+      const depositStats = {
+        total: 0,
+        completed: 0,
+        pending: 0,
+        failed: 0,
+        totalAmount: 0,
+        completedAmount: 0
+      };
+
+      const withdrawalStats = {
+        total: 0,
+        completed: 0, 
+        pending: 0,
+        failed: 0,
+        totalAmount: 0,
+        completedAmount: 0
+      };
+
+      // Processar depósitos se existirem
+      if (allDeposits && Array.isArray(allDeposits)) {
+        allDeposits.forEach((deposit: any) => {
+          const amount = parseFloat(deposit.amount) || 0;
+          
+          depositStats.total += 1;
+          depositStats.totalAmount += amount;
+          
+          if (deposit.status === 'completed') {
+            depositStats.completed += 1;
+            depositStats.completedAmount += amount;
+          } else if (deposit.status === 'waiting_payment' || deposit.status === 'pending') {
+            depositStats.pending += 1;
+          } else if (deposit.status === 'failed' || deposit.status === 'canceled') {
+            depositStats.failed += 1;
+          }
+        });
+      }
+
+      // Processar saques se existirem
+      if (allWithdrawals && Array.isArray(allWithdrawals)) {
+        allWithdrawals.forEach((withdrawal: any) => {
+          const amount = parseFloat(withdrawal.amount) || 0;
+          
+          withdrawalStats.total += 1;
+          withdrawalStats.totalAmount += amount;
+          
+          if (withdrawal.status === 'completed' || withdrawal.status === 'success') {
+            withdrawalStats.completed += 1;
+            withdrawalStats.completedAmount += amount;
+          } else if (withdrawal.status === 'pending' || withdrawal.status === 'processing') {
+            withdrawalStats.pending += 1;
+          } else if (withdrawal.status === 'failed' || withdrawal.status === 'canceled' || withdrawal.status === 'cancelado') {
+            withdrawalStats.failed += 1;
+          }
+        });
+      }
+
+      console.log("📊 Estatísticas calculadas:", { deposits: depositStats, withdrawals: withdrawalStats });
+
+      res.json({
+        deposits: depositStats,
+        withdrawals: withdrawalStats
+      });
+
+    } catch (error) {
+      console.error("❌ Erro ao buscar estatísticas de carteira:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Referral system routes
+  app.get("/api/referrals/status", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get or generate referral code
+      let referralCode = await storage.generateReferralCode(userId);
+      
+      // Get referral stats
+      const stats = await storage.getReferralStats(userId);
+      
+      // Get crystal ball configuration directly from database
+      const { data: crystalConfig, error: configError } = await supabase
+        .from('crystal_ball_config')
+        .select('*')
+        .order('crystal_number', { ascending: true });
+
+      if (configError) {
+        console.error('Error fetching crystal config:', configError);
+        // Fallback to default crystal ball structure
+        const defaultCrystals = Array.from({ length: 12 }, (_, i) => {
+          const level = i + 1;
+          let reward = 10;
+          if (level >= 4 && level <= 6) reward = 12;
+          if (level >= 7 && level <= 9) reward = 18;
+          if (level >= 10) reward = 22;
+          
+          return {
+            level,
+            reward_amount: reward,
+            is_unlocked: false,
+            is_claimed: false
+          };
+        });
+        
+        res.json({
+          referralCode,
+          referralLink: `${req.protocol}://${req.get('host')}/register?ref=${referralCode}`,
+          stats,
+          rewards: defaultCrystals,
+          referralHistory: []
+        });
+        return;
+      }
+
+      // Get or create user crystal ball rewards
+      let { data: crystalRewards, error: rewardsError } = await supabase
+        .from('user_crystal_rewards')
+        .select('*')
+        .eq('user_id', userId)
+        .order('crystal_number', { ascending: true });
+
+      if (rewardsError || !crystalRewards || crystalRewards.length === 0) {
+        // Initialize crystal balls for new user
+        const newRewards = [];
+        for (const config of crystalConfig) {
+          const { data: newReward } = await supabase
+            .from('user_crystal_rewards')
+            .insert({
+              user_id: userId,
+              crystal_number: config.crystal_number,
+              status: 'locked',
+              reward_amount: config.reward_amount,
+              qualified_referrals_count: 0
+            })
+            .select()
+            .single();
+          
+          if (newReward) newRewards.push(newReward);
+        }
+        crystalRewards = newRewards;
+      }
+      
+      // Get referral history
+      const referralHistory = await storage.getReferralsByUser(userId);
+      
+      res.json({
+        referralCode,
+        referralLink: `${req.protocol}://${req.get('host')}/register?ref=${referralCode}`,
+        stats,
+        rewards: crystalRewards.map(r => ({
+          level: r.crystal_number,
+          reward_amount: r.reward_amount,
+          is_unlocked: r.status === 'available' || r.status === 'claimed',
+          is_claimed: r.status === 'claimed',
+          unlocked_at: r.unlocked_at,
+          claimed_at: r.claimed_at
+        })),
+        referralHistory: referralHistory.map(r => ({
+          id: r.id,
+          created_at: r.created_at,
+          referred_email: r.referred?.email || 'Email não disponível',
+          status: r.status,
+          first_deposit_amount: r.first_deposit_amount
+        }))
+      });
+    } catch (error: any) {
+      console.error('Error getting referral status:', error);
+      res.status(500).json({ message: "Failed to get referral status" });
+    }
+  });
+
+  app.post("/api/referrals/claim", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { level } = req.body;
+      
+      if (!level || level < 1 || level > 12) {
+        return res.status(400).json({ message: "Invalid crystal ball number" });
+      }
+      
+      const rewardAmount = await storage.claimCrystalBallReward(userId, level);
+      
+      res.json({ 
+        message: "Crystal ball reward claimed successfully",
+        rewardAmount 
+      });
+    } catch (error: any) {
+      console.error('Error claiming crystal ball reward:', error);
+      res.status(400).json({ message: error.message || "Failed to claim reward" });
+    }
+  });
+
+  // Handle referral registration
+  app.post("/api/auth/register-with-referral", async (req, res) => {
+    try {
+      const { referralCode, ...userData } = req.body;
+      
+      // First create the user
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+        balance: "0.00",
+      });
+      
+      // If referral code provided, create referral relationship
+      if (referralCode) {
+        const { data: referrer, error: referrerError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('referral_code', referralCode)
+          .single();
+          
+        if (!referrerError && referrer) {
+          await storage.createReferral({
+            referrerId: referrer.id,
+            referredId: user.id,
+            referralCode: referralCode,
+            status: 'pending'
+          });
+        }
+      }
+      
+      req.session.userId = user.id;
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error('Error in referral registration:', error);
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  return httpServer;
+}
