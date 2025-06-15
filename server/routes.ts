@@ -152,7 +152,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata
       } = req.body;
       
-      const user = await storage.getUser(userId);
+      // Get or create user by email if userId is a Supabase UUID
+      let user;
+      let numericUserId;
+      
+      if (userEmail) {
+        user = await storage.getUserByEmail(userEmail);
+        if (!user && userEmail) {
+          // Create user record for Supabase user
+          user = await storage.createUser({
+            username: userEmail.split('@')[0],
+            email: userEmail,
+            password: 'supabase_auth',
+            fullName: userEmail.split('@')[0],
+            phone: '',
+            cpf: '',
+            accountMode: 'nacional',
+            balance: '0.00'
+          });
+        }
+        numericUserId = user.id;
+      } else {
+        numericUserId = parseInt(userId.toString());
+        user = await storage.getUser(numericUserId);
+      }
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -160,21 +184,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentBalance = parseFloat(user.balance.toString());
       const depositAmount = parseFloat(amount);
 
+      console.log(`📝 Creating Supabase transaction for user ${numericUserId} (${userEmail || 'N/A'}) - Amount: R$ ${depositAmount.toFixed(2)}`);
+
       const transaction = await storage.createTransaction({
-        userId,
+        userId: numericUserId,
         type: 'deposit',
         amount: depositAmount,
         status: 'pending',
-        description: `Depósito PIX via ZyonPay`,
+        description: `Depósito PIX via ZyonPay - R$ ${depositAmount.toFixed(2)}`,
         balanceBefore: currentBalance,
-        balanceAfter: currentBalance, // Will be updated when payment is confirmed
+        balanceAfter: currentBalance,
         zyonPayTransactionId: zyonPayTransactionId.toString(),
         zyonPaySecureId,
         zyonPaySecureUrl,
         zyonPayPixQrCode,
         zyonPayPixUrl,
-        zyonPayPixExpiration: new Date(zyonPayPixExpiration),
-        zyonPayStatus
+        zyonPayPixExpiration: zyonPayPixExpiration ? new Date(zyonPayPixExpiration) : new Date(Date.now() + 24 * 60 * 60 * 1000),
+        zyonPayStatus,
+        metadata: metadata || JSON.stringify({
+          userEmail,
+          supabaseUserId: userId,
+          transactionDate: new Date().toISOString()
+        })
+      });
+
+      console.log(`✅ Transaction saved to Supabase:`, {
+        id: transaction.id,
+        userId: numericUserId,
+        email: userEmail,
+        amount: depositAmount,
+        zyonPayId: zyonPayTransactionId,
+        status: 'pending'
       });
       
       res.json(transaction);
