@@ -472,6 +472,35 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         </div>
                       </div>
 
+                      {/* Instructions Section */}
+                      <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl p-4 border border-gray-600/30">
+                        <h4 className="font-semibold text-white mb-3 flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-smartphone w-4 h-4 mr-2 text-blue-400" aria-hidden="true">
+                            <rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
+                            <path d="M12 18h.01"></path>
+                          </svg>
+                          Instruções:
+                        </h4>
+                        <ul className="text-sm text-gray-300 space-y-2">
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
+                            Abra o app do seu banco
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
+                            Escaneie o QR Code ou cole o código PIX
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
+                            Confirme o pagamento
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
+                            O saldo será creditado automaticamente
+                          </li>
+                        </ul>
+                      </div>
+
                       {/* Action Buttons */}
                       <div className="flex space-x-3">
                         <Button
