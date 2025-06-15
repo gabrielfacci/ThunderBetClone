@@ -246,8 +246,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
-          <div className="py-2"></div>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
 
           {activeTab === 'pix' && (
             <div>
@@ -516,98 +515,113 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
             <div className="space-y-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <History className="w-8 h-8 text-purple-400" />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-history w-8 h-8 text-purple-400" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                    <path d="M12 7v5l4 2"></path>
+                  </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Histórico de Depósitos</h3>
-                <p className="text-gray-400">Acompanhe suas transações PIX</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Histórico de Transações</h3>
+                <p className="text-gray-400">Acompanhe todos os seus depósitos realizados</p>
               </div>
-
+              
               {transactions.length === 0 ? (
                 <div className="bg-gray-800/30 rounded-xl p-8 text-center border border-gray-700/30">
                   <div className="w-12 h-12 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <History className="w-6 h-6 text-gray-400" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-inbox w-6 h-6 text-gray-400" aria-hidden="true">
+                      <polyline points="22,12 16,12 14,15 10,15 8,12 2,12"></polyline>
+                      <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                    </svg>
                   </div>
-                  <h4 className="text-white font-medium mb-2">Nenhum depósito encontrado</h4>
-                  <p className="text-gray-400 text-sm">Suas transações PIX aparecerão aqui</p>
+                  <h4 className="text-white font-medium mb-2">Nenhuma transação encontrada</h4>
+                  <p className="text-gray-400 text-sm">Suas transações aparecerão aqui após realizar depósitos</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {transactions.map((transaction) => (
-                    <div key={transaction.id} className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 rounded-xl p-4 border border-gray-600/30 hover:border-purple-500/30 transition-colors">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  {transactions.map((transaction, index) => (
+                    <div key={transaction.id} className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 rounded-xl p-4 border border-gray-600/30 hover:border-purple-500/30 transition-all duration-300">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${
                             transaction.status === 'completed' 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-yellow-500/20 text-yellow-400'
+                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                              : transaction.status === 'pending'
+                              ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                              : 'bg-red-500/10 border-red-500/30 text-red-400'
                           }`}>
                             {transaction.status === 'completed' ? (
-                              <Check className="w-5 h-5" />
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check w-5 h-5" aria-hidden="true">
+                                <path d="m9 12 2 2 4-4"></path>
+                              </svg>
+                            ) : transaction.status === 'pending' ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock w-5 h-5" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12,6 12,12 16,14"></polyline>
+                              </svg>
                             ) : (
-                              <Clock className="w-5 h-5" />
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x w-5 h-5" aria-hidden="true">
+                                <path d="m18 6-12 12"></path>
+                                <path d="m6 6 12 12"></path>
+                              </svg>
                             )}
                           </div>
-                          <div>
-                            <h4 className="text-white font-semibold">Depósito PIX</h4>
-                            <p className="text-gray-400 text-sm">ID: {transaction.zyonpay_transaction_id || transaction.id}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xl font-bold text-green-400">
-                            R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
-                          </p>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            transaction.status === 'completed' 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-yellow-500/20 text-yellow-400'
-                          }`}>
-                            {transaction.status === 'completed' ? 'Concluído' : 'Pendente'}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="border-t border-gray-700/50 pt-3 mt-3">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-400">Data</p>
-                            <p className="text-white font-medium">
-                              {new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR')}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-400">Horário</p>
-                            <p className="text-white font-medium">
-                              {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', {
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center space-x-2">
+                              <h4 className="text-white font-semibold text-sm">Depósito PIX</h4>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                transaction.status === 'completed' 
+                                  ? 'bg-emerald-500/20 text-emerald-400' 
+                                  : transaction.status === 'pending'
+                                  ? 'bg-amber-500/20 text-amber-400'
+                                  : 'bg-red-500/20 text-red-400'
+                              }`}>
+                                {transaction.status === 'completed' ? 'Concluído' : transaction.status === 'pending' ? 'Pendente' : 'Cancelado'}
+                              </span>
+                            </div>
+                            <p className="text-gray-400 text-xs mt-1">
+                              {new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                              })} às {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', {
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })}
                             </p>
+                            <p className="text-gray-500 text-xs mt-1">ID: {transaction.zyonpay_transaction_id || transaction.id}</p>
                           </div>
                         </div>
-                        
-                        {transaction.zyonpay_secure_url && (
-                          <div className="mt-3">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:border-purple-400"
-                              onClick={() => window.open(transaction.zyonpay_secure_url, '_blank')}
-                            >
-                              <Check className="w-4 h-4 mr-2" />
-                              Ver Comprovante
-                            </Button>
-                          </div>
-                        )}
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-emerald-400">
+                            R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
+                          </p>
+                        </div>
                       </div>
+                      
+                      {transaction.zyonpay_secure_url && (
+                        <div className="mt-4 pt-4 border-t border-gray-700/50">
+                          <button
+                            className="w-full flex items-center justify-center space-x-2 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                            onClick={() => window.open(transaction.zyonpay_secure_url, '_blank')}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link w-4 h-4" aria-hidden="true">
+                              <path d="M15 3h6v6"></path>
+                              <path d="M10 14 21 3"></path>
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            </svg>
+                            <span>Ver detalhes da transação</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
               
               {transactions.length > 0 && (
-                <div className="text-center pt-4">
-                  <p className="text-gray-400 text-sm">
-                    Mostrando {transactions.length} transação{transactions.length !== 1 ? 'ões' : ''}
+                <div className="text-center">
+                  <p className="text-gray-500 text-sm">
+                    {transactions.length} transação{transactions.length !== 1 ? 'ões' : ''} encontrada{transactions.length !== 1 ? 's' : ''}
                   </p>
                 </div>
               )}
