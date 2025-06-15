@@ -157,7 +157,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             </div>
           ) : (
             /* Profile Content */
-            <div className="py-2">
+            (<div className="py-2">
               <div className="space-y-3">
                 <div className="text-center space-y-1">
                   <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto">
@@ -267,7 +267,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         </div>
                       )}
                     </div>
-                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-4">
+                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-4 pl-[18px] pr-[18px] pt-[0px] pb-[0px] mt-[12px] mb-[12px]">
                       <p className="text-sm text-gray-400 mb-2">{t('profile.accountMode.description')}</p>
                       <p className="text-base text-white font-medium">
                         {accountMode === 'nacional' ? t('profile.accountMode.nacional') : t('profile.accountMode.internacional')}
@@ -322,7 +322,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   </div>
                 </form>
               </div>
-            </div>
+            </div>)
           )}
           
           <div className="absolute inset-0 -z-10">
