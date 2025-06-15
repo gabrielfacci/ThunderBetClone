@@ -1,7 +1,7 @@
 import { generateValidCPF } from './cpfGenerator';
 
 const ZYONPAY_API_URL = 'https://api.zyonpay.com/v1/transactions';
-const ZYONPAY_AUTH_HEADER = 'Basic c2tfbGl2ZV92MlVOY0NXdHpRQUtyVmFRWjhtdkpLenFHcjhmd3ZlYlV5Q3JDTENkQUc6eA==';
+const ZYONPAY_SECRET_KEY = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
 
 interface ZyonPayCustomer {
   name: string;
@@ -70,7 +70,9 @@ interface ZyonPayResponse {
 
 export class ZyonPayService {
   private getAuthHeader(): string {
-    return ZYONPAY_AUTH_HEADER;
+    // Correct Basic Auth format: Base64(secretKey:)
+    const credentials = `${ZYONPAY_SECRET_KEY}:`;
+    return `Basic ${btoa(credentials)}`;
   }
 
   private generatePhoneNumber(): string {
@@ -134,6 +136,12 @@ export class ZyonPayService {
       ]
     };
 
+    console.log('Creating ZyonPay PIX transaction with data:', {
+      amount: amountInCentavos,
+      customer: transactionData.customer.name,
+      email: transactionData.customer.email
+    });
+
     try {
       const response = await fetch(ZYONPAY_API_URL, {
         method: 'POST',
@@ -152,9 +160,7 @@ export class ZyonPayService {
 
       const result = await response.json();
       
-      // Store transaction in backend database
-      await this.storeTransactionInDatabase(result, amount, userEmail);
-      
+      console.log('ZyonPay transaction created successfully:', result.id);
       return result;
     } catch (error) {
       console.error('Error creating PIX transaction:', error);
