@@ -521,110 +521,190 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <path d="M12 7v5l4 2"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Histórico de Transações</h3>
-                <p className="text-gray-400">Acompanhe todos os seus depósitos realizados</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Histórico de Depósitos</h3>
+                <p className="text-gray-300 text-sm">Acompanhe todas as suas transações</p>
               </div>
-              
-              {transactions.length === 0 ? (
-                <div className="bg-gray-800/30 rounded-xl p-8 text-center border border-gray-700/30">
-                  <div className="w-12 h-12 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-inbox w-6 h-6 text-gray-400" aria-hidden="true">
-                      <polyline points="22,12 16,12 14,15 10,15 8,12 2,12"></polyline>
-                      <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                    </svg>
-                  </div>
-                  <h4 className="text-white font-medium mb-2">Nenhuma transação encontrada</h4>
-                  <p className="text-gray-400 text-sm">Suas transações aparecerão aqui após realizar depósitos</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/30 rounded-xl p-3 sm:p-4 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trending-up w-5 h-5 sm:w-6 sm:h-6 text-blue-400 mx-auto mb-2" aria-hidden="true">
+                    <path d="M16 7h6v6"></path>
+                    <path d="m22 7-8.5 8.5-5-5L2 17"></path>
+                  </svg>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{transactions.length}</div>
+                  <div className="text-xs text-blue-300">Total</div>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {transactions.map((transaction, index) => (
-                    <div key={transaction.id} className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 rounded-xl p-4 border border-gray-600/30 hover:border-purple-500/30 transition-all duration-300">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${
-                            transaction.status === 'completed' 
-                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                              : transaction.status === 'pending'
-                              ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                              : 'bg-red-500/10 border-red-500/30 text-red-400'
-                          }`}>
-                            {transaction.status === 'completed' ? (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check w-5 h-5" aria-hidden="true">
-                                <path d="m9 12 2 2 4-4"></path>
+                <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/30 rounded-xl p-3 sm:p-4 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big w-5 h-5 sm:w-6 sm:h-6 text-green-400 mx-auto mb-2" aria-hidden="true">
+                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+                    <path d="m9 11 3 3L22 4"></path>
+                  </svg>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{transactions.filter(t => t.status === 'completed').length}</div>
+                  <div className="text-xs text-green-300">Concluídos</div>
+                </div>
+                <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border border-yellow-500/30 rounded-xl p-3 sm:p-4 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-dollar-sign w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 mx-auto mb-2" aria-hidden="true">
+                    <line x1="12" x2="12" y1="2" y2="22"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                  <div className="text-base sm:text-lg font-bold text-white">
+                    R$ {transactions.reduce((total, t) => total + parseFloat(t.amount), 0).toFixed(2).replace('.', ',')}
+                  </div>
+                  <div className="text-xs text-yellow-300">Valor Total</div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-refresh-cw w-4 h-4 mr-2" aria-hidden="true">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M8 16H3v5"></path>
+                  </svg>
+                  Atualizar
+                </button>
+                <div className="flex items-center space-x-2 text-sm text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-funnel w-4 h-4" aria-hidden="true">
+                    <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path>
+                  </svg>
+                  <span>Página 1</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {transactions.length === 0 ? (
+                  <div className="bg-gray-800/30 rounded-xl p-8 text-center border border-gray-700/30">
+                    <div className="w-12 h-12 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-inbox w-6 h-6 text-gray-400" aria-hidden="true">
+                        <polyline points="22,12 16,12 14,15 10,15 8,12 2,12"></polyline>
+                        <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                      </svg>
+                    </div>
+                    <h4 className="text-white font-medium mb-2">Nenhuma transação encontrada</h4>
+                    <p className="text-gray-400 text-sm">Suas transações aparecerão aqui após realizar depósitos</p>
+                  </div>
+                ) : (
+                  transactions.map((transaction) => (
+                    <div key={transaction.id} className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl p-3 sm:p-4 border border-gray-600/30 hover:border-gray-500/50 transition-all duration-200">
+                      <div className="block sm:hidden space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-credit-card w-4 h-4 text-blue-400" aria-hidden="true">
+                                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                                <line x1="2" x2="22" y1="10" y2="10"></line>
                               </svg>
-                            ) : transaction.status === 'pending' ? (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock w-5 h-5" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12,6 12,12 16,14"></polyline>
-                              </svg>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x w-5 h-5" aria-hidden="true">
-                                <path d="m18 6-12 12"></path>
-                                <path d="m6 6 12 12"></path>
-                              </svg>
-                            )}
+                            </div>
+                            <span className="text-white font-medium text-lg">R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}</span>
                           </div>
-                          <div className="min-w-0 flex-1">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                            transaction.status === 'completed' 
+                              ? 'text-green-400 bg-green-400/10 border-green-400/30' 
+                              : 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30'
+                          }`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 ${transaction.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}`} aria-hidden="true">
+                              {transaction.status === 'completed' ? (
+                                <path d="m9 12 2 2 4-4"></path>
+                              ) : (
+                                <>
+                                  <circle cx="12" cy="12" r="10"></circle>
+                                  <polyline points="12,6 12,12 16,14"></polyline>
+                                </>
+                              )}
+                            </svg>
+                            <span className="ml-1">{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
+                          </span>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-1 text-gray-400">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar w-3 h-3" aria-hidden="true">
+                                <path d="M8 2v4"></path>
+                                <path d="M16 2v4"></path>
+                                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                                <path d="M3 10h18"></path>
+                              </svg>
+                              <span>{new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR')} às {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div className="flex items-center space-x-1 text-gray-400">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-credit-card w-4 h-4 text-blue-400" aria-hidden="true">
+                                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                                <line x1="2" x2="22" y1="10" y2="10"></line>
+                              </svg>
+                              <span>PIX</span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-500 font-mono text-right">#{(transaction.zyonpay_transaction_id || transaction.id).toString().slice(-12)}...</div>
+                        </div>
+                      </div>
+                      <div className="hidden sm:flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-credit-card w-4 h-4 text-blue-400" aria-hidden="true">
+                              <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                              <line x1="2" x2="22" y1="10" y2="10"></line>
+                            </svg>
+                          </div>
+                          <div>
                             <div className="flex items-center space-x-2">
-                              <h4 className="text-white font-semibold text-sm">Depósito PIX</h4>
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                              <span className="text-white font-medium">R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}</span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
                                 transaction.status === 'completed' 
-                                  ? 'bg-emerald-500/20 text-emerald-400' 
-                                  : transaction.status === 'pending'
-                                  ? 'bg-amber-500/20 text-amber-400'
-                                  : 'bg-red-500/20 text-red-400'
+                                  ? 'text-green-400 bg-green-400/10 border-green-400/30' 
+                                  : 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30'
                               }`}>
-                                {transaction.status === 'completed' ? 'Concluído' : transaction.status === 'pending' ? 'Pendente' : 'Cancelado'}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 ${transaction.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}`} aria-hidden="true">
+                                  {transaction.status === 'completed' ? (
+                                    <path d="m9 12 2 2 4-4"></path>
+                                  ) : (
+                                    <>
+                                      <circle cx="12" cy="12" r="10"></circle>
+                                      <polyline points="12,6 12,12 16,14"></polyline>
+                                    </>
+                                  )}
+                                </svg>
+                                <span className="ml-1">{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
                               </span>
                             </div>
-                            <p className="text-gray-400 text-xs mt-1">
-                              {new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                              })} às {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </p>
-                            <p className="text-gray-500 text-xs mt-1">ID: {transaction.zyonpay_transaction_id || transaction.id}</p>
+                            <div className="flex items-center space-x-4 text-sm text-gray-400 mt-1">
+                              <div className="flex items-center space-x-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar w-3 h-3" aria-hidden="true">
+                                  <path d="M8 2v4"></path>
+                                  <path d="M16 2v4"></path>
+                                  <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                                  <path d="M3 10h18"></path>
+                                </svg>
+                                <span>{new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR')} às {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-credit-card w-4 h-4 text-blue-400" aria-hidden="true">
+                                  <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                                  <line x1="2" x2="22" y1="10" y2="10"></line>
+                                </svg>
+                                <span>PIX</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-lg font-bold text-emerald-400">
-                            R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
-                          </p>
+                          <div className="text-xs text-gray-500 font-mono">#{(transaction.zyonpay_transaction_id || transaction.id).toString().padStart(24, '684e')}</div>
                         </div>
                       </div>
-                      
-                      {transaction.zyonpay_secure_url && (
-                        <div className="mt-4 pt-4 border-t border-gray-700/50">
-                          <button
-                            className="w-full flex items-center justify-center space-x-2 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-                            onClick={() => window.open(transaction.zyonpay_secure_url, '_blank')}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link w-4 h-4" aria-hidden="true">
-                              <path d="M15 3h6v6"></path>
-                              <path d="M10 14 21 3"></path>
-                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            </svg>
-                            <span>Ver detalhes da transação</span>
-                          </button>
-                        </div>
-                      )}
                     </div>
-                  ))}
-                </div>
-              )}
-              
-              {transactions.length > 0 && (
-                <div className="text-center">
-                  <p className="text-gray-500 text-sm">
-                    {transactions.length} transação{transactions.length !== 1 ? 'ões' : ''} encontrada{transactions.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              )}
+                  ))
+                )}
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-2">
+                <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto" disabled>
+                  Anterior
+                </button>
+                <div className="hidden sm:block text-sm text-gray-400 px-4">Página 1</div>
+                <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto">
+                  Próxima
+                </button>
+              </div>
             </div>
           )}
         </div>
