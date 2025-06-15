@@ -320,8 +320,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                   </Button>
                 </>
               ) : (
-                // PIX Payment Display - Compact style like the example
-                <div className="space-y-4">
+                // PIX Payment Display - Exact design from example
+                <div className="space-y-6">
                   {pixError ? (
                     <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
                       <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
@@ -335,121 +335,89 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                       </Button>
                     </div>
                   ) : pixData ? (
-                    <div className="space-y-4">
-                      {/* QR Code with white background - compact */}
+                    <div className="space-y-6">
+                      {/* Header Section */}
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <QrCode className="w-8 h-8 text-green-400" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-white mb-2">QR Code PIX Gerado</h3>
+                        <p className="text-gray-300 mb-4">
+                          Valor: <span className="text-green-400 font-semibold">{amount}</span>
+                        </p>
+                      </div>
+
+                      {/* QR Code */}
                       <div className="flex justify-center">
-                        <div className="bg-white rounded-lg p-2 inline-block">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg">
                           <img
                             src={pixData.qrCode}
                             alt="QR Code PIX"
-                            className="w-40 h-40 block"
+                            className="w-48 h-48 rounded-lg"
                             onError={(e) => {
                               console.error('QR Code failed to load');
-                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIiBmaWxsPSIjZjNmNGY2Ii8+CiAgICA8dGV4dCB4PSI4MCIgeT0iODAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzY2Nzg5ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcnJlZ2FuZG88L3RleHQ+Cjwvc3ZnPg==';
+                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjZjNmNGY2Ii8+CiAgICA8dGV4dCB4PSI5NiIgeT0iOTYiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2Nzg5ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcnJlZ2FuZG88L3RleHQ+Cjwvc3ZnPg==';
                             }}
                           />
                         </div>
                       </div>
 
-                      {/* Amount and Status */}
+                      {/* PIX Code Section */}
+                      <div className="space-y-3">
+                        <Label className="block text-sm font-medium text-gray-300">Código PIX (Copia e Cola)</Label>
+                        <div className="flex space-x-3">
+                          <Input
+                            readOnly
+                            value={pixData.pixCode || pixData.url || ''}
+                            className="flex-1 bg-gray-800/50 border-gray-600 text-white text-xs font-mono"
+                          />
+                          <Button
+                            onClick={copyPixCode}
+                            className={`bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 transition-all duration-300 ${
+                              isCopied ? "bg-green-500 text-white" : ""
+                            }`}
+                          >
+                            {isCopied ? (
+                              <>
+                                <Check className="w-4 h-4 mr-2" />
+                                Copiado
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-4 h-4 mr-2" />
+                                Copiar
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Info Section */}
                       <div className="text-center">
-                        <h3 className="text-white font-bold text-xl">
-                          {amount}
-                        </h3>
-                        <div className="mt-3 flex items-center justify-center gap-2">
-                          <Clock className={`w-4 h-4 ${
-                            paymentStage === "waiting" ? "text-yellow-400 animate-pulse" :
-                            paymentStage === "processing" ? "text-blue-400 animate-pulse" :
-                            "text-green-400"
-                          }`} />
-                          <span className={`text-sm ${
-                            paymentStage === "waiting" ? "text-yellow-400 animate-pulse" :
-                            paymentStage === "processing" ? "text-blue-400 animate-pulse" :
-                            "text-green-400"
-                          }`}>
-                            {paymentStage === "waiting" ? "Aguardando..." :
-                             paymentStage === "processing" ? "Processando..." :
-                             "Concluído!"}
-                          </span>
+                        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                          <p className="text-blue-400 font-medium">Escaneie o QR Code ou copie o código PIX para realizar o pagamento</p>
                         </div>
                       </div>
 
-                      {/* Progress Indicator */}
-                      <div className="bg-black/30 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className={`flex items-center gap-1 ${
-                            paymentStage === "waiting" ? "text-yellow-400" : "text-green-400"
-                          }`}>
-                            <div className={`w-2 h-2 rounded-full ${
-                              paymentStage === "waiting" ? "bg-yellow-400 animate-pulse" : "bg-green-400"
-                            }`}></div>
-                            <span className="text-xs">Aguardando</span>
-                          </div>
-                          <div className={`flex items-center gap-1 ${
-                            paymentStage === "processing" ? "text-blue-400" : 
-                            paymentStage === "completed" ? "text-green-400" : "text-gray-500"
-                          }`}>
-                            <div className={`w-2 h-2 rounded-full ${
-                              paymentStage === "processing" ? "bg-blue-400 animate-pulse" :
-                              paymentStage === "completed" ? "bg-green-400" : "bg-gray-500"
-                            }`}></div>
-                            <span className="text-xs">Processando</span>
-                          </div>
-                          <div className={`flex items-center gap-1 ${
-                            paymentStage === "completed" ? "text-green-400" : "text-gray-500"
-                          }`}>
-                            <div className={`w-2 h-2 rounded-full ${
-                              paymentStage === "completed" ? "bg-green-400" : "bg-gray-500"
-                            }`}></div>
-                            <span className="text-xs">Concluído</span>
-                          </div>
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-1">
-                          <div className={`h-1 rounded-full transition-all duration-500 ${
-                            paymentStage === "waiting" ? "w-1/3 bg-yellow-400" :
-                            paymentStage === "processing" ? "w-2/3 bg-blue-400" :
-                            "w-full bg-green-400"
-                          }`}></div>
-                        </div>
-                      </div>
-
-                      {/* PIX Code */}
-                      <div className="bg-black/30 rounded-lg p-3">
-                        <p className="text-gray-300 text-xs mb-2 font-medium">Código PIX:</p>
-                        <div className="bg-black/50 rounded p-2 mb-3 overflow-x-auto">
-                          <code className="text-white text-xs font-mono whitespace-nowrap select-all block">
-                            {pixData.pixCode || pixData.url || ''}
-                          </code>
-                        </div>
-                      </div>
-
-                      {/* Copy Button */}
-                      <Button
-                        onClick={copyPixCode}
-                        className={`w-full font-medium py-3 transition-all duration-300 ${
-                          isCopied 
-                            ? "bg-green-500 text-white" 
-                            : "bg-green-600 hover:bg-green-700 text-white"
-                        }`}
-                      >
-                        {isCopied ? (
-                          <>
-                            <Check className="w-4 h-4 mr-2" />
-                            Código Copiado!
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-4 h-4 mr-2" />
-                            Copiar Código PIX
-                          </>
-                        )}
-                      </Button>
-
-                      {/* Info */}
-                      <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
-                        <p className="text-blue-400 text-xs text-center">
-                          PIX expira em 24h. Saldo creditado automaticamente.
-                        </p>
+                      {/* Action Buttons */}
+                      <div className="flex space-x-3">
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                          onClick={() => {
+                            setShowPixPayment(false);
+                            setPixData(null);
+                            setAmount('');
+                          }}
+                        >
+                          Gerar Novo QR Code
+                        </Button>
+                        <Button 
+                          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                          onClick={onClose}
+                        >
+                          Concluído
+                        </Button>
                       </div>
                     </div>
                   ) : null}
