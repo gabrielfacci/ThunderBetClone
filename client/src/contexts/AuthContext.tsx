@@ -8,6 +8,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -126,12 +127,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
   };
 
+  const refreshProfile = async () => {
+    console.log('Refreshing profile...');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      setUser(session.user);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
     signUp,
     signIn,
-    signOut
+    signOut,
+    refreshProfile
   };
 
   return (
