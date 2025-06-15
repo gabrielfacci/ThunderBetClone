@@ -92,29 +92,20 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       setOriginalAccountMode(updatedProfile.account_mode);
       setIsEditing(false);
       
-      // Check if language changed and update immediately
+      // Check if language changed and handle appropriately
       const languageChanged = originalAccountMode !== accountMode;
       if (languageChanged) {
-        // Update language context immediately for smooth transition
+        // Update language immediately without delays
         const newLanguage = accountMode === 'internacional' ? 'en' : 'pt';
+        setLanguage(newLanguage);
         
-        // Close modal first to avoid content jumping
-        onClose();
-        
-        // Update language with a small delay for smoother transition
-        setTimeout(() => {
-          setLanguage(newLanguage);
-          
-          // Show success notification after language change
-          setTimeout(() => {
-            toast({
-              title: accountMode === 'internacional' ? 'Profile Updated' : 'Perfil Atualizado',
-              description: accountMode === 'internacional' 
-                ? 'Language changed to English successfully' 
-                : 'Idioma alterado para Português com sucesso',
-            });
-          }, 150);
-        }, 50);
+        // Show success notification immediately in the new language
+        toast({
+          title: accountMode === 'internacional' ? 'Profile Updated' : 'Perfil Atualizado',
+          description: accountMode === 'internacional' 
+            ? 'Language changed to English successfully' 
+            : 'Idioma alterado para Português com sucesso',
+        });
       } else {
         toast({
           title: t('message.profileUpdated'),

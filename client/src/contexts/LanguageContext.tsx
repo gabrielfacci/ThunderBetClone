@@ -292,22 +292,20 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { user, profile } = useAuth();
 
-  // Update language based on user's account_mode
+  // Update language based on user's account_mode with debouncing
   useEffect(() => {
     if (profile?.account_mode) {
       const newLanguage = profile.account_mode === 'internacional' ? 'en' : 'pt';
       if (newLanguage !== language) {
         console.log('Changing language to:', newLanguage, 'based on account_mode:', profile.account_mode);
-        setIsTransitioning(true);
-        setLanguageState(newLanguage);
         
-        // Remove transition state after language change is complete
-        setTimeout(() => {
-          setIsTransitioning(false);
-        }, 200);
+        // Use requestAnimationFrame for smoother transition
+        requestAnimationFrame(() => {
+          setLanguageState(newLanguage);
+        });
       }
     }
-  }, [profile?.account_mode, language]);
+  }, [profile?.account_mode]);
 
   const setLanguage = (lang: Language) => {
     console.log('Manual language change to:', lang);
