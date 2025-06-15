@@ -207,9 +207,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const webhookData = req.body;
       console.log('ZyonPay webhook received:', JSON.stringify(webhookData, null, 2));
       
-      const { id: transactionId, status, amount } = webhookData;
+      const transactionData = webhookData.data;
+      const transactionId = transactionData.id;
+      const pixCode = transactionData.pix?.qrcode;
       
-      // Update transaction status in our database
+      // Update transaction with PIX code in our database
       const transactions = await storage.getAllTransactions();
       const transaction = transactions.find(t => 
         t.zyonPayTransactionId?.toString() === transactionId?.toString()
@@ -217,20 +219,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (transaction) {
         await storage.updateTransaction(transaction.id, {
-          status: status === 'paid' ? 'completed' : status,
+          status: transactionData.status === 'paid' ? 'completed' : transactionData.status,
+          pixCode: pixCode,
           updatedAt: new Date()
         });
 
         // If payment is confirmed, update user balance
-        if (status === 'paid') {
+        if (transactionData.status === 'paid') {
           const user = await storage.getUser(transaction.userId);
           if (user) {
             const currentBalance = parseFloat(user.balance.toString());
-            const depositAmount = amount / 100; // Convert from centavos to reais
+            const depositAmount = transactionData.amount / 100; // Convert from centavos to reais
             const newBalance = currentBalance + depositAmount;
             
             await storage.updateUser(transaction.userId, {
-              balance: newBalance
+              balance: newBalance.toString()
             });
             
             console.log(`Payment confirmed for transaction ${transactionId}, user balance updated`);

@@ -78,8 +78,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         user.user_metadata?.phone
       );
 
-      setPixData(result);
-      setShowPixPayment(true);
+      // Poll for PIX code from webhook
+      await pollForPixCode(result.id);
     } catch (error) {
       console.error('Error generating PIX:', error);
       setPixError('Erro ao gerar PIX. Tente novamente.');
@@ -107,6 +107,43 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         variant: "destructive",
       });
     }
+  };
+
+  const pollForPixCode = async (transactionId: number) => {
+    const maxAttempts = 30; // 30 seconds of polling
+    let attempts = 0;
+
+    const poll = async () => {
+      try {
+        const response = await fetch(`/api/zyonpay/transaction/${transactionId}`);
+        if (response.ok) {
+          const transaction = await response.json();
+          if (transaction.pixCode) {
+            // PIX code received, generate QR code and display
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(transaction.pixCode)}`;
+            setPixData({
+              transactionId,
+              qrCode: qrCodeUrl,
+              url: transaction.pixCode
+            });
+            setShowPixPayment(true);
+            return;
+          }
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 1000); // Poll every second
+        } else {
+          setPixError('Timeout: Não foi possível obter o código PIX. Tente novamente.');
+        }
+      } catch (error) {
+        console.error('Error polling for PIX code:', error);
+        setPixError('Erro ao buscar código PIX. Tente novamente.');
+      }
+    };
+
+    poll();
   };
 
   const resetPixPayment = () => {
@@ -272,10 +309,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         </div>
                       </div>
 
-                      {/* Payment Link */}
+                      {/* PIX Code */}
                       <div className="bg-gradient-to-br from-gray-800/80 via-gray-900/80 to-gray-800/80 rounded-xl p-4 border border-gray-700/50">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-300">Link de Pagamento:</span>
+                          <span className="text-sm font-medium text-gray-300">Código PIX:</span>
                           <Button
                             onClick={copyPixCode}
                             variant="ghost"
@@ -290,13 +327,6 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                             {pixData.url}
                           </p>
                         </div>
-                        <Button
-                          onClick={() => window.open(pixData.url, '_blank')}
-                          className="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white"
-                          size="sm"
-                        >
-                          Abrir Página de Pagamento
-                        </Button>
                       </div>
 
                       {/* Payment Instructions */}

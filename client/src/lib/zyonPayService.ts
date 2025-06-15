@@ -165,15 +165,9 @@ export class ZyonPayService {
       console.log('ZyonPay transaction created successfully:', result.id);
       console.log('Full ZyonPay response:', JSON.stringify(result, null, 2));
       
-      // For now, use the secureUrl as the PIX code since ZyonPay doesn't return PIX code directly
-      // The secureUrl can be used as a payment link or converted to QR code
-      const pixCode = result.secureUrl || '';
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode)}`;
-      
+      // Since webhook provides PIX code, we'll poll for it
       return {
         ...result,
-        qrCode: qrCodeUrl,
-        url: pixCode,
         transactionId: result.id
       };
     } catch (error) {
