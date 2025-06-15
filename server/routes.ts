@@ -256,7 +256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const transactions = await storage.getAllTransactions();
       const transaction = transactions.find(t => 
-        t.zyonPayTransactionId === zyonPayId
+        t.zyonPayTransactionId?.toString() === zyonPayId.toString()
       );
 
       if (!transaction) {
