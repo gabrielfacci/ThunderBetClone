@@ -130,6 +130,9 @@ Changelog:
   - Direct Supabase API integration bypassing intermediate storage layers
   - All PIX transactions stored in transactions table with complete ZyonPay data
   - User linking via metadata with Supabase UUID and email preservation
+  - Fixed UUID to integer conversion errors in transaction retrieval system
+  - Implemented automatic fallback transaction search by UUID in metadata
+  - Confirmed working storage and retrieval of PIX transaction history
 ```
 
 ## User Preferences
