@@ -88,7 +88,8 @@ export class ZyonPayService {
     amount: number,
     userEmail: string,
     userName: string,
-    userPhone?: string
+    userPhone?: string,
+    userId?: string
   ): Promise<ZyonPayResponse> {
     // Convert amount from reais to centavos
     const amountInCentavos = Math.round(amount * 100);
@@ -176,29 +177,46 @@ export class ZyonPayService {
     }
   }
 
-  private async storeTransactionInDatabase(zyonPayResponse: ZyonPayResponse, amount: number, userEmail: string): Promise<void> {
+  private async storeTransactionInDatabase(zyonPayResponse: ZyonPayResponse, amount: number, userEmail: string, userId?: string): Promise<void> {
     try {
-      // Get user ID from current session or user context
+      // Get user data from Supabase if userId is provided
+      let supabaseUserId = null;
+      if (userId) {
+        const userResponse = await fetch(`/api/supabase/user/${userId}`);
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          supabaseUserId = userData.id;
+        }
+      }
+
       const response = await fetch('/api/zyonpay/create-transaction', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: 1, // This should be dynamic based on logged user
+          userId: supabaseUserId || userId || userEmail, // Use Supabase user ID, fallback to provided userId or email
           amount: amount,
+          userEmail: userEmail,
           zyonPayTransactionId: zyonPayResponse.id,
           zyonPaySecureId: zyonPayResponse.secureId,
           zyonPaySecureUrl: zyonPayResponse.secureUrl,
-          zyonPayPixQrCode: zyonPayResponse.pix.qrcode,
-          zyonPayPixUrl: zyonPayResponse.pix.url,
-          zyonPayPixExpiration: zyonPayResponse.pix.expirationDate,
-          zyonPayStatus: zyonPayResponse.status
+          zyonPayPixQrCode: zyonPayResponse.pix?.qrcode,
+          zyonPayPixUrl: zyonPayResponse.pix?.url || zyonPayResponse.pix?.qrcode,
+          zyonPayPixExpiration: zyonPayResponse.pix?.expirationDate,
+          zyonPayStatus: zyonPayResponse.status,
+          metadata: JSON.stringify({
+            customerEmail: userEmail,
+            zyonPayResponse: zyonPayResponse,
+            transactionDate: new Date().toISOString()
+          })
         }),
       });
 
       if (!response.ok) {
         console.error('Failed to store transaction in database');
+      } else {
+        console.log('✅ Transaction successfully stored in Supabase');
       }
     } catch (error) {
       console.error('Error storing transaction:', error);

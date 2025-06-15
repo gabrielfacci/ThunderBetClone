@@ -330,7 +330,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                 </>
               ) : (
                 // PIX Payment Display - Exact design from example
-                <div className="space-y-6">
+                (<div className="space-y-6">
                   {pixError ? (
                     <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
                       <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
@@ -523,15 +523,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                           Gerar Novo QR Code
                         </Button>
                         <Button 
-                          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                          className="flex-1 bg-[#312152] hover:bg-[#3a2960] text-white"
                           onClick={onClose}
-                        >
-                          Concluído
-                        </Button>
+                        >Fechar</Button>
                       </div>
                     </div>
                   ) : null}
-                </div>
+                </div>)
               )}
             </div>
           )}
