@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
+import { profileService, type UserProfile } from '@/lib/supabaseProfile';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: SupabaseUser | null;
+  profile: UserProfile | null;
   isLoading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -19,6 +21,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -180,8 +183,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Load profile when user changes
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) {
+        setProfile(null);
+        return;
+      }
+      
+      try {
+        const userProfile = await profileService.getOrCreateUserProfile(user.id, user);
+        setProfile(userProfile);
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+      }
+    };
+
+    loadProfile();
+  }, [user]);
+
   const value: AuthContextType = {
     user,
+    profile,
     isLoading,
     signUp,
     signIn,
