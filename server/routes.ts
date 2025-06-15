@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
+import { storeTransactionInSupabase, getAllTransactionsFromSupabase, getUserTransactionsFromSupabase } from "./supabaseClient";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Mock API endpoints for ThunderBet functionality
@@ -224,17 +225,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Debug endpoint: Get all transactions stored in Supabase
+  // Store PIX transaction directly in Supabase (new endpoint)
+  app.post("/api/supabase/store-transaction", async (req, res) => {
+    try {
+      const { 
+        userId, 
+        userEmail,
+        amount, 
+        zyonPayTransactionId, 
+        zyonPaySecureId, 
+        zyonPaySecureUrl,
+        zyonPayPixQrCode,
+        zyonPayPixUrl,
+        zyonPayPixExpiration,
+        zyonPayStatus,
+        metadata
+      } = req.body;
+      
+      const depositAmount = parseFloat(amount);
+      console.log(`Storing PIX transaction in Supabase for ${userEmail} - R$ ${depositAmount.toFixed(2)}`);
+
+      const transaction = await storeTransactionInSupabase({
+        userId: userId,
+        userEmail: userEmail,
+        amount: depositAmount,
+        zyonPayTransactionId: zyonPayTransactionId.toString(),
+        zyonPaySecureId,
+        zyonPaySecureUrl,
+        zyonPayPixQrCode,
+        zyonPayPixUrl,
+        zyonPayPixExpiration: zyonPayPixExpiration || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        zyonPayStatus,
+        metadata: metadata || JSON.stringify({
+          userEmail,
+          supabaseUserId: userId,
+          transactionDate: new Date().toISOString()
+        })
+      });
+
+      console.log(`Transaction ${transaction.id} stored in Supabase for user ${userEmail}`);
+      res.json(transaction);
+    } catch (error) {
+      console.error('Error storing transaction in Supabase:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get all transactions from Supabase (debug endpoint)
   app.get("/api/transactions/all", async (req, res) => {
     try {
-      const transactions = await storage.getAllTransactions();
-      console.log(`📊 Found ${transactions.length} total transactions in Supabase`);
+      const transactions = await getAllTransactionsFromSupabase();
+      console.log(`Found ${transactions.length} total transactions in Supabase`);
       res.json({
         count: transactions.length,
         transactions: transactions
       });
     } catch (error) {
       console.error('Error fetching all transactions:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get user transactions from Supabase
+  app.get("/api/supabase/user/:userId/transactions", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const transactions = await getUserTransactionsFromSupabase(userId);
+      console.log(`Found ${transactions.length} transactions for user ${userId}`);
+      res.json(transactions);
+    } catch (error) {
+      console.error('Error fetching user transactions:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });

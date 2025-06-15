@@ -190,7 +190,7 @@ export class ZyonPayService {
         userId: userId
       });
 
-      const response = await fetch('/api/zyonpay/create-transaction', {
+      const response = await fetch('/api/supabase/store-transaction', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
