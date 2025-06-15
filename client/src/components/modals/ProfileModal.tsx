@@ -18,7 +18,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { t } = useTranslation();
   const { user, refreshProfile } = useAuth();
   const { toast } = useToast();
-  const [fullName, setFullName] = useState(user?.full_name || '');
+  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [selectedMode, setSelectedMode] = useState<'national' | 'international'>('national');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     try {
       const updates: { full_name?: string; account_mode?: 'national' | 'international' } = {};
       
-      if (fullName !== user.full_name) {
+      if (fullName !== user.user_metadata?.full_name) {
         updates.full_name = fullName;
       }
       

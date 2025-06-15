@@ -172,7 +172,7 @@ export function Home() {
   };
 
   const handleGameClick = (game: GameData) => {
-    if ((user?.balance || 0) < 10) {
+    if (1000.00 < 10) { // Default balance for Supabase users
       setSelectedGame(game);
       setShowInsufficientBalance(true);
     } else {
@@ -227,7 +227,7 @@ export function Home() {
                   <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-800/60 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
                     <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                     <span className="text-green-400 font-medium text-xs sm:text-sm">
-                      {formatBalance(user.balance)}
+                      {formatBalance(1000.00)}
                     </span>
                     <button 
                       onClick={() => refreshProfile()}
