@@ -114,10 +114,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   };
 
   const copyPixCode = async () => {
-    if (!pixData?.url) return;
+    const pixCode = pixData?.pixCode || pixData?.url;
+    if (!pixCode) return;
 
     try {
-      await navigator.clipboard.writeText(pixData.url);
+      await navigator.clipboard.writeText(pixCode);
       setIsCopied(true);
       toast({
         title: "Código copiado!",
@@ -149,7 +150,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
             setPixData({
               transactionId,
               qrCode: qrCodeUrl,
-              url: transaction.pixCode
+              url: transaction.pixCode,
+              pixCode: transaction.pixCode
             });
             setShowPixPayment(true);
             return;
@@ -416,7 +418,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         <p className="text-gray-300 text-xs mb-2 font-medium">Código PIX:</p>
                         <div className="bg-black/50 rounded p-2 mb-3 overflow-x-auto">
                           <code className="text-white text-xs font-mono whitespace-nowrap select-all block">
-                            {pixData.url || ''}
+                            {pixData.pixCode || pixData.url || ''}
                           </code>
                         </div>
                       </div>
