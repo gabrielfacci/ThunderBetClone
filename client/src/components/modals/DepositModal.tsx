@@ -70,10 +70,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
     try {
       const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
-      const amountInCents = Math.round(numericAmount * 100);
 
       const result = await zyonPayService.createPixTransaction(
-        amountInCents,
+        numericAmount,
         user.email || '',
         user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
         user.user_metadata?.phone
