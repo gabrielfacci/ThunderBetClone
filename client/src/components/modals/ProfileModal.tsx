@@ -41,8 +41,10 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     if (!user) return;
     
     setIsLoadingProfile(true);
+    console.log('Carregando perfil do usuário:', user.id);
     try {
       const userProfile = await profileService.getOrCreateUserProfile(user.id, user);
+      console.log('Perfil carregado:', userProfile);
       setProfile(userProfile);
       setFullName(userProfile.full_name);
       setAccountMode(userProfile.account_mode);
@@ -61,6 +63,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   };
 
   const handleEdit = () => {
+    console.log('Ativando modo de edição');
     setIsEditing(true);
   };
 
@@ -278,7 +281,12 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         </Button>
                         <Button 
                           className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                          onClick={handleEdit}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            console.log('Botão editar clicado, isEditing atual:', isEditing);
+                            handleEdit();
+                            console.log('Após handleEdit, isEditing deveria ser true');
+                          }}
                         >
                           <Edit3 className="w-4 h-4 mr-2" />
                           Editar Perfil
