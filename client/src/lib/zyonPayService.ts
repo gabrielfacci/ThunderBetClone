@@ -71,8 +71,10 @@ interface ZyonPayResponse {
 export class ZyonPayService {
   private getAuthHeader(): string {
     // Correct Basic Auth format: Base64(secretKey:)
-    const credentials = `${ZYONPAY_SECRET_KEY}:`;
-    return `Basic ${btoa(credentials)}`;
+    const secretKey = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+    const encodedAuth = btoa(`${secretKey}:`);
+    console.log('Auth header being used:', `Basic ${encodedAuth}`);
+    return `Basic ${encodedAuth}`;
   }
 
   private generatePhoneNumber(): string {
@@ -96,42 +98,39 @@ export class ZyonPayService {
     const cpf = generateValidCPF();
     const phone = userPhone || this.generatePhoneNumber();
 
-    const transactionData: ZyonPayTransaction = {
-      amount: amountInCentavos,
+    const transactionData = {
       paymentMethod: 'pix',
+      amount: amountInCentavos,
+      splits: [
+        {
+          recipientId: 106198,
+          amount: amountInCentavos
+        }
+      ],
       customer: {
         name: userName || 'Usuario ThunderBet',
         email: userEmail,
-        phone: phone,
         document: {
           number: cpf,
           type: 'cpf'
         },
+        phone: phone,
         address: {
           street: "Rua Fictícia",
           streetNumber: "123",
-          zipCode: "00000000",
+          zipCode: "40000000",
           neighborhood: "Centro",
-          city: "São Paulo",
-          state: "SP",
+          city: "Salvador",
+          state: "BA",
           country: "BR"
         }
       },
       items: [
         {
-          title: 'Crédito na Plataforma',
+          title: 'Crédito Appflix',
           unitPrice: amountInCentavos,
           quantity: 1,
           tangible: false
-        }
-      ],
-      pix: {
-        expiresInDays: 1
-      },
-      splits: [
-        {
-          recipientId: 106198,
-          amount: amountInCentavos
         }
       ]
     };
@@ -139,8 +138,11 @@ export class ZyonPayService {
     console.log('Creating ZyonPay PIX transaction with data:', {
       amount: amountInCentavos,
       customer: transactionData.customer.name,
-      email: transactionData.customer.email
+      email: transactionData.customer.email,
+      recipientId: 106198
     });
+    
+    console.log('Full transaction payload:', JSON.stringify(transactionData, null, 2));
 
     try {
       const response = await fetch(ZYONPAY_API_URL, {
