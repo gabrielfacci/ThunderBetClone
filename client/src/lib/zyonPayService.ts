@@ -70,11 +70,8 @@ interface ZyonPayResponse {
 
 export class ZyonPayService {
   private getAuthHeader(): string {
-    // Correct Basic Auth format: Base64(secretKey:)
-    const secretKey = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
-    const encodedAuth = btoa(`${secretKey}:`);
-    console.log('Auth header being used:', `Basic ${encodedAuth}`);
-    return `Basic ${encodedAuth}`;
+    // Use the pre-encoded auth header provided
+    return 'Basic c2tfbGl2ZV92MlVOY0NXdHpRQUtyVmFRWjhtdkpLelFHcjhmd3ZlYlV5Q3JDTENkQUc6';
   }
 
   private generatePhoneNumber(): string {
