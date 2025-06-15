@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Crown, Gift, TrendingUp, Star } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PromotionModalProps {
   isOpen: boolean;
@@ -9,7 +9,7 @@ interface PromotionModalProps {
 }
 
 export function PromotionModal({ isOpen, onClose }: PromotionModalProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
