@@ -221,6 +221,26 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* PIX Key Input */}
+              <div className="mb-6">
+                <Label className="text-sm text-gray-400 mb-2 block">{t('PIX key')}</Label>
+                <Input
+                  value={pixKey}
+                  onChange={(e) => setPixKey(e.target.value)}
+                  placeholder={t('Enter PIX key')}
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-12"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                onClick={handleWithdrawal}
+                disabled={isProcessing || !amount || !pixKey}
+                className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-bold disabled:opacity-50"
+              >
+                {isProcessing ? t('modal.deposit.processing') : t('Request Withdrawal')}
+              </Button>
             </div>
           )}
 
