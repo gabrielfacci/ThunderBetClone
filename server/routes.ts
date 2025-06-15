@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -322,6 +323,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat support API endpoints
+  app.post("/api/chat/conversation", async (req, res) => {
+    try {
+      const { userId, userName } = req.body;
+      
+      const conversation = await storage.createChatConversation({
+        userId,
+        status: 'active'
+      });
+
+      // Get existing messages for this conversation
+      const messages = await storage.getChatMessages(conversation.id);
+
+      res.json({
+        conversationId: conversation.id,
+        messages
+      });
+    } catch (error) {
+      console.error('Error creating chat conversation:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/chat/message", async (req, res) => {
+    try {
+      const { conversationId, senderId, senderName, message, isFromSupport } = req.body;
+      
+      const chatMessage = await storage.createChatMessage({
+        conversationId,
+        senderId,
+        senderName,
+        message,
+        isFromSupport: isFromSupport || false
+      });
+
+      res.json(chatMessage);
+    } catch (error) {
+      console.error('Error creating chat message:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/chat/messages/:conversationId", async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.conversationId);
+      const messages = await storage.getChatMessages(conversationId);
+      res.json(messages);
+    } catch (error) {
+      console.error('Error getting chat messages:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
+  
+  // Setup WebSocket server for real-time chat
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  const connectedClients = new Map<string, { ws: WebSocket, conversationId: number, userId: string }>();
+
+  wss.on('connection', (ws: WebSocket) => {
+    console.log('New WebSocket connection established');
+
+    ws.on('message', async (data: Buffer) => {
+      try {
+        const message = JSON.parse(data.toString());
+        
+        if (message.type === 'join') {
+          // User joining a conversation
+          const clientId = `${message.userId}_${message.conversationId}`;
+          connectedClients.set(clientId, {
+            ws,
+            conversationId: message.conversationId,
+            userId: message.userId
+          });
+          
+          console.log(`Client ${message.userId} joined conversation ${message.conversationId}`);
+          
+        } else if (message.type === 'message') {
+          // Broadcasting message to all clients in the same conversation
+          const { conversationId, senderId, senderName, message: messageText, isFromSupport } = message;
+          
+          // Save message to database
+          const chatMessage = await storage.createChatMessage({
+            conversationId,
+            senderId,
+            senderName,
+            message: messageText,
+            isFromSupport
+          });
+
+          // Broadcast to all clients in this conversation
+          connectedClients.forEach((client, clientId) => {
+            if (client.conversationId === conversationId && client.ws.readyState === WebSocket.OPEN) {
+              client.ws.send(JSON.stringify({
+                type: 'message',
+                message: chatMessage
+              }));
+            }
+          });
+
+          // Auto-reply from support (simulated)
+          if (!isFromSupport) {
+            setTimeout(async () => {
+              const supportMessage = await storage.createChatMessage({
+                conversationId,
+                senderId: 'support',
+                senderName: 'Support Agent',
+                message: 'Thank you for contacting us! A support agent will be with you shortly.',
+                isFromSupport: true
+              });
+
+              connectedClients.forEach((client, clientId) => {
+                if (client.conversationId === conversationId && client.ws.readyState === WebSocket.OPEN) {
+                  client.ws.send(JSON.stringify({
+                    type: 'message',
+                    message: supportMessage
+                  }));
+                }
+              });
+            }, 2000);
+          }
+        }
+      } catch (error) {
+        console.error('Error handling WebSocket message:', error);
+      }
+    });
+
+    ws.on('close', () => {
+      // Remove client from connected clients
+      connectedClients.forEach((client, clientId) => {
+        if (client.ws === ws) {
+          connectedClients.delete(clientId);
+          console.log(`Client ${clientId} disconnected`);
+        }
+      });
+    });
+
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+  });
+
   return httpServer;
 }

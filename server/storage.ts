@@ -42,6 +42,11 @@ export interface IStorage {
   updateTransaction(id: number, updates: any): Promise<any>;
   getAllTransactions(): Promise<any[]>;
   getUserTransactions(userId: number): Promise<any[]>;
+  
+  // Chat support operations
+  createChatConversation(conversation: any): Promise<any>;
+  createChatMessage(message: any): Promise<any>;
+  getChatMessages(conversationId: number): Promise<any[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -127,6 +132,31 @@ export class MemStorage implements IStorage {
 
   async getUserTransactions(userId: number): Promise<any[]> {
     // Mock implementation for in-memory storage
+    return [];
+  }
+
+  async createChatConversation(conversation: any): Promise<any> {
+    const id = Date.now();
+    const newConversation = {
+      id,
+      ...conversation,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    return newConversation;
+  }
+
+  async createChatMessage(message: any): Promise<any> {
+    const id = Date.now() + Math.random();
+    const newMessage = {
+      id: Math.floor(id),
+      ...message,
+      createdAt: new Date()
+    };
+    return newMessage;
+  }
+
+  async getChatMessages(conversationId: number): Promise<any[]> {
     return [];
   }
 }
@@ -273,6 +303,45 @@ export class PostgresStorage implements IStorage {
     } catch (error) {
       console.error('Error authenticating user:', error);
       return null;
+    }
+  }
+
+  async createChatConversation(conversation: any): Promise<any> {
+    try {
+      const result = await this.db.insert(chatConversations).values({
+        ...conversation,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating chat conversation:', error);
+      throw error;
+    }
+  }
+
+  async createChatMessage(message: any): Promise<any> {
+    try {
+      const result = await this.db.insert(chatMessages).values({
+        ...message,
+        createdAt: new Date()
+      }).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating chat message:', error);
+      throw error;
+    }
+  }
+
+  async getChatMessages(conversationId: number): Promise<any[]> {
+    try {
+      const result = await this.db.select().from(chatMessages)
+        .where(eq(chatMessages.conversationId, conversationId))
+        .orderBy(chatMessages.createdAt);
+      return result;
+    } catch (error) {
+      console.error('Error getting chat messages:', error);
+      return [];
     }
   }
 }
