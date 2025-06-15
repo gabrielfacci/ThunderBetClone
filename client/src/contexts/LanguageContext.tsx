@@ -20,6 +20,7 @@ const translations = {
     // Navigation
     'nav.home': 'Início',
     'nav.deposit': 'Depósito',
+    'nav.withdrawal': 'Saque',
     'nav.promotion': 'Promoção',
     'nav.profile': 'Perfil',
     
@@ -91,6 +92,7 @@ const translations = {
     // Navigation
     'nav.home': 'Home',
     'nav.deposit': 'Deposit',
+    'nav.withdrawal': 'Withdrawal',
     'nav.promotion': 'Promotion',
     'nav.profile': 'Profile',
     

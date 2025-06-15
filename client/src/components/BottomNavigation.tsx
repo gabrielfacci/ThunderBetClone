@@ -57,14 +57,14 @@ export function BottomNavigation({ onLoginRequest }: BottomNavigationProps) {
             <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
               <Wallet className="relative z-10 transition-all duration-300 h-5 w-5 text-gray-300 group-hover:text-white" />
             </div>
-            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">Depósito</span>
+            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">{t('nav.deposit')}</span>
           </div>
           
           <div className="tabbar-left-item relative flex flex-col items-center cursor-pointer transition-all duration-300" onClick={() => openModal('withdrawal')}>
             <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
               <TrendingDown className="relative z-10 transition-all duration-300 h-5 w-5 text-gray-300 group-hover:text-white" />
             </div>
-            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">Saque</span>
+            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">{t('nav.withdrawal')}</span>
           </div>
           
           <div className="tabbar-left-item relative flex flex-col items-center cursor-pointer transition-all duration-300 transform -translate-y-4" onClick={() => setActiveTab('home')}>
@@ -73,7 +73,7 @@ export function BottomNavigation({ onLoginRequest }: BottomNavigationProps) {
               <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/5 to-white/10"></div>
               <Home className="relative z-10 transition-all duration-300 h-6 w-6 text-white drop-shadow-sm" />
             </div>
-            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-orange-200">Início</span>
+            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-orange-200">{t('nav.home')}</span>
           </div>
           
           <div className="tabbar-left-item relative flex flex-col items-center cursor-pointer transition-all duration-300" onClick={() => openModal('promotion')}>
@@ -83,14 +83,14 @@ export function BottomNavigation({ onLoginRequest }: BottomNavigationProps) {
                 <span className="text-white text-[8px] font-bold leading-none">2</span>
               </div>
             </div>
-            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">Promoção</span>
+            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">{t('nav.promotion')}</span>
           </div>
           
           <div className="tabbar-left-item relative flex flex-col items-center cursor-pointer transition-all duration-300" onClick={() => openModal('profile')}>
             <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
               <User className="relative z-10 transition-all duration-300 h-5 w-5 text-gray-300 group-hover:text-white" />
             </div>
-            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">Perfil</span>
+            <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">{t('nav.profile')}</span>
           </div>
         </div>
       </div>
