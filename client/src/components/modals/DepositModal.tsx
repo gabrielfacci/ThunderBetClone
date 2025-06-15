@@ -3,11 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CreditCard, History, QrCode, DollarSign } from 'lucide-react';
+import { CreditCard, History, QrCode, DollarSign, Copy, Check, AlertCircle, RotateCcw, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { PixPaymentModal } from './PixPaymentModal';
+import { zyonPayService } from '@/lib/zyonPayService';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -22,7 +22,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [showPixModal, setShowPixModal] = useState(false);
+  const [pixData, setPixData] = useState<any>(null);
+  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
+  const [pixError, setPixError] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+  const [showPixPayment, setShowPixPayment] = useState(false);
 
   const quickAmounts = [35, 50, 100, 200, 500, 1000];
 
@@ -54,16 +58,63 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
       return;
     }
 
-    // Open PIX payment modal with ZyonPay integration
-    setShowPixModal(true);
+    await generatePixPayment();
   };
 
-  const handlePixPaymentSuccess = async () => {
-    // Refresh user profile to update balance
-    await refreshProfile();
-    setAmount('');
-    setShowPixModal(false);
-    onClose();
+  const generatePixPayment = async () => {
+    if (!user || !amount) return;
+
+    setIsGeneratingPix(true);
+    setPixError(null);
+    setPixData(null);
+
+    try {
+      const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
+      const amountInCents = Math.round(numericAmount * 100);
+
+      const result = await zyonPayService.createPixTransaction(
+        amountInCents,
+        user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+        user.email || '',
+        user.user_metadata?.phone
+      );
+
+      setPixData(result);
+      setShowPixPayment(true);
+    } catch (error) {
+      console.error('Error generating PIX:', error);
+      setPixError('Erro ao gerar PIX. Tente novamente.');
+    } finally {
+      setIsGeneratingPix(false);
+    }
+  };
+
+  const copyPixCode = async () => {
+    if (!pixData?.url) return;
+
+    try {
+      await navigator.clipboard.writeText(pixData.url);
+      setIsCopied(true);
+      toast({
+        title: "Código copiado!",
+        description: "O código PIX foi copiado para a área de transferência",
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar o código",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetPixPayment = () => {
+    setPixData(null);
+    setPixError(null);
+    setShowPixPayment(false);
+    setIsCopied(false);
   };
 
   const loadTransactions = async () => {
@@ -119,49 +170,150 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
           {activeTab === 'pix' && (
             <div>
-              <h3 className="text-base sm:text-lg font-bold mb-2">{t('Deposit via PIX')}</h3>
-              <p className="text-sm sm:text-base text-gray-400 mb-4">{t('Fast, secure and available 24h')}</p>
-              
-              {/* Quick Amounts */}
-              <div className="mb-4">
-                <p className="text-sm sm:text-base text-green-400 mb-3 flex items-center">
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  {t('Quick amounts')}
-                </p>
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  {quickAmounts.slice(0, 6).map((value) => (
-                    <Button
-                      key={value}
-                      variant="outline"
-                      className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-9 text-sm sm:h-10 sm:text-base touch-manipulation"
-                      onClick={() => handleQuickAmount(value)}
-                    >
-                      R$ {value}
-                    </Button>
-                  ))}
+              {!showPixPayment ? (
+                <>
+                  <h3 className="text-base sm:text-lg font-bold mb-2">{t('Deposit via PIX')}</h3>
+                  <p className="text-sm sm:text-base text-gray-400 mb-4">{t('Fast, secure and available 24h')}</p>
+                  
+                  {/* Quick Amounts */}
+                  <div className="mb-4">
+                    <p className="text-sm sm:text-base text-green-400 mb-3 flex items-center">
+                      <DollarSign className="w-4 h-4 mr-2" />
+                      {t('Quick amounts')}
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {quickAmounts.slice(0, 6).map((value) => (
+                        <Button
+                          key={value}
+                          variant="outline"
+                          className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-9 text-sm sm:h-10 sm:text-base touch-manipulation"
+                          onClick={() => handleQuickAmount(value)}
+                        >
+                          R$ {value}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Amount Input */}
+                  <div className="mb-4">
+                    <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('Deposit amount')}</Label>
+                    <Input
+                      value={amount}
+                      onChange={(e) => handleAmountChange(e.target.value)}
+                      placeholder="R$ 0,00"
+                      className="bg-gray-800/50 border-gray-600/50 text-white h-10 text-base sm:h-12 sm:text-lg touch-manipulation"
+                    />
+                  </div>
+
+                  {/* Generate PIX Button */}
+                  <Button 
+                    onClick={handleDeposit}
+                    disabled={!amount || isGeneratingPix}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 text-sm sm:h-12 sm:text-base touch-manipulation disabled:opacity-50"
+                  >
+                    {isGeneratingPix ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                        Gerando PIX...
+                      </>
+                    ) : (
+                      <>
+                        <QrCode className="w-4 h-4 mr-2" />
+                        {t('Generate PIX QR Code')}
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : (
+                // PIX Payment Display
+                <div className="space-y-4">
+                  {/* Header */}
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <Button
+                        onClick={resetPixPayment}
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-white p-1"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                      </Button>
+                      <h3 className="text-lg font-bold flex-1">Pagamento PIX</h3>
+                    </div>
+                    <p className="text-sm text-gray-400">Valor: {amount}</p>
+                  </div>
+
+                  {pixError ? (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
+                      <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
+                      <p className="text-red-400 text-sm">{pixError}</p>
+                      <Button
+                        onClick={generatePixPayment}
+                        className="mt-3 bg-red-500 hover:bg-red-600 text-white"
+                        size="sm"
+                      >
+                        Tentar Novamente
+                      </Button>
+                    </div>
+                  ) : pixData ? (
+                    <div className="space-y-4">
+                      {/* QR Code */}
+                      <div className="relative w-full max-w-[280px] mx-auto bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700/50 shadow-2xl">
+                        <div className="bg-white rounded-xl p-4 shadow-inner">
+                          <img 
+                            src={pixData.qrCode} 
+                            alt="QR Code PIX" 
+                            className="w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </div>
+
+                      {/* PIX Code */}
+                      <div className="bg-gradient-to-br from-gray-800/80 via-gray-900/80 to-gray-800/80 rounded-xl p-4 border border-gray-700/50">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-300">Código PIX:</span>
+                          <Button
+                            onClick={copyPixCode}
+                            variant="ghost"
+                            size="sm"
+                            className="text-yellow-400 hover:text-yellow-300 p-1"
+                          >
+                            {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                        <div className="bg-gray-900/60 rounded-lg p-3 border border-gray-700/30">
+                          <p className="text-xs text-gray-300 font-mono break-all leading-relaxed">
+                            {pixData.url}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Payment Instructions */}
+                      <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl p-4 border border-blue-700/30">
+                        <h4 className="font-semibold text-blue-300 mb-2 flex items-center">
+                          <Clock className="w-4 h-4 mr-2" />
+                          Como pagar:
+                        </h4>
+                        <ol className="text-sm text-gray-300 space-y-1">
+                          <li>1. Abra o app do seu banco</li>
+                          <li>2. Escaneie o QR Code ou cole o código PIX</li>
+                          <li>3. Confirme o pagamento</li>
+                          <li>4. Aguarde a confirmação automática</li>
+                        </ol>
+                      </div>
+
+                      {/* Transaction Info */}
+                      <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                        <div className="text-xs text-gray-400 space-y-1">
+                          <p>ID da Transação: {pixData.transactionId}</p>
+                          <p>Status: Aguardando pagamento</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
-
-              {/* Amount Input */}
-              <div className="mb-4">
-                <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('Deposit amount')}</Label>
-                <Input
-                  value={amount}
-                  onChange={(e) => handleAmountChange(e.target.value)}
-                  placeholder="R$ 0,00"
-                  className="bg-gray-800/50 border-gray-600/50 text-white h-10 text-base sm:h-12 sm:text-lg touch-manipulation"
-                />
-              </div>
-
-              {/* Generate PIX Button */}
-              <Button 
-                onClick={handleDeposit}
-                disabled={!amount}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 text-sm sm:h-12 sm:text-base touch-manipulation disabled:opacity-50"
-              >
-                <QrCode className="w-4 h-4 mr-2" />
-                {t('Generate PIX QR Code')}
-              </Button>
+              )}
             </div>
           )}
 
@@ -198,17 +350,6 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
           )}
         </div>
       </DialogContent>
-
-      {/* PIX Payment Modal */}
-      <PixPaymentModal
-        isOpen={showPixModal}
-        onClose={() => setShowPixModal(false)}
-        amount={parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.')) || 0}
-        userEmail={user?.email || ''}
-        userName={user?.user_metadata?.full_name || 'Usuario ThunderBet'}
-        userPhone={user?.user_metadata?.phone || undefined}
-        onPaymentSuccess={handlePixPaymentSuccess}
-      />
     </Dialog>
   );
 }
