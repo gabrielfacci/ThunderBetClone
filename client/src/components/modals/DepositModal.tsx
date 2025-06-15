@@ -77,31 +77,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         numericAmount,
         user.email || '',
         user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-        user.user_metadata?.phone
+        user.user_metadata?.phone,
+        user.id // Pass Supabase user ID for proper database linking
       );
-
-      // Create transaction record in our database
-      const dbTransactionResponse = await fetch('/api/zyonpay/create-transaction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: 1, // Use a fixed user ID for now since our storage expects numeric IDs
-          amount: parseFloat(amount),
-          zyonPayTransactionId: result.id,
-          zyonPaySecureId: result.secureId,
-          zyonPaySecureUrl: result.secureUrl,
-          zyonPayPixQrCode: null,
-          zyonPayPixUrl: null,
-          zyonPayPixExpiration: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-          zyonPayStatus: result.status
-        })
-      });
-
-      if (!dbTransactionResponse.ok) {
-        throw new Error('Failed to create transaction record');
-      }
 
       // Poll for PIX code from webhook
       await pollForPixCode(result.id);

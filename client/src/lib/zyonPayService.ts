@@ -166,6 +166,9 @@ export class ZyonPayService {
       console.log('ZyonPay transaction created successfully:', result.id);
       console.log('Full ZyonPay response:', JSON.stringify(result, null, 2));
       
+      // Store transaction in Supabase database
+      await this.storeTransactionInDatabase(result, amount, userEmail, userId);
+      
       // Since webhook provides PIX code, we'll poll for it
       return {
         ...result,

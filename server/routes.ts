@@ -101,11 +101,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create ZyonPay PIX transaction
+  // Get Supabase user data by email for transaction linking
+  app.get("/api/supabase/user/:identifier", async (req, res) => {
+    try {
+      const { identifier } = req.params;
+      
+      // Try to find user by email first
+      let user = await storage.getUserByEmail(identifier);
+      
+      // If not found by email, try by Supabase ID
+      if (!user && identifier.length > 10) {
+        // This looks like a Supabase UUID, create a database record if needed
+        user = {
+          id: parseInt(Date.now().toString().slice(-8)), // Generate numeric ID for our system
+          email: identifier,
+          fullName: 'Supabase User',
+          username: identifier.split('@')[0] || 'user',
+          phone: '',
+          cpf: '',
+          balance: '0.00',
+          accountMode: 'nacional'
+        };
+      }
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json(user);
+    } catch (error) {
+      console.error('Error getting Supabase user:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Create ZyonPay PIX transaction with Supabase user integration
   app.post("/api/zyonpay/create-transaction", async (req, res) => {
     try {
       const { 
         userId, 
+        userEmail,
         amount, 
         zyonPayTransactionId, 
         zyonPaySecureId, 
@@ -113,7 +148,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         zyonPayPixQrCode,
         zyonPayPixUrl,
         zyonPayPixExpiration,
-        zyonPayStatus
+        zyonPayStatus,
+        metadata
       } = req.body;
       
       const user = await storage.getUser(userId);
