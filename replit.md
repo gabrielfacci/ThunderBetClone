@@ -110,6 +110,13 @@ Changelog:
   - Data stored in localStorage for immediate functionality
   - Auto-login after registration working
   - Full TypeScript compatibility with balance and user properties
+- June 15, 2025. Implemented comprehensive internationalization system
+  - Real Supabase authentication replacing mock system
+  - Dynamic language switching based on account_mode field
+  - Nacional mode = Portuguese, Internacional mode = English
+  - Real-time language updates without page reload
+  - Complete ProfileModal with Supabase integration
+  - Translation system supporting all UI text
 ```
 
 ## User Preferences

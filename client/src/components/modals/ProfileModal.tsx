@@ -315,7 +315,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           disabled={isSaving || !fullName.trim()}
                         >
                           <Save className="w-4 h-4 mr-2" />
-                          {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                          {isSaving ? t('profile.saving') : t('profile.save')}
                         </Button>
                       </>
                     )}
