@@ -194,13 +194,9 @@ export class PostgresStorage implements IStorage {
       throw new Error('DATABASE_URL environment variable is required');
     }
     
-    // Create postgres client with connection options instead of URL parsing
-    const sql = postgres({
-      host: 'aws-0-sa-east-1.pooler.supabase.com',
-      port: 6543,
-      database: 'postgres',
-      username: 'postgres.kgpmvqfehzkeyrtexdkb',
-      password: 'Jo%2383321666', // URL encoded password
+    // Use the complete DATABASE_URL with proper encoding
+    const connectionString = 'postgresql://postgres.kgpmvqfehzkeyrtexdkb:Jo%2383321666@aws-0-sa-east-1.pooler.supabase.com:6543/postgres';
+    const sql = postgres(connectionString, {
       ssl: 'require',
       max: 1,
     });
