@@ -160,8 +160,8 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
           {activeTab === 'withdrawal' && (
             <div>
-              <h3 className="text-lg font-bold mb-1">Solicitar Saque</h3>
-              <p className="text-sm text-gray-400 mb-4">Retire seus ganhos via PIX</p>
+              <h3 className="text-lg font-bold mb-1">{t('Request Withdrawal')}</h3>
+              <p className="text-sm text-gray-400 mb-4">{t('Withdraw your winnings via PIX')}</p>
               
               {/* Available Balance */}
               <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 mb-6">
@@ -227,7 +227,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
           {activeTab === 'history' && (
             <div className="text-center py-8">
               <p className="text-gray-400">{t('History')}</p>
-              <p className="text-sm text-gray-500 mt-2">No withdrawals found</p>
+              <p className="text-sm text-gray-500 mt-2">{t('No withdrawals found')}</p>
             </div>
           )}
         </div>
