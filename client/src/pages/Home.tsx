@@ -378,7 +378,7 @@ export function Home() {
                       {winners[currentWinner].game === 'Lucky Wheel' ? 'Golden Temple' : winners[currentWinner].game}
                     </div>
                   </div>
-                  <div className="w-3 h-3 bg-red-500 rounded-full ml-[0px] mr-[0px]"></div>
+
                 </div>
               </div>
             );
