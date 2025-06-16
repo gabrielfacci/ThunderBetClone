@@ -587,8 +587,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
                       </svg>
                     </div>
-                    <h4 className="text-white font-medium mb-2 text-sm sm:text-base">Nenhuma transação encontrada</h4>
-                    <p className="text-gray-400 text-xs sm:text-sm">Suas transações aparecerão aqui após realizar depósitos</p>
+                    <h4 className="text-white font-medium mb-2 text-sm sm:text-base">{t('modal.deposit.history.noTransactions')}</h4>
+                    <p className="text-gray-400 text-xs sm:text-sm">
+                      {t('modal.deposit.history.noTransactions') === 'No transactions found' ? 
+                        'Your transactions will appear here after making deposits' : 
+                        'Suas transações aparecerão aqui após realizar depósitos'
+                      }
+                    </p>
                   </div>
                 ) : (
                   transactions.map((transaction) => (
@@ -622,7 +627,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                 </>
                               )}
                             </svg>
-                            <span style={{ marginLeft: '4px', flexShrink: 0 }}>{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
+                            <span style={{ marginLeft: '4px', flexShrink: 0 }}>
+                              {transaction.status === 'completed' ? t('modal.deposit.history.status.completed') : t('modal.deposit.history.status.pending')}
+                            </span>
                           </div>
                         </div>
                         <div className="space-y-2 text-sm">
@@ -649,7 +656,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                 <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                 <line x1="2" x2="22" y1="10" y2="10"></line>
                               </svg>
-                              <span className="text-xs whitespace-nowrap">PIX</span>
+                              <span className="text-xs whitespace-nowrap">{t('modal.deposit.history.paymentMethod')}</span>
                             </div>
                           </div>
                           <div className="text-xs text-gray-500 font-mono text-right">
@@ -687,7 +694,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                     </>
                                   )}
                                 </svg>
-                                <span style={{ marginLeft: '4px', flexShrink: 0 }}>{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
+                                <span style={{ marginLeft: '4px', flexShrink: 0 }}>
+                                  {transaction.status === 'completed' ? t('modal.deposit.history.status.completed') : t('modal.deposit.history.status.pending')}
+                                </span>
                               </div>
                             </div>
                             <div className="flex items-center space-x-4 text-sm text-gray-400 mt-1">
@@ -714,7 +723,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                   <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                   <line x1="2" x2="22" y1="10" y2="10"></line>
                                 </svg>
-                                <span>PIX</span>
+                                <span>{t('modal.deposit.history.paymentMethod')}</span>
                               </div>
                             </div>
                           </div>
@@ -732,11 +741,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-2">
                 <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto" disabled>
-                  Anterior
+                  {t('modal.deposit.history.previous')}
                 </button>
-                <div className="hidden sm:block text-sm text-gray-400 px-4">Página 1</div>
+                <div className="hidden sm:block text-sm text-gray-400 px-4">{t('modal.deposit.history.page')} 1</div>
                 <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto">
-                  Próxima
+                  {t('modal.deposit.history.next')}
                 </button>
               </div>
             </div>
