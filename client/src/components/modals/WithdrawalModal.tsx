@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -131,32 +131,41 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900/98 backdrop-blur-md border-gray-700/50 text-white w-[90%] max-w-md mx-auto rounded-2xl max-h-[85vh] overflow-y-auto p-0 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <DialogHeader className="p-4 pb-3 border-b border-gray-700/30">
-          <DialogTitle className="text-lg font-bold text-center">{t('Request Withdrawal')}</DialogTitle>
-          <p className="text-gray-400 text-sm text-center mt-1">{t('Withdraw your winnings via PIX')}</p>
-        </DialogHeader>
-        
-        <div className="p-4">
-          {/* Tabs */}
-          <div className="flex space-x-2 mb-5">
-            <Button
-              variant={activeTab === 'withdrawal' ? 'default' : 'secondary'}
-              className={`flex-1 h-11 text-sm ${activeTab === 'withdrawal' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
-              onClick={() => setActiveTab('withdrawal')}
-            >
-              <TrendingDown className="w-4 h-4 mr-1.5" />
-              {t('Request Withdrawal')}
-            </Button>
-            <Button
-              variant={activeTab === 'history' ? 'default' : 'secondary'}
-              className={`flex-1 h-11 text-sm ${activeTab === 'history' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
-              onClick={() => setActiveTab('history')}
-            >
-              <History className="w-4 h-4 mr-1.5" />
-              {t('History')}
-            </Button>
+      <DialogContent className="bg-gray-900/98 backdrop-blur-md border-gray-700/50 text-white w-[95%] max-w-md mx-auto rounded-2xl h-[90vh] max-h-[600px] overflow-hidden p-0 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        {/* Fixed Header */}
+        <div className="sticky top-0 bg-gray-900/98 backdrop-blur-md border-b border-gray-700/30 z-10">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="text-xl font-bold text-center leading-tight">{t('Request Withdrawal')}</DialogTitle>
+            <p className="text-gray-400 text-sm text-center leading-tight mt-1">
+              {t('Withdraw your winnings via PIX')}
+            </p>
+          </DialogHeader>
+          
+          {/* Fixed Tabs */}
+          <div className="px-4 pb-3">
+            <div className="flex space-x-2">
+              <Button
+                variant={activeTab === 'withdrawal' ? 'default' : 'secondary'}
+                className={`flex-1 h-12 text-base touch-manipulation ${activeTab === 'withdrawal' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+                onClick={() => setActiveTab('withdrawal')}
+              >
+                <TrendingDown className="w-4 h-4 mr-2" />
+                {t('Request Withdrawal')}
+              </Button>
+              <Button
+                variant={activeTab === 'history' ? 'default' : 'secondary'}
+                className={`flex-1 h-12 text-base touch-manipulation ${activeTab === 'history' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+                onClick={() => setActiveTab('history')}
+              >
+                <History className="w-4 h-4 mr-2" />
+                {t('History')}
+              </Button>
+            </div>
           </div>
+        </div>
+        
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4 pt-4">
 
           {activeTab === 'withdrawal' && (
             <div>
