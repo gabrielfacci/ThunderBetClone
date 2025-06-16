@@ -526,8 +526,12 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <path d="M12 7v5l4 2"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Histórico de Depósitos</h3>
-                <p className="text-gray-300 text-sm">Acompanhe todas as suas transações</p>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  {language === 'en' ? 'Deposit History' : 'Histórico de Depósitos'}
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  {language === 'en' ? 'Track all your transactions' : 'Acompanhe todas as suas transações'}
+                </p>
               </div>
               
               <div className="grid grid-cols-3 gap-2 sm:gap-4">
@@ -537,7 +541,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <path d="m22 7-8.5 8.5-5-5L2 17"></path>
                   </svg>
                   <div className="text-lg sm:text-2xl font-bold text-white">{transactions.length}</div>
-                  <div className="text-xs text-blue-300">Total</div>
+                  <div className="text-xs text-blue-300">{language === 'en' ? 'Total' : 'Total'}</div>
                 </div>
                 <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/30 rounded-xl p-2 sm:p-4 text-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big w-4 h-4 sm:w-6 sm:h-6 text-green-400 mx-auto mb-1 sm:mb-2" aria-hidden="true">
@@ -629,7 +633,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                               )}
                             </svg>
                             <span style={{ marginLeft: '4px', flexShrink: 0 }}>
-                              {transaction.status === 'completed' ? t('modal.deposit.history.status.completed') : t('modal.deposit.history.status.pending')}
+                              {transaction.status === 'completed' ? 
+                                (language === 'en' ? 'Completed' : 'Concluído') : 
+                                (language === 'en' ? 'Pending' : 'Pendente')
+                              }
                             </span>
                           </div>
                         </div>
@@ -657,7 +664,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                 <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                 <line x1="2" x2="22" y1="10" y2="10"></line>
                               </svg>
-                              <span className="text-xs whitespace-nowrap">{t('modal.deposit.history.paymentMethod')}</span>
+                              <span className="text-xs whitespace-nowrap">PIX</span>
                             </div>
                           </div>
                           <div className="text-xs text-gray-500 font-mono text-right">
@@ -696,7 +703,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                   )}
                                 </svg>
                                 <span style={{ marginLeft: '4px', flexShrink: 0 }}>
-                                  {transaction.status === 'completed' ? t('modal.deposit.history.status.completed') : t('modal.deposit.history.status.pending')}
+                                  {transaction.status === 'completed' ? 
+                                    (language === 'en' ? 'Completed' : 'Concluído') : 
+                                    (language === 'en' ? 'Pending' : 'Pendente')
+                                  }
                                 </span>
                               </div>
                             </div>
@@ -742,11 +752,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-2">
                 <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto" disabled>
-                  {t('modal.deposit.history.previous')}
+                  {language === 'en' ? 'Previous' : 'Anterior'}
                 </button>
-                <div className="hidden sm:block text-sm text-gray-400 px-4">{t('modal.deposit.history.page')} 1</div>
+                <div className="hidden sm:block text-sm text-gray-400 px-4">{language === 'en' ? 'Page' : 'Página'} 1</div>
                 <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto">
-                  {t('modal.deposit.history.next')}
+                  {language === 'en' ? 'Next' : 'Próxima'}
                 </button>
               </div>
             </div>
