@@ -265,55 +265,97 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
           )}
 
           {activeTab === 'history' && (
-            <div>
+            <div className="space-y-6">
+              {/* Header Section */}
+              <div className="text-center">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{t('Withdrawal History')}</h3>
+                <p className="text-gray-400 text-sm">{t('Your recent withdrawals')}</p>
+              </div>
+
               {showSuccessMessage && (
-                <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 mb-4 text-center">
-                  <div className="text-green-400 font-bold mb-2">✅ Withdrawal in Analysis</div>
-                  <p className="text-sm text-gray-300">Your withdrawal has been submitted and is being processed</p>
+                <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 text-center">
+                  <div className="text-green-400 font-bold mb-2">✅ {t('Withdrawal requested!')}</div>
+                  <p className="text-sm text-gray-300">{t('is being processed')}</p>
                 </div>
               )}
               
               {withdrawals.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-400">{t('History')}</p>
-                  <p className="text-sm text-gray-500 mt-2">{t('No withdrawals found')}</p>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
+                    <History className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <p className="text-gray-400 text-lg font-medium mb-2">{t('No withdrawals found')}</p>
+                  <p className="text-gray-500 text-sm">
+                    Make your first withdrawal to see it here
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <h3 className="text-base font-bold mb-3">{t('Withdrawal History')}</h3>
-                  {withdrawals.map((withdrawal: any) => (
-                    <div key={withdrawal.id} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="text-white font-medium">
-                            {formatBalance(parseFloat(withdrawal.amount))}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            PIX: {withdrawal.pix_key_type.toUpperCase()} - {withdrawal.pix_key}
-                          </p>
+                <div className="space-y-4">
+                  {/* Summary Card */}
+                  <div className="bg-gradient-to-r from-red-900/30 to-orange-900/30 border border-red-500/30 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-400 text-sm">{t('Total withdrawals')}</p>
+                        <p className="text-white text-lg font-bold">
+                          {withdrawals.length} {withdrawals.length === 1 ? 'withdrawal' : 'withdrawals'}
+                        </p>
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-red-600/20 flex items-center justify-center">
+                        <TrendingDown className="w-6 h-6 text-red-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Withdrawals List */}
+                  <div className="space-y-3">
+                    {withdrawals.map((withdrawal: any, index: number) => (
+                      <div key={withdrawal.id} className="bg-gray-800/50 hover:bg-gray-800/70 transition-colors duration-200 rounded-xl p-4 border border-gray-700/50">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-10 h-10 rounded-full bg-red-600/20 flex items-center justify-center mt-0.5">
+                              <TrendingDown className="w-5 h-5 text-red-400" />
+                            </div>
+                            <div>
+                              <p className="text-white font-bold text-lg">
+                                {formatBalance(parseFloat(withdrawal.amount))}
+                              </p>
+                              <p className="text-gray-400 text-sm">
+                                {t('PIX Key')}: {withdrawal.pix_key_type.toUpperCase()}
+                              </p>
+                              <p className="text-gray-500 text-xs">
+                                {withdrawal.pix_key}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${
+                              withdrawal.status === 'pending' ? 'bg-yellow-900/50 text-yellow-300 border border-yellow-500/30' :
+                              withdrawal.status === 'completed' ? 'bg-green-900/50 text-green-300 border border-green-500/30' :
+                              'bg-red-900/50 text-red-300 border border-red-500/30'
+                            }`}>
+                              {withdrawal.status === 'pending' ? t('Pending') :
+                               withdrawal.status === 'completed' ? t('Completed') : t('Cancelled')}
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            withdrawal.status === 'pending' ? 'bg-yellow-900/50 text-yellow-400' :
-                            withdrawal.status === 'completed' ? 'bg-green-900/50 text-green-400' :
-                            'bg-red-900/50 text-red-400'
-                          }`}>
-                            {withdrawal.status === 'pending' ? 'Pending' :
-                             withdrawal.status === 'completed' ? 'Completed' : 'Rejected'}
-                          </span>
+                        
+                        <div className="flex justify-between items-center pt-3 border-t border-gray-700/30">
+                          <p className="text-gray-400 text-xs">
+                            {t('Date')}: {new Date(withdrawal.created_at).toLocaleDateString('pt-BR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                          <p className="text-gray-500 text-xs">
+                            #{withdrawal.id.toString().padStart(6, '0')}
+                          </p>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">
-                        {new Date(withdrawal.created_at).toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
