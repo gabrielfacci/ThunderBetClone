@@ -480,6 +480,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process Supabase withdrawal request (Real implementation)
+  app.post("/api/withdrawal/request", async (req, res) => {
+    try {
+      const { userId, amount, pixKey, pixKeyType } = req.body;
+      
+      if (!userId || !amount || !pixKey || !pixKeyType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const withdrawalAmount = parseFloat(amount.replace(/[^\d.,]/g, '').replace(',', '.'));
+      
+      // Minimum withdrawal check (R$ 50)
+      if (withdrawalAmount < 50) {
+        return res.status(400).json({ error: "Minimum withdrawal amount is R$ 50.00" });
+      }
+
+      // Get user profile to check balance
+      const { data: userProfile, error: profileError } = await supabase
+        .from('users')
+        .select('balance, email, full_name')
+        .eq('id', userId)
+        .single();
+
+      if (profileError || !userProfile) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const currentBalance = parseFloat(userProfile.balance);
+      
+      // Check sufficient balance
+      if (currentBalance < withdrawalAmount) {
+        return res.status(400).json({ error: "Insufficient balance" });
+      }
+
+      const newBalance = currentBalance - withdrawalAmount;
+
+      // Update user balance in Supabase
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ balance: newBalance })
+        .eq('id', userId);
+
+      if (updateError) {
+        console.error('Error updating balance:', updateError);
+        return res.status(500).json({ error: "Failed to process withdrawal" });
+      }
+
+      // Create withdrawal record in Supabase
+      const { data: withdrawal, error: withdrawalError } = await supabase
+        .from('withdrawals')
+        .insert({
+          user_id: userId,
+          amount: withdrawalAmount,
+          pix_key: pixKey,
+          pix_key_type: pixKeyType,
+          status: 'pending',
+          balance_before: currentBalance,
+          balance_after: newBalance
+        })
+        .select()
+        .single();
+
+      if (withdrawalError) {
+        console.error('Error creating withdrawal:', withdrawalError);
+        // Rollback balance update
+        await supabase
+          .from('users')
+          .update({ balance: currentBalance })
+          .eq('id', userId);
+        return res.status(500).json({ error: "Failed to create withdrawal record" });
+      }
+
+      console.log(`✅ Withdrawal processed: R$ ${withdrawalAmount} for user ${userId}`);
+      
+      res.json({
+        success: true,
+        withdrawal,
+        newBalance
+      });
+
+    } catch (error) {
+      console.error('Error processing withdrawal:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get user withdrawals from Supabase
+  app.get("/api/user/:userId/withdrawals", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+
+      const { data: withdrawals, error } = await supabase
+        .from('withdrawals')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching withdrawals:', error);
+        return res.status(500).json({ error: "Failed to fetch withdrawals" });
+      }
+
+      res.json(withdrawals || []);
+    } catch (error) {
+      console.error('Error fetching user withdrawals:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Get transaction history
   app.get("/api/transactions/:userId", async (req, res) => {
     try {

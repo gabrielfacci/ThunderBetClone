@@ -82,6 +82,22 @@ export const transactions = pgTable("transactions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Withdrawals table - track withdrawal requests
+export const withdrawals = pgTable("withdrawals", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(), // UUID from Supabase auth
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  pixKey: text("pix_key").notNull(),
+  pixKeyType: text("pix_key_type").notNull(), // 'cpf', 'email', 'phone', 'random'
+  status: text("status").notNull().default("pending"), // 'pending', 'processing', 'completed', 'rejected'
+  balanceBefore: decimal("balance_before", { precision: 10, scale: 2 }),
+  balanceAfter: decimal("balance_after", { precision: 10, scale: 2 }),
+  processedAt: timestamp("processed_at"),
+  rejectedReason: text("rejected_reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Game sessions table - track user gaming sessions
 export const gameSessions = pgTable("game_sessions", {
   id: serial("id").primaryKey(),
@@ -324,6 +340,12 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
   createdAt: true,
 });
 
+export const insertWithdrawalSchema = createInsertSchema(withdrawals).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Type definitions for all tables
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -366,3 +388,6 @@ export type ChatConversation = typeof chatConversations.$inferSelect;
 
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
+
+export type InsertWithdrawal = z.infer<typeof insertWithdrawalSchema>;
+export type Withdrawal = typeof withdrawals.$inferSelect;
