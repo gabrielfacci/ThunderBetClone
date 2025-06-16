@@ -169,10 +169,11 @@ export class ZyonPayService {
       // Store transaction in Supabase database
       await this.storeTransactionInDatabase(result, amount, userEmail, userId);
       
-      // Since webhook provides PIX code, we'll poll for it
+      // Return the result with PIX code available immediately (if provided by API)
       return {
         ...result,
-        transactionId: result.id
+        transactionId: result.id,
+        pixCode: result.pix?.qrcode || null
       };
     } catch (error) {
       console.error('Error creating PIX transaction:', error);

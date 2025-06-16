@@ -366,6 +366,150 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fast PIX endpoint - get QR code directly from ZyonPay API
+  app.post("/api/zyonpay/fast-pix", async (req, res) => {
+    try {
+      const { amount, userEmail, userName, userPhone, userId } = req.body;
+      
+      if (!amount || !userEmail || !userName) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Generate CPF and phone if needed
+      const generateValidCPF = () => {
+        // Simple CPF generator for testing
+        const digits = [];
+        for (let i = 0; i < 9; i++) {
+          digits.push(Math.floor(Math.random() * 10));
+        }
+        
+        // Calculate verification digits
+        let sum = 0;
+        for (let i = 0; i < 9; i++) {
+          sum += digits[i] * (10 - i);
+        }
+        let firstDigit = 11 - (sum % 11);
+        if (firstDigit >= 10) firstDigit = 0;
+        digits.push(firstDigit);
+        
+        sum = 0;
+        for (let i = 0; i < 10; i++) {
+          sum += digits[i] * (11 - i);
+        }
+        let secondDigit = 11 - (sum % 11);
+        if (secondDigit >= 10) secondDigit = 0;
+        digits.push(secondDigit);
+        
+        return digits.join('');
+      };
+
+      const generatePhone = () => {
+        const areaCodes = ['11', '21', '31', '41', '51', '61', '71', '81', '85', '91'];
+        const areaCode = areaCodes[Math.floor(Math.random() * areaCodes.length)];
+        const number = '9' + Math.floor(Math.random() * 90000000 + 10000000).toString();
+        return `${areaCode}${number}`;
+      };
+
+      const amountInCentavos = Math.round(amount * 100);
+      const cpf = generateValidCPF();
+      const phone = userPhone || generatePhone();
+
+      const transactionData = {
+        paymentMethod: "pix",
+        amount: amountInCentavos,
+        splits: [
+          {
+            recipientId: 106198,
+            amount: amountInCentavos
+          }
+        ],
+        customer: {
+          name: userName,
+          email: userEmail,
+          document: {
+            number: cpf,
+            type: "cpf"
+          },
+          phone: phone,
+          address: {
+            street: "Rua Fictícia",
+            streetNumber: "123",
+            zipCode: "40000000",
+            neighborhood: "Centro",
+            city: "Salvador",
+            state: "BA",
+            country: "BR"
+          }
+        },
+        items: [
+          {
+            title: 'Crédito Appflix',
+            unitPrice: amountInCentavos,
+            quantity: 1,
+            tangible: false
+          }
+        ]
+      };
+
+      // Call ZyonPay API directly
+      const secretKey = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+      const authString = `${secretKey}:x`;
+      const authHeader = 'Basic ' + Buffer.from(authString).toString('base64');
+
+      const response = await fetch('https://api.zyonpay.com/v1/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify(transactionData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('ZyonPay API Error:', response.status, errorData);
+        return res.status(500).json({ error: "Failed to create PIX transaction" });
+      }
+
+      const result = await response.json();
+      console.log(`🚀 Fast PIX created - Transaction ${result.id} for ${userEmail}`);
+
+      // Store in database
+      try {
+        const storeResponse = await fetch(`${req.protocol}://${req.get('host')}/api/supabase/store-transaction`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            zyonPayId: result.id,
+            amount: amount,
+            userEmail: userEmail,
+            userId: userId
+          })
+        });
+        
+        if (storeResponse.ok) {
+          console.log(`💾 Fast PIX transaction ${result.id} stored in database`);
+        }
+      } catch (dbError) {
+        console.error('Database storage error:', dbError);
+      }
+
+      // Return transaction with immediate PIX code (if available)
+      res.json({
+        id: result.id,
+        pixCode: result.pix?.qrcode || null,
+        qrCodeUrl: result.pix?.qrcode ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(result.pix.qrcode)}` : null,
+        status: result.status,
+        amount: result.amount,
+        secureUrl: result.secureUrl
+      });
+
+    } catch (error) {
+      console.error('Fast PIX error:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Simple in-memory storage for webhook data
   const webhookTransactions = new Map<string, any>();
 

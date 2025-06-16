@@ -85,17 +85,47 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
 
     try {
-      // Create ZyonPay transaction
-      const result = await zyonPayService.createPixTransaction(
-        numericAmount,
-        user.email || '',
-        user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-        user.user_metadata?.phone,
-        user.id // Pass Supabase user ID for proper database linking
-      );
+      // Use fast PIX endpoint for instant QR code generation
+      const response = await fetch('/api/zyonpay/fast-pix', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: numericAmount,
+          userEmail: user.email || '',
+          userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+          userPhone: user.user_metadata?.phone,
+          userId: user.id
+        })
+      });
 
-      // Start polling immediately for real PIX code
-      pollForPixCode(result.id);
+      if (!response.ok) {
+        throw new Error('Failed to create PIX transaction');
+      }
+
+      const result = await response.json();
+
+      // Display PIX code immediately
+      if (result.pixCode && result.qrCodeUrl) {
+        setPixData({
+          transactionId: result.id,
+          qrCode: result.qrCodeUrl,
+          url: result.pixCode,
+          pixCode: result.pixCode,
+          isTemporary: false
+        });
+        setIsGeneratingPix(false);
+        
+        toast({
+          title: language === 'en' ? "PIX Ready!" : "PIX Pronto!",
+          description: language === 'en' ? "Your PIX code is ready for payment" : "Seu código PIX está pronto para pagamento",
+          duration: 2000,
+        });
+      } else {
+        // Fallback to polling if PIX code not immediately available
+        pollForPixCode(result.id);
+      }
     } catch (error) {
       console.error('Error generating PIX:', error);
       setPixError('Erro ao gerar PIX. Tente novamente.');
