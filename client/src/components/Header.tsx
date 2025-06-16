@@ -1,17 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LoginModal } from '@/components/modals/LoginModal';
 import { RegisterModal } from '@/components/modals/RegisterModal';
+import { BalanceAnimation } from '@/components/ui/balance-animation';
 import { LogOut, Wallet } from 'lucide-react';
 import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Header() {
-  const { user, isLoading, signOut } = useAuth();
+  const { user, profile, isLoading, signOut } = useAuth();
   const { t } = useLanguage();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showBalanceAnimation, setShowBalanceAnimation] = useState(false);
+  const [animationAmount, setAnimationAmount] = useState(0);
+
+  // Listen for payment success events
+  useEffect(() => {
+    const handlePaymentSuccess = (event: CustomEvent) => {
+      const { amount } = event.detail;
+      setAnimationAmount(amount);
+      setShowBalanceAnimation(true);
+    };
+
+    window.addEventListener('paymentSuccess', handlePaymentSuccess as EventListener);
+    return () => window.removeEventListener('paymentSuccess', handlePaymentSuccess as EventListener);
+  }, []);
 
   // Debug logs
   console.log('Header render - user:', user, 'isLoading:', isLoading);
@@ -114,6 +129,13 @@ export function Header() {
           setShowRegisterModal(false);
           setShowLoginModal(true);
         }}
+      />
+      
+      {/* Balance Animation */}
+      <BalanceAnimation 
+        amount={animationAmount}
+        show={showBalanceAnimation}
+        onComplete={() => setShowBalanceAnimation(false)}
       />
     </>
   );

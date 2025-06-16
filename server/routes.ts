@@ -372,28 +372,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/webhook/zyonpay", async (req, res) => {
     try {
       const webhookData = req.body;
-      console.log('ZyonPay webhook received:', JSON.stringify(webhookData, null, 2));
+      console.log('🔔 ZyonPay webhook received:', JSON.stringify(webhookData, null, 2));
       
       const transactionData = webhookData.data;
       const transactionId = transactionData.id.toString();
       const pixCode = transactionData.pix?.qrcode;
+      const paymentStatus = transactionData.status;
       
-      // Store webhook data directly for immediate access
+      // Store webhook data for immediate PIX code access
       webhookTransactions.set(transactionId, {
         id: transactionId,
         pixCode: pixCode,
-        status: transactionData.status,
+        status: paymentStatus,
         amount: transactionData.amount,
         createdAt: new Date()
       });
 
-      console.log(`Stored PIX code for transaction ${transactionId}:`, pixCode);
+      console.log(`📦 Stored PIX code for transaction ${transactionId}:`, pixCode);
 
-      // Always respond with 200 to acknowledge receipt
-      res.status(200).json({ received: true });
+      // Process payment if status is "paid"
+      if (paymentStatus === 'paid') {
+        console.log(`💰 Processing payment for transaction ${transactionId}`);
+        
+        // Find transaction in Supabase by ZyonPay ID
+        const { data: transactions, error: findError } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('zyonpay_transaction_id', transactionId)
+          .limit(1);
+
+        if (findError) {
+          console.error('❌ Error finding transaction:', findError);
+        } else if (transactions && transactions.length > 0) {
+          const transaction = transactions[0];
+          const userId = transaction.user_id;
+          const depositAmount = parseFloat(transactionData.amount) / 100; // Convert centavos to reais
+          
+          console.log(`💳 Processing payment: User ${userId}, Amount R$ ${depositAmount}`);
+
+          // Get current user balance
+          const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('balance')
+            .eq('id', userId)
+            .single();
+
+          if (userError) {
+            console.error('❌ Error getting user:', userError);
+          } else if (user) {
+            const currentBalance = parseFloat(user.balance || '0');
+            const newBalance = currentBalance + depositAmount;
+
+            console.log(`📊 Balance update: ${currentBalance} + ${depositAmount} = ${newBalance}`);
+
+            // Update user balance
+            const { error: balanceError } = await supabase
+              .from('users')
+              .update({ balance: newBalance })
+              .eq('id', userId);
+
+            if (balanceError) {
+              console.error('❌ Error updating balance:', balanceError);
+            } else {
+              console.log(`✅ Balance updated successfully for user ${userId}`);
+
+              // Update transaction status
+              const { error: txError } = await supabase
+                .from('transactions')
+                .update({ 
+                  status: 'completed',
+                  balance_after: newBalance,
+                  processed_at: new Date()
+                })
+                .eq('id', transaction.id);
+
+              if (txError) {
+                console.error('❌ Error updating transaction:', txError);
+              } else {
+                console.log(`✅ Transaction ${transaction.id} marked as completed`);
+              }
+            }
+          }
+        } else {
+          console.log(`⚠️ Transaction ${transactionId} not found in database`);
+        }
+      }
+
+      res.status(200).json({ received: true, processed: paymentStatus === 'paid' });
     } catch (error) {
-      console.error('Error processing ZyonPay webhook:', error);
-      res.status(200).json({ received: true }); // Still acknowledge to prevent retries
+      console.error('❌ Error processing ZyonPay webhook:', error);
+      res.status(200).json({ received: true }); 
     }
   });
 

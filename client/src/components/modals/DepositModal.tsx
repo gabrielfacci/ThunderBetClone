@@ -222,11 +222,34 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
             setPaymentStage("completed");
             setPaymentCompleted(true);
             
-            // Wait 2-3 seconds to show success message, then redirect to home
+            // Calculate deposit amount from the original transaction
+            const depositAmount = parseFloat(amount.replace(/[^\d]/g, '')) || 1;
+            
+            // Dispatch payment success event for balance animation
+            window.dispatchEvent(new CustomEvent('paymentSuccess', {
+              detail: { amount: depositAmount }
+            }));
+            
+            // Show success message and refresh user profile
+            toast({
+              title: language === 'en' ? "Payment Successful!" : "Pagamento Aprovado!",
+              description: language === 'en' ? "Your balance has been updated" : "Seu saldo foi atualizado",
+              duration: 4000,
+            });
+            
+            // Refresh user profile to get updated balance
+            if (refreshProfile) {
+              refreshProfile();
+            }
+            
+            // Close modal smoothly after showing success
             setTimeout(() => {
               onClose();
-              window.location.href = "/"; // Redirect to home page
-            }, 2500);
+              resetPixPayment();
+            }, 2000);
+            
+            // Clear polling interval since payment is complete
+            clearInterval(interval);
           }
         }
       } catch (error) {
