@@ -180,6 +180,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       setUser(session.user);
+      
+      // Recarrega o perfil do usuário
+      try {
+        const userProfile = await profileService.getOrCreateUserProfile(session.user.id, session.user);
+        setProfile(userProfile);
+        console.log('Profile refreshed:', userProfile);
+      } catch (error) {
+        console.error('Error refreshing profile:', error);
+      }
     }
   };
 

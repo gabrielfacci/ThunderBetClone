@@ -17,7 +17,7 @@ import thunderbetLogo from '@assets/thunderbet-logo_1749830832840.png';
 
 export function Home() {
   const { t } = useLanguage();
-  const { user, signOut, refreshProfile } = useAuth();
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -260,7 +260,7 @@ export function Home() {
                   <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-800/60 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
                     <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                     <span className="text-green-400 font-medium text-xs sm:text-sm">
-                      {formatBalance(1000.00)}
+                      {formatBalance(profile?.balance || 0)}
                     </span>
                     <button 
                       onClick={() => refreshProfile()}

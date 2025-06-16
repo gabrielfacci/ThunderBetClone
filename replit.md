@@ -142,6 +142,9 @@ Changelog:
   - Added success screen with check icon, pulsing animations, and game-specific messaging
   - Complete internationalization of loading and success states
   - Enhanced user experience with smooth transitions and professional feedback
+  - Implemented Instagram-like heart animation for game cards with persistent localStorage state
+  - Fixed balance display to show real Supabase database value from users.balance column
+  - Enhanced refreshProfile function to reload complete user profile with balance updates
 ```
 
 ## User Preferences
