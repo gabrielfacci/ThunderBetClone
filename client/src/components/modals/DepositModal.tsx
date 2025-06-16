@@ -543,7 +543,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <path d="m9 11 3 3L22 4"></path>
                   </svg>
                   <div className="text-lg sm:text-2xl font-bold text-white">{transactions.filter(t => t.status === 'completed').length}</div>
-                  <div className="text-xs text-green-300">Concluídos</div>
+                  <div className="text-xs text-green-300">{t('modal.deposit.history.status.completed')}</div>
                 </div>
                 <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border border-yellow-500/30 rounded-xl p-2 sm:p-4 text-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-dollar-sign w-4 h-4 sm:w-6 sm:h-6 text-yellow-400 mx-auto mb-1 sm:mb-2" aria-hidden="true">
@@ -553,7 +553,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                   <div className="text-sm sm:text-lg font-bold text-white">
                     R$ {transactions.reduce((total, t) => total + parseFloat(t.amount), 0).toFixed(2).replace('.', ',')}
                   </div>
-                  <div className="text-xs text-yellow-300">Valor Total</div>
+                  <div className="text-xs text-yellow-300">{t('modal.deposit.history.totalValue')}</div>
                 </div>
               </div>
               
@@ -568,13 +568,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
                     <path d="M8 16H3v5"></path>
                   </svg>
-                  Atualizar
+                  {t('modal.deposit.history.refresh')}
                 </button>
                 <div className="flex items-center space-x-2 text-sm text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-funnel w-4 h-4" aria-hidden="true">
                     <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path>
                   </svg>
-                  <span>Página 1</span>
+                  <span>{t('modal.deposit.history.page')} 1</span>
                 </div>
               </div>
               
