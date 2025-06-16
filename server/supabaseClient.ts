@@ -7,7 +7,13 @@ if (!supabaseAnonKey) {
   throw new Error('SUPABASE_ANON_KEY environment variable not found');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create admin client with service role for server-side operations
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 // Simplified transaction storage with proper error handling
 export async function storeTransactionInSupabase(transactionData: {

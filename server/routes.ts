@@ -501,24 +501,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('💰 Looking for user:', userId, 'withdrawal amount:', withdrawalAmount);
 
-      // Get user profile to check balance from Supabase users table
-      const { data: userProfile, error: profileError } = await supabase
+      // Direct SQL query to get user data and avoid RLS issues
+      const { data: userData, error: sqlError } = await supabase
         .from('users')
         .select('balance, email, full_name')
-        .eq('id', userId)
-        .single();
+        .eq('id', userId);
 
-      console.log('👤 User query result:', { userProfile, profileError });
+      console.log('👤 SQL query result:', { userData, sqlError });
 
-      if (profileError) {
-        console.error('❌ Profile error:', profileError);
-        return res.status(404).json({ error: "User not found", details: profileError.message });
+      if (sqlError) {
+        console.error('❌ SQL Error:', sqlError);
+        return res.status(500).json({ error: "Database error" });
       }
 
-      if (!userProfile) {
-        console.error('❌ No user profile found for:', userId);
+      if (!userData || userData.length === 0) {
+        console.error('❌ No user found with ID:', userId);
         return res.status(404).json({ error: "User not found" });
       }
+
+      const userProfile = userData[0];
+      console.log('✅ Found user:', userProfile);
 
       const currentBalance = parseFloat(userProfile.balance);
       
