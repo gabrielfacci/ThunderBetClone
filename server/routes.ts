@@ -482,8 +482,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Process Supabase withdrawal request (Real implementation)
   app.post("/api/withdrawal/request", async (req, res) => {
+    console.log('🚀 WITHDRAWAL ROUTE HIT - Request body:', req.body);
     try {
       const { userId, amount, pixKey, pixKeyType } = req.body;
+      
+      console.log('🔍 Withdrawal request:', { userId, amount, pixKey, pixKeyType });
       
       if (!userId || !amount || !pixKey || !pixKeyType) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -496,14 +499,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Minimum withdrawal amount is R$ 50.00" });
       }
 
-      // Get user profile to check balance
+      console.log('💰 Looking for user:', userId, 'withdrawal amount:', withdrawalAmount);
+
+      // Get user profile to check balance from Supabase users table
       const { data: userProfile, error: profileError } = await supabase
         .from('users')
         .select('balance, email, full_name')
         .eq('id', userId)
         .single();
 
-      if (profileError || !userProfile) {
+      console.log('👤 User query result:', { userProfile, profileError });
+
+      if (profileError) {
+        console.error('❌ Profile error:', profileError);
+        return res.status(404).json({ error: "User not found", details: profileError.message });
+      }
+
+      if (!userProfile) {
+        console.error('❌ No user profile found for:', userId);
         return res.status(404).json({ error: "User not found" });
       }
 
