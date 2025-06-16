@@ -145,6 +145,11 @@ Changelog:
   - Implemented Instagram-like heart animation for game cards with persistent localStorage state
   - Fixed balance display to show real Supabase database value from users.balance column
   - Enhanced refreshProfile function to reload complete user profile with balance updates
+  - Implemented complete withdrawal system with real balance deduction
+  - Created withdrawals table in Supabase with comprehensive transaction tracking
+  - Fixed Row Level Security (RLS) issues blocking server-side database operations
+  - Added withdrawal API with R$ 50 minimum validation and balance verification
+  - Withdrawal transactions appear in history with "pending" status for realistic UX
 ```
 
 ## User Preferences
