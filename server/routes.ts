@@ -469,8 +469,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 .from('transactions')
                 .update({ 
                   status: 'completed',
-                  balance_after: newBalance,
-                  processed_at: new Date()
+                  balance_after: newBalance
                 })
                 .eq('id', transaction.id);
 
