@@ -159,23 +159,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   };
 
   const loadTransactions = async () => {
-    if (!user) {
-      console.log('No user found for loading transactions');
-      return;
-    }
-    
-    console.log('Loading transactions for user:', user.id);
+    if (!user) return;
     
     try {
       const response = await fetch(`/api/user/${user.id}/transactions`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Raw transactions data:', data);
-        const depositTransactions = data; // Remove filter to show all transactions
-        console.log('Filtered deposit transactions:', depositTransactions);
-        setTransactions(depositTransactions);
-      } else {
-        console.error('Failed to load transactions, status:', response.status);
+        setTransactions(data);
       }
     } catch (error) {
       console.error('Erro ao carregar transações:', error);
@@ -606,18 +596,18 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                       {/* Mobile Layout */}
                       <div className="block sm:hidden space-y-3">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                          <div className="flex items-center space-x-2 min-w-0 flex-1">
+                            <div className="w-8 h-8 bg-gray-700/50 rounded-lg flex items-center justify-center flex-shrink-0">
                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-credit-card w-4 h-4 text-blue-400" aria-hidden="true">
                                 <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                 <line x1="2" x2="22" y1="10" y2="10"></line>
                               </svg>
                             </div>
-                            <span className="text-white font-medium text-base">
+                            <span className="text-white font-medium text-base whitespace-nowrap">
                               R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
                             </span>
                           </div>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${
                             transaction.status === 'completed' 
                               ? 'text-green-400 bg-green-400/10 border-green-400/30' 
                               : 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30'
@@ -632,35 +622,34 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                 </>
                               )}
                             </svg>
-                            <span className="ml-1">{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
+                            <span className="ml-1 whitespace-nowrap">{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
                           </span>
                         </div>
                         <div className="space-y-2 text-sm">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-1 text-gray-400">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar w-3 h-3" aria-hidden="true">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center space-x-1 text-gray-400 min-w-0 flex-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar w-3 h-3 flex-shrink-0" aria-hidden="true">
                                 <path d="M8 2v4"></path>
                                 <path d="M16 2v4"></path>
                                 <rect width="18" height="18" x="3" y="4" rx="2"></rect>
                                 <path d="M3 10h18"></path>
                               </svg>
-                              <span className="text-xs">
+                              <span className="text-xs truncate">
                                 {new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR', {
                                   day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric'
+                                  month: '2-digit'
                                 })}, {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', {
                                   hour: '2-digit',
                                   minute: '2-digit'
                                 })}
                               </span>
                             </div>
-                            <div className="flex items-center space-x-1 text-gray-400">
+                            <div className="flex items-center space-x-1 text-gray-400 flex-shrink-0">
                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-credit-card w-3 h-3 text-blue-400" aria-hidden="true">
                                 <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                 <line x1="2" x2="22" y1="10" y2="10"></line>
                               </svg>
-                              <span className="text-xs">PIX</span>
+                              <span className="text-xs whitespace-nowrap">PIX</span>
                             </div>
                           </div>
                           <div className="text-xs text-gray-500 font-mono text-right">
