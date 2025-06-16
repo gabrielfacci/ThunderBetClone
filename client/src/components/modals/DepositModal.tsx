@@ -568,6 +568,27 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         </div>
                       </div>
 
+                      {/* Action Buttons */}
+                      <div className="flex space-x-3">
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                          onClick={() => {
+                            setShowPixPayment(false);
+                            setPixData(null);
+                            setAmount('');
+                          }}
+                        >
+                          {language === 'en' ? 'Generate New QR Code' : 'Gerar Novo QR Code'}
+                        </Button>
+                        <Button 
+                          className="flex-1 bg-[#312152] hover:bg-[#3a2960] text-white"
+                          onClick={onClose}
+                        >
+                          {language === 'en' ? 'Close' : 'Fechar'}
+                        </Button>
+                      </div>
+
                       {/* Instructions Section */}
                       <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl p-4 border border-gray-600/30">
                         <h4 className="font-semibold text-white mb-3 flex items-center">
@@ -595,27 +616,6 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                             {language === 'en' ? 'Balance will be credited automatically' : 'O saldo será creditado automaticamente'}
                           </li>
                         </ul>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex space-x-3">
-                        <Button
-                          variant="outline"
-                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-                          onClick={() => {
-                            setShowPixPayment(false);
-                            setPixData(null);
-                            setAmount('');
-                          }}
-                        >
-                          {language === 'en' ? 'Generate New QR Code' : 'Gerar Novo QR Code'}
-                        </Button>
-                        <Button 
-                          className="flex-1 bg-[#312152] hover:bg-[#3a2960] text-white"
-                          onClick={onClose}
-                        >
-                          {language === 'en' ? 'Close' : 'Fechar'}
-                        </Button>
                       </div>
                         </>
                       ) : null}

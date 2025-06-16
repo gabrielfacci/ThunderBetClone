@@ -150,6 +150,11 @@ Changelog:
   - Fixed Row Level Security (RLS) issues blocking server-side database operations
   - Added withdrawal API with R$ 50 minimum validation and balance verification
   - Withdrawal transactions appear in history with "pending" status for realistic UX
+  - Optimized PIX generation system for ultra-fast QR code display
+  - Implemented direct ZyonPay API integration bypassing webhook delays
+  - Removed temporary/fake QR codes - system now shows only authentic codes
+  - Added ultra-fast PIX endpoint `/api/zyonpay/fast-pix` for instant generation
+  - Improved deposit modal UX by moving action buttons above instructions section
 ```
 
 ## User Preferences
