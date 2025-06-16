@@ -157,6 +157,14 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
               pixCode: transaction.pixCode,
               isTemporary: false
             }) : null);
+            
+            // Show brief success notification that QR code was updated
+            toast({
+              title: language === 'en' ? "QR Code Updated!" : "QR Code Atualizado!",
+              description: language === 'en' ? "PIX code is now ready for payment" : "Código PIX está pronto para pagamento",
+              duration: 3000,
+            });
+            
             return; // Stop polling when we get the real PIX code
           }
         }
@@ -387,7 +395,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
                       {/* QR Code */}
                       <div className="flex justify-center">
-                        <div className="bg-white p-4 rounded-2xl shadow-lg">
+                        <div className="relative bg-white p-4 rounded-2xl shadow-lg">
                           <img
                             src={pixData.qrCode}
                             alt="QR Code PIX"
@@ -397,6 +405,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                               e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjZjNmNGY2Ii8+CiAgICA8dGV4dCB4PSI2NCIgeT0iNjQiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzY2Nzg5ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcnJlZ2FuZG88L3RleHQ+Cjwvc3ZnPg==';
                             }}
                           />
+                          {pixData.isTemporary && (
+                            <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-semibold animate-pulse shadow-lg">
+                              {language === 'en' ? 'Updating...' : 'Atualizando...'}
+                            </div>
+                          )}
                         </div>
                       </div>
 
