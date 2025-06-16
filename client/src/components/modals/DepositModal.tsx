@@ -92,21 +92,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         user.id // Pass Supabase user ID for proper database linking
       );
 
-      // Immediately generate QR code with placeholder and show interface
-      const tempPixCode = `00020101021226580014br.gov.bcb.pix${result.id.toString().padStart(20, '0')}5204000053039865802BR5925TEMP_PIX_CODE6007TEMP***6304TEMP`;
-      const tempQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(tempPixCode)}`;
-      
-      setPixData({
-        transactionId: result.id,
-        qrCode: tempQrCodeUrl,
-        url: tempPixCode,
-        pixCode: tempPixCode,
-        isTemporary: true
-      });
-      
+      // Wait for real PIX code from ZyonPay
       setIsGeneratingPix(false);
-      
-      // Poll for real PIX code in background and update when ready
       pollForPixCode(result.id);
     } catch (error) {
       console.error('Error generating PIX:', error);
@@ -139,7 +126,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   };
 
   const pollForPixCode = async (transactionId: number) => {
-    const maxAttempts = 30; // 30 seconds of polling
+    const maxAttempts = 30;
     let attempts = 0;
 
     const poll = async () => {
@@ -148,42 +135,41 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         if (response.ok) {
           const transaction = await response.json();
           if (transaction.pixCode) {
-            // PIX code received, update with real QR code
+            // Use exact ZyonPay PIX code without any modification
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(transaction.pixCode)}`;
-            setPixData(prevData => prevData ? ({
-              transactionId: prevData.transactionId,
+            setPixData({
+              transactionId: transactionId,
               qrCode: qrCodeUrl,
               url: transaction.pixCode,
               pixCode: transaction.pixCode,
               isTemporary: false
-            }) : null);
+            });
             
-            // Show brief success notification that QR code was updated
             toast({
-              title: language === 'en' ? "QR Code Updated!" : "QR Code Atualizado!",
-              description: language === 'en' ? "PIX code is now ready for payment" : "Código PIX está pronto para pagamento",
+              title: language === 'en' ? "PIX Code Ready!" : "Código PIX Pronto!",
+              description: language === 'en' ? "PIX code is ready for payment" : "Código PIX está pronto para pagamento",
               duration: 3000,
             });
             
-            return; // Stop polling when we get the real PIX code
+            return;
           }
         }
 
         attempts++;
         if (attempts < maxAttempts) {
-          setTimeout(poll, 2000); // Poll every 2 seconds to reduce server load
+          setTimeout(poll, 1000);
         } else {
-          // Keep the temporary QR code if timeout, don't show error
-          console.log('Timeout waiting for PIX code, keeping temporary QR code');
+          setPixError('Tempo esgotado para gerar código PIX. Tente novamente.');
+          setIsGeneratingPix(false);
         }
       } catch (error) {
         console.error('Error polling for PIX code:', error);
-        // Keep the temporary QR code on error, don't disrupt user experience
+        setPixError('Erro ao obter código PIX. Tente novamente.');
+        setIsGeneratingPix(false);
       }
     };
 
-    // Start polling after a short delay to let webhook process
-    setTimeout(poll, 1000);
+    poll();
   };
 
   const resetPixPayment = () => {
