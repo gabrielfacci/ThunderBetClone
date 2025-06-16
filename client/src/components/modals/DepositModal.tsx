@@ -303,7 +303,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     {isGeneratingPix ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                        Gerando PIX...
+                        {language === 'en' ? 'Generating PIX...' : 'Gerando PIX...'}
                       </>
                     ) : (
                       <>
@@ -325,7 +325,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         className="mt-3 bg-red-500 hover:bg-red-600 text-white"
                         size="sm"
                       >
-                        Tentar Novamente
+                        {language === 'en' ? 'Try Again' : 'Tentar Novamente'}
                       </Button>
                     </div>
                   ) : pixData ? (
@@ -335,9 +335,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                           <QrCode className="w-8 h-8 text-green-400" />
                         </div>
-                        <h3 className="text-xl font-semibold text-white mb-2">QR Code PIX Gerado</h3>
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                          {language === 'en' ? 'PIX QR Code Generated' : 'QR Code PIX Gerado'}
+                        </h3>
                         <p className="text-gray-300 mb-4">
-                          Valor: <span className="text-green-400 font-semibold">{amount}</span>
+                          {language === 'en' ? 'Amount: ' : 'Valor: '}<span className="text-green-400 font-semibold">{amount}</span>
                         </p>
                       </div>
 
@@ -358,7 +360,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
                       {/* PIX Code Section */}
                       <div className="space-y-3">
-                        <Label className="block text-sm font-medium text-gray-300">Código PIX (Copia e Cola)</Label>
+                        <Label className="block text-sm font-medium text-gray-300">
+                          {language === 'en' ? 'PIX Code (Copy and Paste)' : 'Código PIX (Copia e Cola)'}
+                        </Label>
                         <div className="flex space-x-3">
                           <Input
                             readOnly
@@ -374,12 +378,12 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                             {isCopied ? (
                               <>
                                 <Check className="w-4 h-4 mr-2" />
-                                Copiado
+                                {language === 'en' ? 'Copied' : 'Copiado'}
                               </>
                             ) : (
                               <>
                                 <Copy className="w-4 h-4 mr-2" />
-                                Copiar
+                                {language === 'en' ? 'Copy' : 'Copiar'}
                               </>
                             )}
                           </Button>
@@ -389,7 +393,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                       {/* Payment Status Tracker */}
                       <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                         <div className="flex items-center justify-between mb-4">
-                          <span className="text-gray-300 font-medium text-sm">Status do Pagamento</span>
+                          <span className="text-gray-300 font-medium text-sm">
+                            {language === 'en' ? 'Payment Status' : 'Status do Pagamento'}
+                          </span>
                           <div className={`flex items-center space-x-2 ${
                             paymentStage === "waiting" ? "text-yellow-400" : "text-green-400"
                           }`}>
@@ -424,12 +430,15 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                               <p className={`text-sm font-medium ${
                                 paymentStage === "waiting" ? "text-yellow-400" : "text-green-400"
                               }`}>
-                                {paymentStage === "waiting" ? "Aguardando pagamento" : "Pagamento detectado"}
+                                {paymentStage === "waiting" 
+                                  ? (language === 'en' ? "Waiting for payment" : "Aguardando pagamento")
+                                  : (language === 'en' ? "Payment detected" : "Pagamento detectado")
+                                }
                               </p>
                               <p className="text-xs text-gray-400">
                                 {paymentStage === "waiting" 
-                                  ? "Realize o pagamento via PIX para continuar" 
-                                  : "Transação confirmada com sucesso"
+                                  ? (language === 'en' ? "Make the PIX payment to continue" : "Realize o pagamento via PIX para continuar")
+                                  : (language === 'en' ? "Transaction confirmed successfully" : "Transação confirmada com sucesso")
                                 }
                               </p>
                             </div>
