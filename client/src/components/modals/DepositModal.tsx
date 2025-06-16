@@ -259,7 +259,6 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
-
           {activeTab === 'pix' && (
             <div>
               {!showPixPayment ? (
