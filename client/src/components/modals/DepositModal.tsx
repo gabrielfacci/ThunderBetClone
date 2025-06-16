@@ -77,26 +77,15 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
     setIsGeneratingPix(true);
     setPixError(null);
+    setPixData(null);
+    
+    // Show PIX loading screen immediately
+    setShowPixPayment(true);
     
     const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
-    
-    // Generate immediate temporary QR code for instant display
-    const tempPixCode = `00020126580014br.gov.bcb.pix01361a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p652040000530398654${String(numericAmount * 100).padStart(4, '0')}5802BR5925THUNDER_BET_BRASIL_LTDA6007GOIANIA62070503***6304${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
-    const tempQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(tempPixCode)}`;
-    
-    // Show PIX screen immediately with temporary QR code
-    setPixData({
-      transactionId: 0,
-      qrCode: tempQrCodeUrl,
-      url: tempPixCode,
-      pixCode: tempPixCode,
-      isTemporary: true
-    });
-    setShowPixPayment(true);
-    setIsGeneratingPix(false);
 
-    // Generate real PIX code in background
     try {
+      // Create ZyonPay transaction
       const result = await zyonPayService.createPixTransaction(
         numericAmount,
         user.email || '',
@@ -105,12 +94,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         user.id // Pass Supabase user ID for proper database linking
       );
 
-      // Start polling for real PIX code
+      // Start polling immediately for real PIX code
       pollForPixCode(result.id);
     } catch (error) {
       console.error('Error generating PIX:', error);
       setPixError('Erro ao gerar PIX. Tente novamente.');
       setShowPixPayment(false);
+      setIsGeneratingPix(false);
     }
   };
 
@@ -137,7 +127,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   };
 
   const pollForPixCode = async (transactionId: number) => {
-    const maxAttempts = 20; // Reduced attempts for faster timeout
+    const maxAttempts = 30;
     let attempts = 0;
 
     const poll = async () => {
@@ -146,21 +136,21 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         if (response.ok) {
           const transaction = await response.json();
           if (transaction.pixCode) {
-            // Smoothly update to real PIX code without disruption
+            // Display real PIX code from ZyonPay
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(transaction.pixCode)}`;
-            setPixData(prev => ({
-              ...prev,
+            setPixData({
               transactionId: transactionId,
               qrCode: qrCodeUrl,
               url: transaction.pixCode,
               pixCode: transaction.pixCode,
               isTemporary: false
-            }));
+            });
             
-            // Subtle notification without interrupting user flow
+            setIsGeneratingPix(false);
+            
             toast({
-              title: language === 'en' ? "PIX Updated" : "PIX Atualizado",
-              description: language === 'en' ? "Your PIX code is now ready for payment" : "Seu código PIX está pronto para pagamento",
+              title: language === 'en' ? "PIX Ready!" : "PIX Pronto!",
+              description: language === 'en' ? "Your PIX code is ready for payment" : "Seu código PIX está pronto para pagamento",
               duration: 2000,
             });
             
@@ -170,14 +160,15 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
         attempts++;
         if (attempts < maxAttempts) {
-          setTimeout(poll, 300); // Further reduced to 300ms for ultra-fast updates
+          setTimeout(poll, 200); // Very fast polling - 200ms
         } else {
-          // Don't show error if temporary code is working - user can still pay
-          console.log('PIX code polling timeout - continuing with temporary code');
+          setPixError('Tempo esgotado para gerar código PIX. Tente novamente.');
+          setIsGeneratingPix(false);
         }
       } catch (error) {
         console.error('Error polling for PIX code:', error);
-        // Continue with temporary code without showing error to user
+        setPixError('Erro ao obter código PIX. Tente novamente.');
+        setIsGeneratingPix(false);
       }
     };
 
@@ -427,11 +418,6 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                               e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjZjNmNGY2Ii8+CiAgICA8dGV4dCB4PSI2NCIgeT0iNjQiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzY2Nzg5ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcnJlZ2FuZG88L3RleHQ+Cjwvc3ZnPg==';
                             }}
                           />
-                          {pixData.isTemporary && (
-                            <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-semibold animate-pulse shadow-lg">
-                              {language === 'en' ? 'Updating...' : 'Atualizando...'}
-                            </div>
-                          )}
                         </div>
                       </div>
 
