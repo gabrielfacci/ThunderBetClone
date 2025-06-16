@@ -155,6 +155,7 @@ Changelog:
   - Removed temporary/fake QR codes - system now shows only authentic codes
   - Added ultra-fast PIX endpoint `/api/zyonpay/fast-pix` for instant generation
   - Improved deposit modal UX by moving action buttons above instructions section
+  - Updated minimum deposit amount back to R$ 35,00 with corresponding quick amount buttons
 ```
 
 ## User Preferences
