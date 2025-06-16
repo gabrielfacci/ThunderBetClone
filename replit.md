@@ -133,6 +133,15 @@ Changelog:
   - Fixed UUID to integer conversion errors in transaction retrieval system
   - Implemented automatic fallback transaction search by UUID in metadata
   - Confirmed working storage and retrieval of PIX transaction history
+- June 16, 2025. Enhanced PIX payment and game loading experience
+  - Completely rewritten PIX QR code generation for instant responsiveness
+  - Immediate QR code display with temporary code, updates to real code in background
+  - Visual indicators showing QR code update status with "Updating..." badges
+  - Toast notifications confirming when PIX code is ready for payment
+  - Implemented 10-second game loading modal with premium gradient design
+  - Added success screen with check icon, pulsing animations, and game-specific messaging
+  - Complete internationalization of loading and success states
+  - Enhanced user experience with smooth transitions and professional feedback
 ```
 
 ## User Preferences
