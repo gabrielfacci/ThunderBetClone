@@ -405,18 +405,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('❌ Error finding transaction:', findError);
         } else if (transactions && transactions.length > 0) {
           const transaction = transactions[0];
-          const userId = transaction.user_id;
           const depositAmount = parseFloat(transactionData.amount) / 100; // Convert centavos to reais
           
-          console.log(`🔍 Found transaction: ID=${transaction.id}, User=${userId}, Amount=R$${depositAmount}`);
+          // Extract Supabase UUID from metadata if available
+          let supabaseUserId = null;
+          try {
+            const metadata = transaction.metadata;
+            if (metadata && typeof metadata === 'object' && metadata.supabaseUserId) {
+              supabaseUserId = metadata.supabaseUserId;
+            }
+          } catch (e) {
+            console.log('📝 No metadata found, searching by email');
+          }
+
+          // If no UUID in metadata, find user by email
+          if (!supabaseUserId && transactionData.customer?.email) {
+            const { data: userByEmail } = await supabase
+              .from('users')
+              .select('id')
+              .eq('email', transactionData.customer.email)
+              .single();
+            
+            if (userByEmail) {
+              supabaseUserId = userByEmail.id;
+            }
+          }
+
+          if (!supabaseUserId) {
+            console.error('❌ Could not find Supabase user ID');
+            return;
+          }
           
-          console.log(`💳 Processing payment: User ${userId}, Amount R$ ${depositAmount}`);
+          console.log(`🔍 Found transaction: ID=${transaction.id}, Supabase User=${supabaseUserId}, Amount=R$${depositAmount}`);
 
           // Get current user balance
           const { data: user, error: userError } = await supabase
             .from('users')
             .select('balance')
-            .eq('id', userId)
+            .eq('id', supabaseUserId)
             .single();
 
           if (userError) {
@@ -431,12 +457,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const { error: balanceError } = await supabase
               .from('users')
               .update({ balance: newBalance })
-              .eq('id', userId);
+              .eq('id', supabaseUserId);
 
             if (balanceError) {
               console.error('❌ Error updating balance:', balanceError);
             } else {
-              console.log(`✅ Balance updated successfully for user ${userId}`);
+              console.log(`✅ Balance updated successfully for user ${supabaseUserId}`);
 
               // Update transaction status
               const { error: txError } = await supabase
