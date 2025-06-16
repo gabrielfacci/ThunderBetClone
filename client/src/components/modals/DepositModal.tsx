@@ -452,8 +452,12 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                   <Check className="w-3 h-3 text-gray-900" />
                                 </div>
                                 <div className="flex-1">
-                                  <p className="text-sm font-medium text-green-400">Pagamento concluído</p>
-                                  <p className="text-xs text-gray-400">Redirecionando em alguns segundos...</p>
+                                  <p className="text-sm font-medium text-green-400">
+                                    {language === 'en' ? 'Payment completed' : 'Pagamento concluído'}
+                                  </p>
+                                  <p className="text-xs text-gray-400">
+                                    {language === 'en' ? 'Redirecting in a few seconds...' : 'Redirecionando em alguns segundos...'}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -464,8 +468,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         <div className="mt-4 text-center">
                           <p className="text-xs text-gray-500">
                             {paymentStage === "waiting" 
-                              ? "Verificamos automaticamente o status do seu pagamento a cada 10 segundos"
-                              : "Saldo creditado em sua conta com sucesso!"
+                              ? (language === 'en' ? "We automatically check your payment status every 10 seconds" : "Verificamos automaticamente o status do seu pagamento a cada 10 segundos")
+                              : (language === 'en' ? "Balance credited to your account successfully!" : "Saldo creditado em sua conta com sucesso!")
                             }
                           </p>
                         </div>
@@ -478,24 +482,24 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                             <rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
                             <path d="M12 18h.01"></path>
                           </svg>
-                          Instruções:
+                          {language === 'en' ? 'Instructions:' : 'Instruções:'}
                         </h4>
                         <ul className="text-sm text-gray-300 space-y-2">
                           <li className="flex items-center">
                             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
-                            Abra o app do seu banco
+                            {language === 'en' ? 'Open your bank app' : 'Abra o app do seu banco'}
                           </li>
                           <li className="flex items-center">
                             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
-                            Escaneie o QR Code ou cole o código PIX
+                            {language === 'en' ? 'Scan the QR Code or paste the PIX code' : 'Escaneie o QR Code ou cole o código PIX'}
                           </li>
                           <li className="flex items-center">
                             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
-                            Confirme o pagamento
+                            {language === 'en' ? 'Confirm the payment' : 'Confirme o pagamento'}
                           </li>
                           <li className="flex items-center">
                             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-3"></div>
-                            O saldo será creditado automaticamente
+                            {language === 'en' ? 'Balance will be credited automatically' : 'O saldo será creditado automaticamente'}
                           </li>
                         </ul>
                       </div>
@@ -511,12 +515,14 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                             setAmount('');
                           }}
                         >
-                          Gerar Novo QR Code
+                          {language === 'en' ? 'Generate New QR Code' : 'Gerar Novo QR Code'}
                         </Button>
                         <Button 
                           className="flex-1 bg-[#312152] hover:bg-[#3a2960] text-white"
                           onClick={onClose}
-                        >Fechar</Button>
+                        >
+                          {language === 'en' ? 'Close' : 'Fechar'}
+                        </Button>
                       </div>
                     </div>
                   ) : null}
@@ -743,7 +749,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                   <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                   <line x1="2" x2="22" y1="10" y2="10"></line>
                                 </svg>
-                                <span>{t('modal.deposit.history.paymentMethod')}</span>
+                                <span>PIX</span>
                               </div>
                             </div>
                           </div>
