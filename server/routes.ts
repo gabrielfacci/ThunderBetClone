@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { supabase, storeTransactionInSupabase, getAllTransactionsFromSupabase, getUserTransactionsFromSupabase } from "./supabaseClient";
+import { formatDateBrazil, getNowBrazilISO } from "../shared/timezone";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Mock API endpoints for ThunderBet functionality
@@ -372,7 +373,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/webhook/zyonpay", async (req, res) => {
     try {
       const webhookData = req.body;
-      console.log('🔔 ZyonPay webhook received:', JSON.stringify(webhookData, null, 2));
+      const timestamp = formatDateBrazil(new Date());
+      console.log(`🔔 [${timestamp}] ZyonPay webhook received:`, JSON.stringify(webhookData, null, 2));
       
       const transactionData = webhookData.data;
       const transactionId = transactionData.id.toString();
@@ -388,11 +390,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: new Date()
       });
 
-      console.log(`📦 Stored PIX code for transaction ${transactionId}:`, pixCode);
+      console.log(`📦 [${formatDateBrazil(new Date())}] Stored PIX code for transaction ${transactionId}:`, pixCode);
 
       // Process payment if status is "paid"
       if (paymentStatus === 'paid') {
-        console.log(`💰 Processing payment for transaction ${transactionId}`);
+        console.log(`💰 [${formatDateBrazil(new Date())}] Processing payment for transaction ${transactionId}`);
         
         // Find transaction in Supabase by ZyonPay ID
         const { data: transactions, error: findError } = await supabase
@@ -464,12 +466,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } else {
               console.log(`✅ Balance updated successfully for user ${supabaseUserId}`);
 
-              // Update transaction status
+              // Update transaction status with São Paulo timezone
+              const now = new Date().toLocaleString('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+              });
+              
               const { error: txError } = await supabase
                 .from('transactions')
                 .update({ 
                   status: 'completed',
-                  balance_after: newBalance
+                  balance_after: newBalance,
+                  updated_at: new Date().toISOString()
                 })
                 .eq('id', transaction.id);
 
