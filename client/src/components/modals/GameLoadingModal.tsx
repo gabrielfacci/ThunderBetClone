@@ -15,43 +15,71 @@ interface GameLoadingModalProps {
 export function GameLoadingModal({ isOpen, onClose, game, onLoadingComplete }: GameLoadingModalProps) {
   const { t, language } = useTranslation();
   const [progress, setProgress] = useState(0);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [loadingStage, setLoadingStage] = useState('');
+
+  const loadingStages = language === 'en' 
+    ? [
+        'Connecting to server...',
+        'Loading interface...',
+        'Initializing...',
+        'Loading resources...',
+        'Preparing interface...',
+        'Finalizing...'
+      ]
+    : [
+        'Conectando ao servidor...',
+        'Carregando interface...',
+        'Inicializando...',
+        'Carregando recursos...',
+        'Preparando interface...',
+        'Finalizando...'
+      ];
 
   useEffect(() => {
-    if (!isOpen || !game) return;
+    if (!isOpen || !game) {
+      setProgress(0);
+      setShowError(false);
+      setLoadingStage('');
+      return;
+    }
 
     setProgress(0);
-    setShowSuccess(false);
+    setShowError(false);
+    setLoadingStage(loadingStages[0]);
     
     const interval = setInterval(() => {
       setProgress(prev => {
         const increment = Math.random() * 8 + 2; // Random increment between 2-10% to complete in ~10 seconds
         const newProgress = Math.min(prev + increment, 100);
         
+        // Update loading stage based on progress
+        const stageIndex = Math.floor((newProgress / 100) * loadingStages.length);
+        if (stageIndex < loadingStages.length) {
+          setLoadingStage(loadingStages[stageIndex]);
+        }
+        
         if (newProgress >= 100) {
           clearInterval(interval);
-          // Show success message for 3 seconds after loading completes
+          // Show error message after loading completes
           setTimeout(() => {
-            setShowSuccess(true);
-            setTimeout(() => {
-              onLoadingComplete();
-            }, 3000);
+            setShowError(true);
           }, 500);
         }
         
         return newProgress;
       });
-    }, 100); // Check every 100ms for smoother animation
+    }, 150); // Check every 150ms for realistic timing
 
     return () => clearInterval(interval);
-  }, [isOpen, game, onLoadingComplete]);
+  }, [isOpen, game, language]);
 
   if (!game) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gradient-to-br from-slate-900/98 via-purple-900/95 to-slate-900/98 border border-purple-400/30 shadow-2xl backdrop-blur-xl text-white w-full max-w-md mx-4 rounded-2xl overflow-hidden">
-        {!showSuccess ? (
+        {!showError ? (
           <>
             <DialogHeader>
               <div className="flex items-center justify-between p-6 border-b border-purple-400/20">
@@ -65,7 +93,9 @@ export function GameLoadingModal({ isOpen, onClose, game, onLoadingComplete }: G
                   </div>
                   <div>
                     <DialogTitle className="text-xl font-bold text-white">{game.name}</DialogTitle>
-                    <p className="text-purple-300 text-sm">{t('Loading game...')}</p>
+                    <p className="text-purple-300 text-sm">
+                      {language === 'en' ? 'Loading game...' : 'Carregando jogo...'}
+                    </p>
                   </div>
                 </div>
                 <button 
@@ -95,7 +125,7 @@ export function GameLoadingModal({ isOpen, onClose, game, onLoadingComplete }: G
                 </div>
               </div>
 
-              <p className="text-gray-400 text-sm mb-4">{t('Loading resources...')}</p>
+              <p className="text-gray-400 text-sm mb-4">{loadingStage}</p>
               
               {/* Progress Bar */}
               <div className="w-full bg-gray-800 rounded-full h-2 mb-4">
@@ -106,9 +136,11 @@ export function GameLoadingModal({ isOpen, onClose, game, onLoadingComplete }: G
               </div>
 
               <p className="text-sm font-medium mb-2">
-                {t('Starting')} {game.name}
+                {language === 'en' ? 'Starting' : 'Iniciando'} {game.name}
               </p>
-              <p className="text-xs text-gray-500">{t('Preparing interface...')}</p>
+              <p className="text-xs text-gray-500">
+                {Math.round(progress)}% {language === 'en' ? 'complete' : 'concluído'}
+              </p>
             </div>
           </>
         ) : (
