@@ -142,22 +142,22 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
           </DialogHeader>
           
           {/* Fixed Tabs */}
-          <div className="px-4 pb-3">
-            <div className="flex space-x-2">
+          <div className="px-3 sm:px-4 pb-3">
+            <div className="flex space-x-1.5 sm:space-x-2">
               <Button
                 variant={activeTab === 'withdrawal' ? 'default' : 'secondary'}
-                className={`flex-1 h-12 text-base touch-manipulation ${activeTab === 'withdrawal' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+                className={`flex-1 h-10 sm:h-12 text-xs sm:text-base touch-manipulation ${activeTab === 'withdrawal' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
                 onClick={() => setActiveTab('withdrawal')}
               >
-                <TrendingDown className="w-4 h-4 mr-2" />
+                <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 {t('Request Withdrawal')}
               </Button>
               <Button
                 variant={activeTab === 'history' ? 'default' : 'secondary'}
-                className={`flex-1 h-12 text-base touch-manipulation ${activeTab === 'history' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
+                className={`flex-1 h-10 sm:h-12 text-xs sm:text-base touch-manipulation ${activeTab === 'history' ? 'bg-red-600 text-white font-bold' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'}`}
                 onClick={() => setActiveTab('history')}
               >
-                <History className="w-4 h-4 mr-2" />
+                <History className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 {t('History')}
               </Button>
             </div>
@@ -165,7 +165,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
         </div>
         
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6">
 
           {activeTab === 'withdrawal' && (
             <div>
@@ -201,21 +201,21 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
               </div>
 
               {/* Amount Input */}
-              <div className="mb-4">
-                <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('Withdrawal amount')}</Label>
+              <div className="mb-3 sm:mb-4">
+                <Label className="text-sm sm:text-base text-gray-400 mb-1.5 sm:mb-2 block">{t('Withdrawal amount')}</Label>
                 <Input
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="R$ 0,00"
-                  className="bg-gray-800/50 border-gray-600/50 text-white h-11 text-base"
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-10 sm:h-11 text-sm sm:text-base"
                 />
               </div>
 
               {/* PIX Key Type */}
-              <div className="mb-4">
-                <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('PIX key type')}</Label>
+              <div className="mb-3 sm:mb-4">
+                <Label className="text-sm sm:text-base text-gray-400 mb-1.5 sm:mb-2 block">{t('PIX key type')}</Label>
                 <Select value={pixKeyType} onValueChange={setPixKeyType}>
-                  <SelectTrigger className="bg-gray-800/50 border-gray-600/50 text-white h-11">
+                  <SelectTrigger className="bg-gray-800/50 border-gray-600/50 text-white h-10 sm:h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">
@@ -228,13 +228,13 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
               </div>
 
               {/* PIX Key Input */}
-              <div className="mb-6">
-                <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('PIX key')}</Label>
+              <div className="mb-4 sm:mb-6">
+                <Label className="text-sm sm:text-base text-gray-400 mb-1.5 sm:mb-2 block">{t('PIX key')}</Label>
                 <Input
                   value={pixKey}
                   onChange={(e) => setPixKey(e.target.value)}
                   placeholder={t('Enter PIX key')}
-                  className="bg-gray-800/50 border-gray-600/50 text-white h-11"
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-10 sm:h-11"
                 />
               </div>
 
@@ -242,7 +242,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
               <Button
                 onClick={handleWithdrawal}
                 disabled={isProcessing || !amount || !pixKey}
-                className="w-full h-11 bg-red-600 hover:bg-red-700 text-white font-bold disabled:opacity-50 text-base touch-manipulation"
+                className="w-full h-10 sm:h-11 bg-red-600 hover:bg-red-700 text-white font-bold disabled:opacity-50 text-sm sm:text-base touch-manipulation"
               >
                 {isProcessing ? t('modal.deposit.processing') : t('Request Withdrawal')}
               </Button>
