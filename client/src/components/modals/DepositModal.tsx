@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { zyonPayService } from '@/lib/zyonPayService';
+import { formatDateTimeBrazil } from '@shared/timezone';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -731,13 +732,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                 <path d="M3 10h18"></path>
                               </svg>
                               <span className="text-xs truncate">
-                                {new Date(transaction.created_at || transaction.createdAt).toLocaleDateString('pt-BR', {
-                                  day: '2-digit',
-                                  month: '2-digit'
-                                })}, {new Date(transaction.created_at || transaction.createdAt).toLocaleTimeString('pt-BR', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
+                                {formatDateTimeBrazil(transaction.created_at || transaction.createdAt)}
                               </span>
                             </div>
                             <div className="flex items-center space-x-1 text-gray-400 flex-shrink-0">

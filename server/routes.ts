@@ -466,23 +466,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } else {
               console.log(`✅ Balance updated successfully for user ${supabaseUserId}`);
 
-              // Update transaction status with São Paulo timezone
-              const now = new Date().toLocaleString('pt-BR', {
-                timeZone: 'America/Sao_Paulo',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-              });
-              
+              // Update transaction status
               const { error: txError } = await supabase
                 .from('transactions')
                 .update({ 
                   status: 'completed',
                   balance_after: newBalance,
-                  updated_at: new Date().toISOString()
+                  updated_at: getNowBrazilISO()
                 })
                 .eq('id', transaction.id);
 
