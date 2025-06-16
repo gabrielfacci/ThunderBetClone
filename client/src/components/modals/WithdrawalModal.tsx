@@ -23,7 +23,8 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
   const [pixKey, setPixKey] = useState('');
   const [pixKeyType, setPixKeyType] = useState('cpf');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const quickAmounts = [50, 100, 200, 500, 1000];
 
@@ -47,19 +48,22 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
   };
 
   const handleWithdrawal = async () => {
-    if (!user || !amount || !pixKey) return;
+    if (!user || !amount || !pixKey || !profile) return;
     
     const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
-    if (numericAmount < 20) {
+    
+    // Minimum withdrawal check (R$ 50)
+    if (numericAmount < 50) {
       toast({
         title: t("Minimum amount"),
-        description: t("Minimum withdrawal amount is R$ 20.00"),
+        description: "Minimum withdrawal amount is R$ 50.00",
         variant: "destructive",
       });
       return;
     }
 
-    if (numericAmount > 1000.00) { // Default balance for Supabase users
+    // Check sufficient balance
+    if (numericAmount > profile.balance) {
       toast({
         title: t("Insufficient balance"),
         description: t("You do not have enough balance for this withdrawal"),
@@ -70,30 +74,41 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
     setIsProcessing(true);
     try {
-      const response = await fetch('/api/transactions/withdrawal', {
+      const response = await fetch('/api/withdrawal/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId: user.id,
-          amount: numericAmount,
-          pixKey
+          amount,
+          pixKey,
+          pixKeyType
         }),
       });
 
       if (response.ok) {
-        const transaction = await response.json();
-        await refreshProfile();
+        const result = await response.json();
+        await refreshProfile(); // Update balance immediately
         
+        // Show success message
+        setShowSuccessMessage(true);
         toast({
-          title: t("Withdrawal requested!"),
-          description: `${t("Your withdrawal of R$")} ${numericAmount.toFixed(2).replace('.', ',')} ${t("is being processed")}`,
+          title: "Withdrawal in Analysis",
+          description: `R$ ${numericAmount.toFixed(2).replace('.', ',')} withdrawal is being processed`,
         });
         
+        // Reset form
         setAmount('');
         setPixKey('');
-        onClose();
+        
+        // Switch to history after 3 seconds
+        setTimeout(() => {
+          setActiveTab('history');
+          loadWithdrawals();
+          setShowSuccessMessage(false);
+        }, 3000);
+        
       } else {
         const error = await response.json();
         throw new Error(error.error || t('Could not process withdrawal'));
@@ -109,23 +124,23 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
     }
   };
 
-  const loadTransactions = async () => {
+  const loadWithdrawals = async () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`/api/user/${user.id}/transactions`);
+      const response = await fetch(`/api/user/${user.id}/withdrawals`);
       if (response.ok) {
         const data = await response.json();
-        setTransactions(data.filter((t: any) => t.type === 'withdrawal'));
+        setWithdrawals(data);
       }
     } catch (error) {
-      console.error(t('Error loading transactions:'), error);
+      console.error('Error loading withdrawals:', error);
     }
   };
 
   useEffect(() => {
     if (isOpen && activeTab === 'history') {
-      loadTransactions();
+      loadWithdrawals();
     }
   }, [isOpen, activeTab, user]);
 
@@ -250,9 +265,57 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
           )}
 
           {activeTab === 'history' && (
-            <div className="text-center py-8">
-              <p className="text-gray-400">{t('History')}</p>
-              <p className="text-sm text-gray-500 mt-2">{t('No withdrawals found')}</p>
+            <div>
+              {showSuccessMessage && (
+                <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 mb-4 text-center">
+                  <div className="text-green-400 font-bold mb-2">✅ Withdrawal in Analysis</div>
+                  <p className="text-sm text-gray-300">Your withdrawal has been submitted and is being processed</p>
+                </div>
+              )}
+              
+              {withdrawals.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-400">{t('History')}</p>
+                  <p className="text-sm text-gray-500 mt-2">{t('No withdrawals found')}</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <h3 className="text-base font-bold mb-3">{t('Withdrawal History')}</h3>
+                  {withdrawals.map((withdrawal: any) => (
+                    <div key={withdrawal.id} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="text-white font-medium">
+                            {formatBalance(parseFloat(withdrawal.amount))}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            PIX: {withdrawal.pix_key_type.toUpperCase()} - {withdrawal.pix_key}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            withdrawal.status === 'pending' ? 'bg-yellow-900/50 text-yellow-400' :
+                            withdrawal.status === 'completed' ? 'bg-green-900/50 text-green-400' :
+                            'bg-red-900/50 text-red-400'
+                          }`}>
+                            {withdrawal.status === 'pending' ? 'Pending' :
+                             withdrawal.status === 'completed' ? 'Completed' : 'Rejected'}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        {new Date(withdrawal.created_at).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

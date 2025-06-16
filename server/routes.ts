@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { storeTransactionInSupabase, getAllTransactionsFromSupabase, getUserTransactionsFromSupabase } from "./supabaseClient";
+import { supabase, storeTransactionInSupabase, getAllTransactionsFromSupabase, getUserTransactionsFromSupabase } from "./supabaseClient";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Mock API endpoints for ThunderBet functionality
