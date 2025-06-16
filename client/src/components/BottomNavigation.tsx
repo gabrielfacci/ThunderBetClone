@@ -89,6 +89,7 @@ export function BottomNavigation({ onLoginRequest }: BottomNavigationProps) {
           <div className="tabbar-left-item relative flex flex-col items-center cursor-pointer transition-all duration-300" onClick={() => openModal('profile')}>
             <div className="relative flex items-center justify-center transition-all duration-300 group w-10 h-10">
               <User className="relative z-10 transition-all duration-300 h-5 w-5 text-gray-300 group-hover:text-white" />
+              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-blue-500 rounded-full border border-white/80 shadow-sm z-20"></div>
             </div>
             <span className="text-[9px] font-medium mt-0.5 transition-all duration-300 text-center leading-none text-gray-400">{t('nav.profile')}</span>
           </div>
