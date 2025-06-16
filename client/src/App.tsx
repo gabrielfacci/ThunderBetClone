@@ -20,7 +20,7 @@ function Router() {
   return (
     <>
       <Header />
-      <Layout onLoginRequest={() => setShowLoginModal(true)}>
+      <Layout>
         <Switch>
           <Route path="/" component={Home} />
           <Route component={NotFound} />
