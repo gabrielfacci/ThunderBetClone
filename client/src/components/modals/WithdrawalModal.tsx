@@ -16,7 +16,7 @@ interface WithdrawalModalProps {
 
 export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
   const { t } = useLanguage();
-  const { user, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'withdrawal' | 'history'>('withdrawal');
   const [amount, setAmount] = useState('');
@@ -164,35 +164,34 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
           </div>
         </div>
         
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-3 pb-4 pt-3">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
 
           {activeTab === 'withdrawal' && (
             <div>
               {/* Available Balance */}
-              <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-2.5 mb-3">
+              <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-3 mb-4">
                 <div className="flex items-center space-x-2">
                   <DollarSign className="w-4 h-4 text-green-400" />
-                  <span className="text-sm">{t('Available balance:')}</span>
-                  <span className="text-green-400 font-bold text-base">
-                    {formatBalance(user?.balance || 0)}
+                  <span className="text-sm sm:text-base">{t('Available balance:')}</span>
+                  <span className="text-green-400 font-bold text-lg">
+                    {formatBalance((profile as any)?.balance || 0)}
                   </span>
                 </div>
               </div>
               
               {/* Quick Amounts */}
-              <div className="mb-3">
-                <p className="text-sm text-green-400 mb-2 flex items-center">
-                  <DollarSign className="w-4 h-4 mr-1" />
+              <div className="mb-4">
+                <p className="text-sm sm:text-base text-green-400 mb-3 flex items-center">
+                  <DollarSign className="w-4 h-4 mr-2" />
                   {t('Quick amounts')}
                 </p>
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-3 gap-2 mb-3">
                   {quickAmounts.map((value) => (
                     <Button
                       key={value}
                       variant="outline"
-                      size="sm"
-                      className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 text-xs h-8 px-1"
+                      className="bg-gray-700/50 hover:bg-gray-600/50 text-white border-gray-600/50 h-9 text-sm sm:h-10 sm:text-base touch-manipulation"
                       onClick={() => handleQuickAmount(value)}
                     >
                       R$ {value}
@@ -202,21 +201,21 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
               </div>
 
               {/* Amount Input */}
-              <div className="mb-3">
-                <Label className="text-sm text-gray-400 mb-1.5 block">{t('Withdrawal amount')}</Label>
+              <div className="mb-4">
+                <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('Withdrawal amount')}</Label>
                 <Input
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="R$ 0,00"
-                  className="bg-gray-800/50 border-gray-600/50 text-white h-10 text-sm"
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-11 text-base"
                 />
               </div>
 
               {/* PIX Key Type */}
-              <div className="mb-3">
-                <Label className="text-sm text-gray-400 mb-1.5 block">{t('PIX key type')}</Label>
+              <div className="mb-4">
+                <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('PIX key type')}</Label>
                 <Select value={pixKeyType} onValueChange={setPixKeyType}>
-                  <SelectTrigger className="bg-gray-800/50 border-gray-600/50 text-white h-10">
+                  <SelectTrigger className="bg-gray-800/50 border-gray-600/50 text-white h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">
@@ -229,13 +228,13 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
               </div>
 
               {/* PIX Key Input */}
-              <div className="mb-4">
-                <Label className="text-sm text-gray-400 mb-1.5 block">{t('PIX key')}</Label>
+              <div className="mb-6">
+                <Label className="text-sm sm:text-base text-gray-400 mb-2 block">{t('PIX key')}</Label>
                 <Input
                   value={pixKey}
                   onChange={(e) => setPixKey(e.target.value)}
                   placeholder={t('Enter PIX key')}
-                  className="bg-gray-800/50 border-gray-600/50 text-white h-10"
+                  className="bg-gray-800/50 border-gray-600/50 text-white h-11"
                 />
               </div>
 
@@ -243,7 +242,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
               <Button
                 onClick={handleWithdrawal}
                 disabled={isProcessing || !amount || !pixKey}
-                className="w-full h-10 bg-red-600 hover:bg-red-700 text-white font-bold disabled:opacity-50 text-sm"
+                className="w-full h-11 bg-red-600 hover:bg-red-700 text-white font-bold disabled:opacity-50 text-base touch-manipulation"
               >
                 {isProcessing ? t('modal.deposit.processing') : t('Request Withdrawal')}
               </Button>
