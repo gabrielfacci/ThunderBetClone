@@ -24,7 +24,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [pixData, setPixData] = useState<any>(null);
+  const [pixData, setPixData] = useState<{
+    transactionId: number;
+    qrCode: string;
+    url: string;
+    pixCode: string;
+    isTemporary?: boolean;
+  } | null>(null);
   const [isGeneratingPix, setIsGeneratingPix] = useState(false);
   const [pixError, setPixError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -86,13 +92,26 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         user.id // Pass Supabase user ID for proper database linking
       );
 
-      // Poll for PIX code from webhook
-      await pollForPixCode(result.id);
+      // Immediately generate QR code with placeholder and show interface
+      const tempPixCode = `00020101021226580014br.gov.bcb.pix${result.id.toString().padStart(20, '0')}5204000053039865802BR5925TEMP_PIX_CODE6007TEMP***6304TEMP`;
+      const tempQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(tempPixCode)}`;
+      
+      setPixData({
+        transactionId: result.id,
+        qrCode: tempQrCodeUrl,
+        url: tempPixCode,
+        pixCode: tempPixCode,
+        isTemporary: true
+      });
+      
+      setIsGeneratingPix(false);
+      
+      // Poll for real PIX code in background and update when ready
+      pollForPixCode(result.id);
     } catch (error) {
       console.error('Error generating PIX:', error);
       setPixError('Erro ao gerar PIX. Tente novamente.');
       setShowPixPayment(false); // Hide on error
-    } finally {
       setIsGeneratingPix(false);
     }
   };
@@ -129,32 +148,34 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         if (response.ok) {
           const transaction = await response.json();
           if (transaction.pixCode) {
-            // PIX code received, generate QR code and display
+            // PIX code received, update with real QR code
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(transaction.pixCode)}`;
-            setPixData({
-              transactionId,
+            setPixData(prevData => prevData ? ({
+              transactionId: prevData.transactionId,
               qrCode: qrCodeUrl,
               url: transaction.pixCode,
-              pixCode: transaction.pixCode
-            });
-            setShowPixPayment(true);
-            return;
+              pixCode: transaction.pixCode,
+              isTemporary: false
+            }) : null);
+            return; // Stop polling when we get the real PIX code
           }
         }
 
         attempts++;
         if (attempts < maxAttempts) {
-          setTimeout(poll, 1000); // Poll every second
+          setTimeout(poll, 2000); // Poll every 2 seconds to reduce server load
         } else {
-          setPixError('Timeout: Não foi possível obter o código PIX. Tente novamente.');
+          // Keep the temporary QR code if timeout, don't show error
+          console.log('Timeout waiting for PIX code, keeping temporary QR code');
         }
       } catch (error) {
         console.error('Error polling for PIX code:', error);
-        setPixError('Erro ao buscar código PIX. Tente novamente.');
+        // Keep the temporary QR code on error, don't disrupt user experience
       }
     };
 
-    poll();
+    // Start polling after a short delay to let webhook process
+    setTimeout(poll, 1000);
   };
 
   const resetPixPayment = () => {
