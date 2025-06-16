@@ -71,6 +71,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     setIsGeneratingPix(true);
     setPixError(null);
     setPixData(null);
+    
+    // Immediately show PIX payment screen with loading state
+    setShowPixPayment(true);
 
     try {
       const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
@@ -88,6 +91,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     } catch (error) {
       console.error('Error generating PIX:', error);
       setPixError('Erro ao gerar PIX. Tente novamente.');
+      setShowPixPayment(false); // Hide on error
     } finally {
       setIsGeneratingPix(false);
     }
@@ -315,7 +319,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                 </>
               ) : (
                 // PIX Payment Display - Exact design from example
-                (<div className="space-y-6">
+                <div className="space-y-6">
                   {pixError ? (
                     <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
                       <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
@@ -328,20 +332,38 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                         {language === 'en' ? 'Try Again' : 'Tentar Novamente'}
                       </Button>
                     </div>
-                  ) : pixData ? (
+                  ) : (
                     <div className="space-y-6">
-                      {/* Header Section */}
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <QrCode className="w-8 h-8 text-green-400" />
+                      {/* Loading State or PIX Content */}
+                      {isGeneratingPix && !pixData ? (
+                        <div className="text-center py-8">
+                          <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400"></div>
+                          </div>
+                          <h3 className="text-xl font-semibold text-white mb-2">
+                            {language === 'en' ? 'Generating PIX QR Code...' : 'Gerando QR Code PIX...'}
+                          </h3>
+                          <p className="text-gray-300 mb-4">
+                            {language === 'en' ? 'Amount: ' : 'Valor: '}<span className="text-green-400 font-semibold">{amount}</span>
+                          </p>
+                          <p className="text-gray-400 text-sm">
+                            {language === 'en' ? 'Please wait while we process your request...' : 'Aguarde enquanto processamos sua solicitação...'}
+                          </p>
                         </div>
-                        <h3 className="text-xl font-semibold text-white mb-2">
-                          {language === 'en' ? 'PIX QR Code Generated' : 'QR Code PIX Gerado'}
-                        </h3>
-                        <p className="text-gray-300 mb-4">
-                          {language === 'en' ? 'Amount: ' : 'Valor: '}<span className="text-green-400 font-semibold">{amount}</span>
-                        </p>
-                      </div>
+                      ) : pixData ? (
+                        <>
+                          {/* Header Section */}
+                          <div className="text-center">
+                            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <QrCode className="w-8 h-8 text-green-400" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                              {language === 'en' ? 'PIX QR Code Generated' : 'QR Code PIX Gerado'}
+                            </h3>
+                            <p className="text-gray-300 mb-4">
+                              {language === 'en' ? 'Amount: ' : 'Valor: '}<span className="text-green-400 font-semibold">{amount}</span>
+                            </p>
+                          </div>
 
                       {/* QR Code */}
                       <div className="flex justify-center">
@@ -524,9 +546,11 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                           {language === 'en' ? 'Close' : 'Fechar'}
                         </Button>
                       </div>
+                        </>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>)
+                  )}
+                </div>
               )}
             </div>
           )}
