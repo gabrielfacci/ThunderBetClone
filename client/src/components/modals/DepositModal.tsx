@@ -159,13 +159,23 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   };
 
   const loadTransactions = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found for loading transactions');
+      return;
+    }
+    
+    console.log('Loading transactions for user:', user.id);
     
     try {
       const response = await fetch(`/api/user/${user.id}/transactions`);
       if (response.ok) {
         const data = await response.json();
-        setTransactions(data.filter((t: any) => t.type === 'deposit'));
+        console.log('Raw transactions data:', data);
+        const depositTransactions = data; // Remove filter to show all transactions
+        console.log('Filtered deposit transactions:', depositTransactions);
+        setTransactions(depositTransactions);
+      } else {
+        console.error('Failed to load transactions, status:', response.status);
       }
     } catch (error) {
       console.error('Erro ao carregar transações:', error);
@@ -173,10 +183,16 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   };
 
   useEffect(() => {
-    if (isOpen && activeTab === 'history') {
+    if (isOpen) {
       loadTransactions();
     }
-  }, [isOpen, activeTab, user]);
+  }, [isOpen, user]);
+
+  useEffect(() => {
+    if (activeTab === 'history') {
+      loadTransactions();
+    }
+  }, [activeTab]);
 
   // Monitor payment status when PIX payment is shown
   useEffect(() => {
@@ -552,7 +568,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
               </div>
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto">
+                <button 
+                  onClick={loadTransactions}
+                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:text-white h-9 rounded-md px-3 border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-refresh-cw w-4 h-4 mr-2" aria-hidden="true">
                     <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
                     <path d="M21 3v5h-5"></path>
