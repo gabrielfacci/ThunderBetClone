@@ -30,6 +30,7 @@ export function Home() {
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
+  const [likedGames, setLikedGames] = useState<Set<string>>(new Set());
   const gamesPerPage = 12;
 
   // Função de logout
@@ -40,6 +41,38 @@ export function Home() {
       console.error('Erro ao fazer logout:', error);
     }
   };
+
+  // Função para curtir/descurtir jogo
+  const handleLikeGame = (e: React.MouseEvent, gameId: string) => {
+    e.stopPropagation(); // Previne o clique no card
+    
+    setLikedGames(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(gameId)) {
+        newLiked.delete(gameId);
+      } else {
+        newLiked.add(gameId);
+      }
+      
+      // Salva no localStorage para persistir entre sessões
+      localStorage.setItem('likedGames', JSON.stringify(Array.from(newLiked)));
+      
+      return newLiked;
+    });
+  };
+
+  // Carrega jogos curtidos do localStorage
+  useEffect(() => {
+    const savedLikes = localStorage.getItem('likedGames');
+    if (savedLikes) {
+      try {
+        const likedArray = JSON.parse(savedLikes);
+        setLikedGames(new Set(likedArray));
+      } catch (error) {
+        console.error('Erro ao carregar jogos curtidos:', error);
+      }
+    }
+  }, []);
 
   // Função para obter ícones relacionados a apostas/jogos/dinheiro
   const getWinnerIcon = (index: number) => {
@@ -448,8 +481,17 @@ export function Home() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <button className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 hover:bg-black/70 transition-colors">
-                        <Heart className="w-3 h-3 text-white" />
+                      <button 
+                        className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 hover:bg-black/70 transition-all duration-200 hover:scale-110 group"
+                        onClick={(e) => handleLikeGame(e, game.id)}
+                      >
+                        <Heart 
+                          className={`w-3 h-3 transition-all duration-200 ${
+                            likedGames.has(game.id) 
+                              ? 'text-red-500 fill-red-500 scale-110' 
+                              : 'text-white group-hover:text-red-300'
+                          }`} 
+                        />
                       </button>
                       <div className="absolute bottom-2 left-2 text-xs font-bold px-2 py-1 rounded bg-[#00000078] text-[#ffffff] pt-[5px] pb-[5px] pl-[12px] pr-[12px] text-center">
                         {game.provider}
