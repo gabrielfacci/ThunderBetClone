@@ -607,12 +607,12 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                               R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
                             </span>
                           </div>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border flex-shrink-0 whitespace-nowrap ${
+                          <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${
                             transaction.status === 'completed' 
                               ? 'text-green-400 bg-green-400/10 border-green-400/30' 
                               : 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30'
-                          }`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-3 h-3 flex-shrink-0 ${transaction.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}`} aria-hidden="true">
+                          }`} style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${transaction.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}`} style={{ flexShrink: 0 }}>
                               {transaction.status === 'completed' ? (
                                 <path d="m9 12 2 2 4-4"></path>
                               ) : (
@@ -622,8 +622,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                 </>
                               )}
                             </svg>
-                            <span className="ml-1 flex-shrink-0">{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
-                          </span>
+                            <span style={{ marginLeft: '4px', flexShrink: 0 }}>{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
+                          </div>
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex items-center justify-between gap-2">
@@ -672,12 +672,12 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                               <span className="text-white font-medium">
                                 R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
                               </span>
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${
+                              <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
                                 transaction.status === 'completed' 
                                   ? 'text-green-400 bg-green-400/10 border-green-400/30' 
                                   : 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30'
-                              }`}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 flex-shrink-0 ${transaction.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}`} aria-hidden="true">
+                              }`} style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${transaction.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}`} style={{ flexShrink: 0 }}>
                                   {transaction.status === 'completed' ? (
                                     <path d="m9 12 2 2 4-4"></path>
                                   ) : (
@@ -687,8 +687,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                     </>
                                   )}
                                 </svg>
-                                <span className="ml-1 flex-shrink-0">{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
-                              </span>
+                                <span style={{ marginLeft: '4px', flexShrink: 0 }}>{transaction.status === 'completed' ? 'Concluído' : 'Pendente'}</span>
+                              </div>
                             </div>
                             <div className="flex items-center space-x-4 text-sm text-gray-400 mt-1">
                               <div className="flex items-center space-x-1">
