@@ -408,6 +408,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const userId = transaction.user_id;
           const depositAmount = parseFloat(transactionData.amount) / 100; // Convert centavos to reais
           
+          console.log(`🔍 Found transaction: ID=${transaction.id}, User=${userId}, Amount=R$${depositAmount}`);
+          
           console.log(`💳 Processing payment: User ${userId}, Amount R$ ${depositAmount}`);
 
           // Get current user balance
