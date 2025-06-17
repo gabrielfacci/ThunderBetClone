@@ -465,10 +465,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phone = phone.substring(3); // Remove +55 prefix
         console.log('Phone after removing +55:', phone);
       }
-      // Ensure phone has exactly 11 digits (2 area code + 9 number)
-      if (phone.length < 11) {
+      
+      // Check if phone is the test number (all zeros) or invalid
+      if (phone === '00000000000' || phone.length < 11 || !/^\d{11}$/.test(phone)) {
         phone = generatePhone(); // Use generated phone if user phone is invalid
-        console.log('Using generated phone due to invalid length:', phone);
+        console.log('Using generated phone due to invalid format:', phone);
       }
       
       console.log('Final phone for ZyonPay:', phone);
