@@ -52,15 +52,8 @@ else
     log "Node.js já instalado: $(node --version)"
 fi
 
-# Instalar PostgreSQL
-log "Instalando PostgreSQL..."
-if ! command -v psql &> /dev/null; then
-    sudo apt install postgresql postgresql-contrib -y
-    sudo systemctl start postgresql
-    sudo systemctl enable postgresql
-else
-    log "PostgreSQL já instalado"
-fi
+# PostgreSQL não necessário - usando Supabase
+log "Usando Supabase como banco de dados (PostgreSQL local não necessário)"
 
 # Instalar Nginx
 log "Instalando Nginx..."
@@ -91,26 +84,8 @@ else
     log "Certbot já instalado"
 fi
 
-# Configurar PostgreSQL
-log "Configurando banco de dados..."
-read -sp "Digite uma senha para o usuário 'thunderbet' do PostgreSQL: " DB_PASSWORD
-echo
-
-sudo -u postgres psql -c "DROP DATABASE IF EXISTS thunderbet;"
-sudo -u postgres psql -c "DROP USER IF EXISTS thunderbet;"
-sudo -u postgres psql -c "CREATE USER thunderbet WITH PASSWORD '$DB_PASSWORD';"
-sudo -u postgres psql -c "CREATE DATABASE thunderbet OWNER thunderbet;"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE thunderbet TO thunderbet;"
-
-# Configurar autenticação PostgreSQL
-log "Configurando autenticação PostgreSQL..."
-PG_VERSION=$(sudo -u postgres psql -c "SHOW server_version;" | grep -oP '\d+' | head -n1)
-PG_HBA_FILE="/etc/postgresql/$PG_VERSION/main/pg_hba.conf"
-
-if ! grep -q "local   thunderbet      thunderbet" "$PG_HBA_FILE"; then
-    sudo sed -i '/^local   all             all                                     peer/i local   thunderbet      thunderbet                              md5' "$PG_HBA_FILE"
-    sudo systemctl restart postgresql
-fi
+# Banco de dados via Supabase - não precisa configurar PostgreSQL local
+log "Banco de dados configurado via Supabase (nenhuma configuração local necessária)"
 
 # Preparar diretório da aplicação
 log "Preparando diretório da aplicação..."
@@ -134,16 +109,11 @@ npm install
 log "Criando arquivo de configuração..."
 cat > .env << EOF
 NODE_ENV=production
-DATABASE_URL=postgresql://thunderbet:$DB_PASSWORD@localhost:5432/thunderbet
 SUPABASE_URL=https://kgpmvqfehzkeyrtexdkb.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtncG12cWZlaHprZXlydGV4ZGtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNzc5MTUsImV4cCI6MjA0OTk1MzkxNX0.Fyl4NTGZ0dNJFJ0NzBE3Y6hMTIhGYOCtYgMcGSwOE2s
 ZYONPAY_SECRET_KEY=sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG
 PORT=3000
 EOF
-
-# Executar migrações
-log "Executando migrações do banco..."
-npm run db:push
 
 # Build da aplicação
 log "Compilando aplicação..."

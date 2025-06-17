@@ -5,6 +5,7 @@
 - Domínio thunderbet.site apontando para o servidor
 - Acesso SSH ao servidor
 - Usuário com privilégios sudo
+- Supabase já configurado (não precisa PostgreSQL local)
 
 ## 🚀 Instalação Rápida (Método Automático)
 
@@ -48,9 +49,6 @@ sudo apt update && sudo apt upgrade -y
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# PostgreSQL
-sudo apt install postgresql postgresql-contrib -y
-
 # Nginx
 sudo apt install nginx -y
 
@@ -63,18 +61,7 @@ sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
-### 2. Configurar PostgreSQL
-```bash
-sudo -u postgres psql
-```
-```sql
-CREATE USER thunderbet WITH PASSWORD 'SUA_SENHA_AQUI';
-CREATE DATABASE thunderbet OWNER thunderbet;
-GRANT ALL PRIVILEGES ON DATABASE thunderbet TO thunderbet;
-\q
-```
-
-### 3. Transferir arquivos da aplicação
+### 2. Transferir arquivos da aplicação
 ```bash
 # Comprimir no seu computador local (sem node_modules)
 tar -czf thunderbet.tar.gz --exclude=node_modules --exclude=.git .
@@ -88,7 +75,7 @@ sudo tar -xzf thunderbet.tar.gz
 sudo chown -R www-data:www-data /var/www/html
 ```
 
-### 4. Configurar aplicação
+### 3. Configurar aplicação
 ```bash
 cd /var/www/html
 npm install
@@ -100,21 +87,19 @@ nano .env
 Conteúdo do .env:
 ```env
 NODE_ENV=production
-DATABASE_URL=postgresql://thunderbet:SUA_SENHA_AQUI@localhost:5432/thunderbet
 SUPABASE_URL=https://kgpmvqfehzkeyrtexdkb.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtncG12cWZlaHprZXlydGV4ZGtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNzc5MTUsImV4cCI6MjA0OTk1MzkxNX0.Fyl4NTGZ0dNJFJ0NzBE3Y6hMTIhGYOCtYgMcGSwOE2s
 ZYONPAY_SECRET_KEY=sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG
 PORT=3000
 ```
 
-### 5. Build e iniciar
+### 4. Build e iniciar
 ```bash
-npm run db:push
 npm run build
 pm2 start ecosystem.config.js
 ```
 
-### 6. Configurar Nginx
+### 5. Configurar Nginx
 ```bash
 sudo nano /etc/nginx/sites-available/thunderbet
 ```
@@ -128,7 +113,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-### 7. Configurar SSL
+### 6. Configurar SSL
 ```bash
 sudo certbot --nginx -d thunderbet.site -d www.thunderbet.site
 ```
