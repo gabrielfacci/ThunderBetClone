@@ -121,41 +121,38 @@ export async function getAllTransactionsFromSupabase() {
 
 export async function getUserTransactionsFromSupabase(userId: string) {
   try {
-    // Use text search in JSON metadata for the UUID
-    const { data, error } = await supabase
+    console.log(`🔍 Searching transactions for user: ${userId}`);
+    
+    // Get all transactions and filter manually since textSearch isn't working reliably
+    const { data: allData, error } = await supabase
       .from('transactions')
       .select('*')
-      .textSearch('metadata', userId)
       .order('created_at', { ascending: false });
-
+    
     if (error) {
-      // Fallback to getting all transactions and filtering manually
-      const { data: allData, error: fallbackError } = await supabase
-        .from('transactions')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (fallbackError) {
-        console.error('❌ Supabase fallback error:', fallbackError);
-        return [];
-      }
-      
-      // Filter transactions that contain the userId in metadata
-      const filteredData = allData?.filter(transaction => {
-        try {
-          const metadata = JSON.parse(transaction.metadata || '{}');
-          return metadata.supabaseUserId === userId || metadata.userEmail?.includes(userId);
-        } catch {
-          return false;
-        }
-      }) || [];
-      
-      console.log(`Found ${filteredData.length} transactions for UUID ${userId} (via fallback)`);
-      return filteredData;
+      console.error('❌ Supabase error fetching transactions:', error);
+      return [];
     }
-
-    console.log(`Found ${data?.length || 0} transactions for UUID ${userId}`);
-    return data || [];
+    
+    // Filter transactions that contain the userId in metadata
+    const filteredData = allData?.filter(transaction => {
+      try {
+        const metadata = JSON.parse(transaction.metadata || '{}');
+        const hasUserId = metadata.supabaseUserId === userId;
+        const hasUserEmail = metadata.userEmail && metadata.userEmail.includes(userId);
+        
+        // Also check if the user_id matches (for numeric IDs)
+        const hasNumericUserId = transaction.user_id && transaction.user_id.toString() === userId;
+        
+        return hasUserId || hasUserEmail || hasNumericUserId;
+      } catch (parseError) {
+        // If metadata parsing fails, also check user_id directly
+        return transaction.user_id && transaction.user_id.toString() === userId;
+      }
+    }) || [];
+    
+    console.log(`Found ${filteredData.length} transactions for UUID ${userId}`);
+    return filteredData;
   } catch (error) {
     console.error('❌ Error fetching user transactions from Supabase:', error);
     return [];

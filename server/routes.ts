@@ -140,6 +140,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           balance: '0.00',
           isActive: true,
           isVerified: false,
+          verificationCode: null,
+          passwordResetToken: null,
+          passwordResetExpires: null,
           lastLoginAt: null,
           createdAt: new Date(),
           updatedAt: null
