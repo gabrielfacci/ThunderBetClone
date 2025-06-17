@@ -169,15 +169,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       throw new Error('Email e senha são obrigatórios');
     }
 
-    console.log('Login com email:', email);
-
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
     if (error) {
-      console.error('Erro no login:', error.message, error.code);
       
       if (error.code === 'invalid_credentials') {
         throw new Error('Email ou senha incorretos');
@@ -198,17 +195,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const signOut = async () => {
-    console.log('Fazendo logout...');
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Erro no logout:', error.message);
       throw new Error(error.message);
     }
     setUser(null);
   };
 
   const refreshProfile = async () => {
-    console.log('Refreshing profile...');
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       setUser(session.user);
@@ -217,9 +211,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const userProfile = await profileService.getOrCreateUserProfile(session.user.id, session.user);
         setProfile(userProfile);
-        console.log('Profile refreshed:', userProfile);
       } catch (error) {
-        console.error('Error refreshing profile:', error);
+        // Silent error handling
       }
     }
   };
@@ -236,7 +229,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const userProfile = await profileService.getOrCreateUserProfile(user.id, user);
         setProfile(userProfile);
       } catch (error) {
-        console.error('Error loading user profile:', error);
+        // Silent error handling
       }
     };
 

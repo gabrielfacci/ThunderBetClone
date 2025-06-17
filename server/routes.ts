@@ -706,7 +706,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       return res.status(404).json({ error: "Transaction not found" });
     } catch (error) {
-      console.error('Error getting ZyonPay transaction:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -745,18 +744,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(transaction);
     } catch (error) {
-      console.error('Error creating withdrawal:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
 
   // Process Supabase withdrawal request (Real implementation)
   app.post("/api/withdrawal/request", async (req, res) => {
-    console.log('🚀 WITHDRAWAL ROUTE HIT - Request body:', req.body);
     try {
       const { userId, amount, pixKey, pixKeyType } = req.body;
-      
-      console.log('🔍 Withdrawal request:', { userId, amount, pixKey, pixKeyType });
       
       if (!userId || !amount || !pixKey || !pixKeyType) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -769,28 +764,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Minimum withdrawal amount is R$ 50.00" });
       }
 
-      console.log('💰 Looking for user:', userId, 'withdrawal amount:', withdrawalAmount);
-
       // Direct SQL query to get user data and avoid RLS issues
       const { data: userData, error: sqlError } = await supabase
         .from('users')
         .select('balance, email, full_name')
         .eq('id', userId);
 
-      console.log('👤 SQL query result:', { userData, sqlError });
-
       if (sqlError) {
-        console.error('❌ SQL Error:', sqlError);
         return res.status(500).json({ error: "Database error" });
       }
 
       if (!userData || userData.length === 0) {
-        console.error('❌ No user found with ID:', userId);
         return res.status(404).json({ error: "User not found" });
       }
 
       const userProfile = userData[0];
-      console.log('✅ Found user:', userProfile);
 
       const currentBalance = parseFloat(userProfile.balance);
       
@@ -828,7 +816,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .single();
 
       if (withdrawalError) {
-        console.error('Error creating withdrawal:', withdrawalError);
         // Rollback balance update
         await supabase
           .from('users')
@@ -836,8 +823,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .eq('id', userId);
         return res.status(500).json({ error: "Failed to create withdrawal record" });
       }
-
-      console.log(`✅ Withdrawal processed: R$ ${withdrawalAmount} for user ${userId}`);
       
       res.json({
         success: true,
@@ -846,7 +831,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error) {
-      console.error('Error processing withdrawal:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
