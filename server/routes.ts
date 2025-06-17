@@ -636,13 +636,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .eq('id', supabaseUserId)
             .single();
 
-          if (userError) {
-            console.error('❌ Error getting user:', userError);
-          } else if (user) {
+          if (!userError && user) {
             const currentBalance = parseFloat(user.balance || '0');
             const newBalance = currentBalance + depositAmount;
-
-            console.log(`📊 Balance update: ${currentBalance} + ${depositAmount} = ${newBalance}`);
 
             // Update user balance
             const { error: balanceError } = await supabase
@@ -650,13 +646,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               .update({ balance: newBalance })
               .eq('id', supabaseUserId);
 
-            if (balanceError) {
-              console.error('❌ Error updating balance:', balanceError);
-            } else {
-              console.log(`✅ Balance updated successfully for user ${supabaseUserId}`);
-
+            if (!balanceError) {
               // Update transaction status
-              const { error: txError } = await supabase
+              await supabase
                 .from('transactions')
                 .update({ 
                   status: 'completed',
@@ -664,22 +656,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   updated_at: getNowBrazilISO()
                 })
                 .eq('id', transaction.id);
-
-              if (txError) {
-                console.error('❌ Error updating transaction:', txError);
-              } else {
-                console.log(`✅ Transaction ${transaction.id} marked as completed`);
-              }
             }
           }
-        } else {
-          console.log(`⚠️ Transaction ${transactionId} not found in database`);
         }
       }
 
       res.status(200).json({ received: true, processed: paymentStatus === 'paid' });
     } catch (error) {
-      console.error('❌ Error processing ZyonPay webhook:', error);
       res.status(200).json({ received: true }); 
     }
   });

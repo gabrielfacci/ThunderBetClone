@@ -82,18 +82,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     }
 
-    console.log('Cadastro realizado:', data.user?.email);
-
     // Create user entry in users table
     if (data.user) {
       try {
         const phoneToSave = phone || data.user.user_metadata?.phone || '';
-        console.log('Salvando usuário na tabela users:', {
-          phone: phoneToSave,
-          phoneParam: phone,
-          userMetadataPhone: data.user.user_metadata?.phone,
-          fullName: fullName
-        });
         
         // Verificar se usuário já existe antes de inserir
         const { data: existingUser } = await supabase
@@ -114,14 +106,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             created_at: new Date().toISOString()
           });
           
-          if (insertError) {
-            console.error('Erro ao inserir na tabela users:', insertError);
-          } else {
-            console.log('Usuário criado na tabela users com telefone:', phoneToSave);
-          }
         } else {
           // Usuário já existe, apenas atualizar informações
-          const { data: updateData, error: updateError } = await supabase
+          await supabase
             .from('users')
             .update({
               full_name: fullName,
@@ -129,12 +116,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
               account_mode: 'nacional'
             })
             .eq('id', data.user.id);
-            
-          if (updateError) {
-            console.error('Erro ao atualizar usuário:', updateError);
-          } else {
-            console.log('Usuário existente atualizado com telefone:', phoneToSave);
-          }
         }
 
         // Garantir que o telefone seja salvo usando endpoint do backend
@@ -149,24 +130,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
               })
             });
             
-            if (phoneResponse.ok) {
-              console.log('Telefone salvo com sucesso via API backend');
-            } else {
-              console.error('Erro ao salvar telefone via API backend');
-            }
           } catch (phoneError) {
-            console.error('Erro na chamada API para salvar telefone:', phoneError);
+            // Silent error handling
           }
         }
       } catch (userCreateError: any) {
-        console.log('Erro ao criar usuário na tabela users:', userCreateError.message);
         // Continue with authentication even if user table creation fails
       }
     }
 
     // If signup successful but no session, try auto-login
     if (data.user && !data.session) {
-      console.log('Tentando login automático após cadastro...');
       try {
         const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
           email,
@@ -174,22 +148,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
 
         if (loginError) {
-          console.log('Login automático falhou:', loginError.message);
           if (loginError.message.includes('Email not confirmed')) {
             throw new Error('Email cadastrado com sucesso! Verifique sua caixa de entrada para confirmar o email antes de fazer login.');
           }
           throw new Error(`Login automático falhou: ${loginError.message}`);
         }
 
-        console.log('Login automático realizado:', loginData.user?.email);
         setUser(loginData.user);
       } catch (autoLoginError: any) {
-        console.error('Erro no login automático:', autoLoginError.message);
         throw autoLoginError;
       }
     } else if (data.session) {
       // Session created immediately
-      console.log('Usuário autenticado imediatamente:', data.user?.email);
       setUser(data.user);
     }
   };
