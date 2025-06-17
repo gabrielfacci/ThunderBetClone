@@ -87,16 +87,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Create user entry in users table
     if (data.user) {
       try {
+        const phoneToSave = phone || data.user.user_metadata?.phone || '';
+        console.log('Salvando usuário na tabela users:', {
+          phone: phoneToSave,
+          phoneParam: phone,
+          userMetadataPhone: data.user.user_metadata?.phone,
+          fullName: fullName
+        });
+        
         await supabase.from('users').insert({
           id: data.user.id,
           email: data.user.email,
           full_name: fullName,
           account_mode: 'nacional',
           balance: 1000.00,
-          phone: phone || data.user.user_metadata?.phone || '',
+          phone: phoneToSave,
           created_at: new Date().toISOString()
         });
-        console.log('Usuário criado na tabela users');
+        console.log('Usuário criado na tabela users com telefone:', phoneToSave);
       } catch (userCreateError: any) {
         console.log('Erro ao criar usuário na tabela users:', userCreateError.message);
         // Continue with authentication even if user table creation fails
