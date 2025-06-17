@@ -95,38 +95,46 @@ export function AuthProvider({ children }: AuthProviderProps) {
           fullName: fullName
         });
         
-        // Primeiro, tentar inserir na tabela users
-        const { data: insertData, error: insertError } = await supabase.from('users').insert({
-          id: data.user.id,
-          email: data.user.email,
-          full_name: fullName,
-          account_mode: 'nacional',
-          balance: 0.00,
-          phone: phoneToSave,
-          created_at: new Date().toISOString()
-        });
-        
-        if (insertError) {
-          console.error('Erro ao inserir na tabela users:', insertError);
+        // Verificar se usuário já existe antes de inserir
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', data.user.id)
+          .single();
+
+        if (!existingUser) {
+          // Usuário não existe, inserir novo
+          const { data: insertData, error: insertError } = await supabase.from('users').insert({
+            id: data.user.id,
+            email: data.user.email,
+            full_name: fullName,
+            account_mode: 'nacional',
+            balance: 0.00,
+            phone: phoneToSave,
+            created_at: new Date().toISOString()
+          });
           
-          // Se falhar, tentar atualizar em vez de inserir (caso o usuário já exista)
+          if (insertError) {
+            console.error('Erro ao inserir na tabela users:', insertError);
+          } else {
+            console.log('Usuário criado na tabela users com telefone:', phoneToSave);
+          }
+        } else {
+          // Usuário já existe, apenas atualizar informações
           const { data: updateData, error: updateError } = await supabase
             .from('users')
             .update({
               full_name: fullName,
               phone: phoneToSave,
-              account_mode: 'nacional',
-              balance: 0.00
+              account_mode: 'nacional'
             })
             .eq('id', data.user.id);
             
           if (updateError) {
             console.error('Erro ao atualizar usuário:', updateError);
           } else {
-            console.log('Usuário atualizado com telefone:', phoneToSave);
+            console.log('Usuário existente atualizado com telefone:', phoneToSave);
           }
-        } else {
-          console.log('Usuário criado na tabela users com telefone:', phoneToSave);
         }
 
         // Garantir que o telefone seja salvo usando endpoint do backend
