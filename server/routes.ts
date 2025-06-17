@@ -130,12 +130,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = {
           id: parseInt(Date.now().toString().slice(-8)), // Generate numeric ID for our system
           email: identifier,
+          password: '', // Not used for Supabase users
           fullName: 'Supabase User',
           username: identifier.split('@')[0] || 'user',
           phone: '',
-          cpf: '',
+          cpf: null,
+          dateOfBirth: null,
+          accountMode: 'nacional',
           balance: '0.00',
-          accountMode: 'nacional'
+          isActive: true,
+          isVerified: false,
+          lastLoginAt: null,
+          createdAt: new Date(),
+          updatedAt: null
         };
       }
       

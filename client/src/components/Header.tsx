@@ -64,7 +64,7 @@ export function Header() {
                 <div className="flex items-center space-x-1 bg-gray-800/60 rounded-lg px-2 py-1">
                   <Wallet className="h-3 w-3 text-green-400" />
                   <span className="text-green-400 font-medium text-xs">
-                    R$ 1.000,00
+                    R$ {(profile?.balance || 0).toFixed(2).replace('.', ',')}
                   </span>
                 </div>
                 <div className="text-right">

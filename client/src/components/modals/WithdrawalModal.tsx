@@ -81,7 +81,7 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
         },
         body: JSON.stringify({
           userId: user.id,
-          amount,
+          amount: numericAmount,
           pixKey,
           pixKeyType
         }),
