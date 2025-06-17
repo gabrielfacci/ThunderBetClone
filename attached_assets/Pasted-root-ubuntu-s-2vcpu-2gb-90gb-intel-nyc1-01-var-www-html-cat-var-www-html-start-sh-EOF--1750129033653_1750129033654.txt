@@ -1,0 +1,78 @@
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# cat > /var/www/html/start.sh << 'EOF'
+#!/bin/bash
+cd /var/www/html
+# Definir todas as variáveis explicitamente
+export NODE_ENV="production"
+export SUPABASE_URL="https://kgpmvqfehzkeyrtexdkb.supabase.co"
+export SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtncG12cWZlaHprZXlydGV4ZGtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNzc5MTUsImV4cCI6MjA0OTk1MzkxNX0.Fyl4NTGZ0dNJFJ0NzBE3Y6hMTIhGYOCtYgMcGSwOE2s"
+export ZYONPAY_SECRET_KEY="sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG"
+export PORT="3000"
+echo "Starting ThunderBet with environment variables:"
+echo "NODE_ENV=$NODE_ENV"
+echo "PORT=$PORT"
+echo "SUPABASE_URL set: $([ -n "$SUPABASE_URL" ] && echo "Yes" || echo "No")"
+echo "SUPABASE_ANON_KEY set: $([ -n "$SUPABASE_ANON_KEY" ] && echo "Yes" || echo "No")"
+# Iniciar aplicação
+exec node dist/index.js
+EOF
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# chmod +x /var/www/html/start.sh
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 start /var/www/html/start.sh --name thunderbet
+[PM2] Starting /var/www/html/start.sh in fork_mode (1 instance)
+[PM2] Done.
+┌────┬───────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name          │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ thunderbet    │ default     │ 1.0.0   │ fork    │ 6345     │ 0s     │ 0    │ online    │ 0%       │ 4.6mb    │ root     │ disabled │
+└────┴───────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 save
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 logs thunderbet --lines 15
+[TAILING] Tailing last 15 lines for [thunderbet] process (change the value with --lines option)
+/root/.pm2/logs/thunderbet-error.log last 15 lines:
+0|thunderb | Error: SUPABASE_ANON_KEY environment variable not found
+0|thunderb |     at file:///var/www/html/dist/index.js:657:9
+0|thunderb |     at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+0|thunderb |     at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+
+/root/.pm2/logs/thunderbet-out.log last 15 lines:
+0|thunderb | 11:55:52 PM [express] serving on port 5000
+0|thunderb | Starting ThunderBet with environment variables:
+0|thunderb | NODE_ENV=production
+0|thunderb | PORT=3000
+0|thunderb | SUPABASE_URL set: Yes
+0|thunderb | SUPABASE_ANON_KEY set: Yes
+0|thunderb | 11:56:57 PM [express] serving on port 5000
+
+/var/www/html/start.sh
+
+^C
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# ^C
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# /var/www/html/start.sh
+Starting ThunderBet with environment variables:
+NODE_ENV=production
+PORT=3000
+SUPABASE_URL set: Yes
+SUPABASE_ANON_KEY set: Yes
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use 0.0.0.0:5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at doListen (node:net:2139:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:524:28)
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 5000
+}
+
+Node.js v20.19.2
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html#

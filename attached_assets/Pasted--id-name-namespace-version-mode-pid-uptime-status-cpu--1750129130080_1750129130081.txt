@@ -1,0 +1,51 @@
+│ id │ name      │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+└────┴───────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo lsof -i :5000
+sudo lsof -i :3000
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo pkill -f "node.*dist/index.js" || true
+sudo pkill -f "start.sh" || true
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sleep 3
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 start /var/www/html/start.sh --name thunderbet
+[PM2] Starting /var/www/html/start.sh in fork_mode (1 instance)
+[PM2] Done.
+┌────┬───────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name          │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ thunderbet    │ default     │ 1.0.0   │ fork    │ 6730     │ 0s     │ 0    │ online    │ 0%       │ 3.3mb    │ root     │ disabled │
+└────┴───────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 logs thunderbet --lines 5
+[TAILING] Tailing last 5 lines for [thunderbet] process (change the value with --lines option)
+/root/.pm2/logs/thunderbet-error.log last 5 lines:
+0|thunderb | Error: SUPABASE_ANON_KEY environment variable not found
+0|thunderb |     at file:///var/www/html/dist/index.js:657:9
+0|thunderb |     at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+0|thunderb |     at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+
+/root/.pm2/logs/thunderbet-out.log last 5 lines:
+0|thunderb | NODE_ENV=production
+0|thunderb | PORT=3000
+0|thunderb | SUPABASE_URL set: Yes
+0|thunderb | SUPABASE_ANON_KEY set: Yes
+0|thunderb | 11:58:26 PM [express] serving on port 5000
+
+curl -I http://localhost:3000 || curl -I http://localhost:5000
+^C
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# curl -I http://localhost:3000 || curl -I http://localhost:5000
+curl: (7) Failed to connect to localhost port 3000 after 0 ms: Couldn't connect to server
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Accept-Ranges: bytes
+Cache-Control: public, max-age=0
+Last-Modified: Tue, 17 Jun 2025 02:48:53 GMT
+ETag: W/"271-1977bca2019"
+Content-Type: text/html; charset=UTF-8
+Content-Length: 625
+Date: Tue, 17 Jun 2025 02:58:36 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo netstat -tulpn | grep :5000
+sudo: netstat: command not found
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo netstat -tulpn | grep :3000
+sudo: netstat: command not found
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html#

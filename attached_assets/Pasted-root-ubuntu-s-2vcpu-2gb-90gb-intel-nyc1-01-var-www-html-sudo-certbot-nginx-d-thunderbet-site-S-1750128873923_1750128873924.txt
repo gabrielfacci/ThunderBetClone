@@ -1,0 +1,49 @@
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo certbot --nginx -d thunderbet.site
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Requesting a certificate for thunderbet.site
+
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/thunderbet.site/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/thunderbet.site/privkey.pem
+This certificate expires on 2025-09-15.
+These files will be updated when the certificate renews.
+Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+Deploying certificate
+Successfully deployed certificate for thunderbet.site to /etc/nginx/sites-enabled/thunderbet
+Congratulations! You have successfully enabled HTTPS on https://thunderbet.site
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# curl -I http://thunderbet.site/api
+HTTP/1.1 301 Moved Permanently
+Date: Tue, 17 Jun 2025 02:54:18 GMT
+Content-Type: text/html
+Connection: keep-alive
+Location: https://thunderbet.site/api
+cf-cache-status: DYNAMIC
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=jUCZdmiFZbz8axmeP0aIN1KtgyjoDMQjZiPRu%2BVf8phPXABApuTHfocFKBk9FpWvUoj%2FGRqrIrK3jX7TFiS4W0dUZdsh0oB%2FvGt%2Bg9SMrWCuuIytXhJS3x4Lz1aEneGKJTw%3D"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Server: cloudflare
+CF-RAY: 950f42f81bf83314-EWR
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=1852&min_rtt=1852&rtt_var=926&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=82&delivery_rate=0&cwnd=247&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 status
+┌────┬───────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name          │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ thunderbet    │ default     │ 1.0.0   │ fork    │ 4779     │ 4m     │ 0    │ online    │ 0%       │ 80.0mb   │ root     │ disabled │
+└────┴───────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 logs thunderbet --lines 20
+[TAILING] Tailing last 20 lines for [thunderbet] process (change the value with --lines option)
+/root/.pm2/logs/thunderbet-out.log last 20 lines:
+/root/.pm2/logs/thunderbet-error.log last 20 lines:
+0|thunderb | Error: SUPABASE_ANON_KEY environment variable not found
+0|thunderb |     at file:///var/www/html/dist/index.js:657:9
+0|thunderb |     at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+0|thunderb |     at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+

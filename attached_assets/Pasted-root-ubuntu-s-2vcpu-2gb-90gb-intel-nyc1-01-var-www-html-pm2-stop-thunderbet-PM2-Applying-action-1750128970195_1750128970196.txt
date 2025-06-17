@@ -1,0 +1,85 @@
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 stop thunderbet
+[PM2] Applying action stopProcessId on app [thunderbet](ids: [ 0 ])
+[PM2] [thunderbet](0) ✓
+┌────┬───────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name          │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ thunderbet    │ default     │ 1.0.0   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b       │ root     │ disabled │
+└────┴───────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# cat /var/www/html/.env
+NODE_ENV=production
+SUPABASE_URL=https://kgpmvqfehzkeyrtexdkb.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtncG12cWZlaHprZXlydGV4ZGtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNzc5MTUsImV4cCI6MjA0OTk1MzkxNX0.Fyl4NTGZ0dNJFJ0NzBE3Y6hMTIhGYOCtYgMcGSwOE2s
+ZYONPAY_SECRET_KEY=sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG
+PORT=3000
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 start dist/index.js --name thunderbet --env production --env-file /var/www/html/.env
+
+  error: unknown option `--env-file'
+
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 logs thunderbet --lines 10
+[TAILING] Tailing last 10 lines for [thunderbet] process (change the value with --lines option)
+/root/.pm2/logs/thunderbet-out.log last 10 lines:
+/root/.pm2/logs/thunderbet-error.log last 10 lines:
+0|thunderb | Error: SUPABASE_ANON_KEY environment variable not found
+0|thunderb |     at file:///var/www/html/dist/index.js:657:9
+0|thunderb |     at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+0|thunderb |     at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+
+^C
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# cat > /var/www/html/start.sh << 'EOF'
+#!/bin/bash
+cd /var/www/html
+source .env
+export NODE_ENV=production
+export SUPABASE_URL=https://kgpmvqfehzkeyrtexdkb.supabase.co
+export SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtncG12cWZlaHprZXlydGV4ZGtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNzc5MTUsImV4cCI6MjA0OTk1MzkxNX0.Fyl4NTGZ0dNJFJ0NzBE3Y6hMTIhGYOCtYgMcGSwOE2s
+export ZYONPAY_SECRET_KEY=sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG
+export PORT=3000
+node dist/index.js
+EOF
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# chmod +x /var/www/html/start.sh
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 delete thunderbet
+[PM2] Applying action deleteProcessId on app [thunderbet](ids: [ 0 ])
+[PM2] [thunderbet](0) ✓
+┌────┬───────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name      │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+└────┴───────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 start /var/www/html/start.sh --name thunderbet
+[PM2] Starting /var/www/html/start.sh in fork_mode (1 instance)
+[PM2] Done.
+┌────┬───────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name          │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ thunderbet    │ default     │ 1.0.0   │ fork    │ 6121     │ 0s     │ 0    │ online    │ 0%       │ 3.3mb    │ root     │ disabled │
+└────┴───────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 save
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 logs thunderbet --lines 10
+[TAILING] Tailing last 10 lines for [thunderbet] process (change the value with --lines option)
+/root/.pm2/logs/thunderbet-error.log last 10 lines:
+0|thunderb | Error: SUPABASE_ANON_KEY environment variable not found
+0|thunderb |     at file:///var/www/html/dist/index.js:657:9
+0|thunderb |     at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+0|thunderb |     at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+
+/root/.pm2/logs/thunderbet-out.log last 10 lines:
+0|thunderb | 11:55:52 PM [express] serving on port 5000
+
+curl -I https://thunderbet.site
+
+^C
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# curl -I https://thunderbet.site
+HTTP/2 200
+date: Tue, 17 Jun 2025 02:56:05 GMT
+content-type: text/html
+server: cloudflare
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+last-modified: Tue, 17 Jun 2025 02:48:53 GMT
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=knipV9MD345nA5hj3qF8SBhvst3a%2FyFbEazbbH0ZAypcZh8R24fxyx7%2F1kF4GKusEcia%2FR0a3XJOrzRMV%2FV%2F3EJ3%2BgoHaZSXpWP4VImO5g%3D%3D"}]}
+accept-ranges: bytes
+cf-cache-status: DYNAMIC
+cf-ray: 950f4594081c7295-EWR
+alt-svc: h3=":443"; ma=86400
+
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html#

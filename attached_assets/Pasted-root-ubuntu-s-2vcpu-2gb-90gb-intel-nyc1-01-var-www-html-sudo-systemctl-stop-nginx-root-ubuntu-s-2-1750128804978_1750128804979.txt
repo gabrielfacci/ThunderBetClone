@@ -1,0 +1,112 @@
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo systemctl stop nginx
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo tee /etc/nginx/sites-available/thunderbet > /dev/null << 'EOF'
+server {
+    listen 80;
+    server_name thunderbet.site www.thunderbet.site;
+    # Root directory for static files
+    root /var/www/html/dist/public;
+    index index.html;
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+    # Static files caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    # API routes proxy
+    location /api {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+    # WebSocket support
+    location /ws {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    # React Router - serve index.html for all routes
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    # Block access to sensitive files
+    location ~ /\.(env|git) {
+        deny all;
+        return 404;
+EOF }
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo systemctl start nginx
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo systemctl status nginx
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2025-06-17 02:52:46 UTC; 3s ago
+       Docs: man:nginx(8)
+    Process: 5424 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 5425 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 5427 (nginx)
+      Tasks: 3 (limit: 2320)
+     Memory: 2.4M (peak: 2.8M)
+        CPU: 20ms
+     CGroup: /system.slice/nginx.service
+             ├─5427 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─5428 "nginx: worker process"
+             └─5429 "nginx: worker process"
+
+Jun 17 02:52:46 ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01 systemd[1]: Starting nginx.service - A high performance web server and a reverse proxy server...
+Jun 17 02:52:46 ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01 systemd[1]: Started nginx.service - A high performance web server and a reverse proxy server.
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# curl -I http://thunderbet.site
+HTTP/1.1 200 OK
+Date: Tue, 17 Jun 2025 02:52:53 GMT
+Content-Type: text/html
+Connection: keep-alive
+Last-Modified: Tue, 17 Jun 2025 02:48:53 GMT
+Accept-Ranges: bytes
+cf-cache-status: DYNAMIC
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=cTZ9B9ejOFI9HiyzR5GjYVHhKsJVCm%2BqzkujumG9KX7MosEAGXV6QkNyTneOkHEXo0r1JSSD6a2NEwbNpo1%2FoFtfRIy9kIV3SnwTWOjotjzQWs6USrFUW2CA4aPjEfgTDRQ%3D"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Server: cloudflare
+CF-RAY: 950f40df8bf40f51-EWR
+alt-svc: h3=":443"; ma=86400
+server-timing: cfL4;desc="?proto=TCP&rtt=1247&min_rtt=1247&rtt_var=623&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=79&delivery_rate=0&cwnd=212&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo certbot --nginx -d thunderbet.site -d www.thunderbet.site
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Enter email address or hit Enter to skip.
+ (Enter 'c' to cancel):
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please read the Terms of Service at:
+https://letsencrypt.org/documents/LE-SA-v1.5-February-24-2025.pdf
+You must agree in order to register with the ACME server. Do you agree?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: y
+Account registered.
+Requesting a certificate for thunderbet.site and www.thunderbet.site
+
+Certbot failed to authenticate some domains (authenticator: nginx). The Certificate Authority reported these problems:
+  Domain: www.thunderbet.site
+  Type:   dns
+  Detail: DNS problem: NXDOMAIN looking up A for www.thunderbet.site - check that a DNS record exists for this domain; DNS problem: NXDOMAIN looking up AAAA for www.thunderbet.site - check that a DNS record exists for this domain
+
+Hint: The Certificate Authority failed to verify the temporary nginx configuration changes made by Certbot. Ensure the listed domains point to this nginx server and that it is accessible from the internet.
+
+Some challenges have failed.
+Ask for help or search for solutions at https://community.letsencrypt.org. See the logfile /var/log/letsencrypt/letsencrypt.log or re-run Certbot with -v for more details.
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html#

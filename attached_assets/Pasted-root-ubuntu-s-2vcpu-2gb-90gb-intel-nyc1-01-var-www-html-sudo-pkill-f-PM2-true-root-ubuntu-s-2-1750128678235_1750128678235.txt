@@ -1,0 +1,134 @@
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo pkill -f PM2 || true
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo rm -rf /var/www/.pm2 || true
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo mkdir -p /home/www-data
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo chown www-data:www-data /home/www-data
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo chown -R $USER:www-data /var/www/html
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo chmod -R 755 /var/www/html
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# cd /var/www/html
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# cat > .env << 'EOF'
+NODE_ENV=production
+SUPABASE_URL=https://kgpmvqfehzkeyrtexdkb.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtncG12cWZlaHprZXlydGV4ZGtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNzc5MTUsImV4cCI6MjA0OTk1MzkxNX0.Fyl4NTGZ0dNJFJ0NzBE3Y6hMTIhGYOCtYgMcGSwOE2s
+ZYONPAY_SECRET_KEY=sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG
+PORT=3000
+EOF
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# npm install
+
+up to date, audited 608 packages in 3s
+
+73 packages are looking for funding
+  run `npm fund` for details
+
+8 vulnerabilities (1 low, 7 moderate)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# npm run build
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.14 building for production...
+transforming (1) index.htmlBrowserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 1814 modules transformed.
+../dist/public/index.html                                                   0.63 kB │ gzip:   0.38 kB
+../dist/public/assets/banner2_1749828043246-B1EGPryw.png                   18.79 kB
+../dist/public/assets/banner1_1749828043247-RpYhWopk.png                   28.15 kB
+../dist/public/assets/csev1741231448021443_1749828043248-CO8sp6om.webp     33.29 kB
+../dist/public/assets/thunderbet-logo_1749830832840-UjGayeyt.png        1,527.33 kB
+../dist/public/assets/index-CiLn2yHp.css                                   96.74 kB │ gzip:  15.69 kB
+../dist/public/assets/index-D1Mu3PTs.js                                   578.66 kB │ gzip: 169.40 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.83s
+
+  dist/index.js  62.6kb
+
+⚡ Done in 18ms
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# cat > ecosystem.config.js << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'thunderbet',
+    script: 'dist/index.js',
+    cwd: '/var/www/html',
+    instances: 1,
+    exec_mode: 'fork',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000
+    },
+    error_file: '/var/log/thunderbet/error.log',
+    out_file: '/var/log/thunderbet/out.log',
+    log_file: '/var/log/thunderbet/combined.log',
+    time: true,
+    watch: false,
+    ignore_watch: ["node_modules", "logs"]
+  }]
+}
+EOF
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo mkdir -p /var/log/thunderbet
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo chown $USER:www-data /var/log/thunderbet
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 start ecosystem.config.js
+[PM2] Spawning PM2 daemon with pm2_home=/root/.pm2
+[PM2] PM2 Successfully daemonized
+[PM2][ERROR] File ecosystem.config.js malformated
+ReferenceError: module is not defined
+    at file:///var/www/html/ecosystem.config.js:1:1
+    at ModuleJobSync.runSync (node:internal/modules/esm/module_job:387:35)
+    at ModuleLoader.importSyncForRequire (node:internal/modules/esm/loader:323:47)
+    at loadESMFromCJS (node:internal/modules/cjs/loader:1371:24)
+    at Module._compile (node:internal/modules/cjs/loader:1511:5)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1572:16)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# ^C
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# cat > ecosystem.config.js << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'thunderbet',
+    script: 'dist/index.js',
+    cwd: '/var/www/html',
+    instances: 1,
+    exec_mode: 'fork',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000
+    },
+    error_file: '/var/log/thunderbet/error.log',
+    out_file: '/var/log/thunderbet/out.log',
+    log_file: '/var/log/thunderbet/combined.log',
+    time: true,
+    watch: false
+  }]
+}
+EOF
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 start dist/index.js --name thunderbet --env production
+[PM2] Starting /var/www/html/dist/index.js in fork_mode (1 instance)
+[PM2] Done.
+┌────┬───────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name          │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ thunderbet    │ default     │ 1.0.0   │ fork    │ 4779     │ 0s     │ 0    │ online    │ 0%       │ 33.6mb   │ root     │ disabled │
+└────┴───────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 save
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# pm2 status
+┌────┬───────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name          │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ thunderbet    │ default     │ 1.0.0   │ fork    │ 4779     │ 7s     │ 0    │ online    │ 0%       │ 95.5mb   │ root     │ disabled │
+└────┴───────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html#

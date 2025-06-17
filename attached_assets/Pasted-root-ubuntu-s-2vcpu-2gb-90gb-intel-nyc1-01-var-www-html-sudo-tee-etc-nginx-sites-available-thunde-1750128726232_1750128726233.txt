@@ -1,0 +1,59 @@
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo tee /etc/nginx/sites-available/thunderbet > /dev/null << 'EOF'
+server {
+    listen 80;
+    server_name thunderbet.site www.thunderbet.site;
+
+    # Redirect HTTP to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+server {
+    listen 443 ssl http2;
+    server_name thunderbet.site www.thunderbet.site;
+    # SSL configuration (will be set up by Certbot)
+    ssl_certificate /etc/letsencrypt/live/thunderbet.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/thunderbet.site/privkey.pem;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    # Root directory for static files
+    root /var/www/html/dist/public;
+    index index.html;
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+    # Static files caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    # API routes proxy
+    location /api {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+    # WebSocket support
+    location /ws {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+EOF }   return 404;env|git) {ve filestml; all routesx_forwarded_for;
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo ln -sf /etc/nginx/sites-available/thunderbet /etc/nginx/sites-enabled/
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo rm -f /etc/nginx/sites-enabled/default
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo nginx -t
+2025/06/17 02:51:56 [emerg] 5220#5220: cannot load certificate "/etc/letsencrypt/live/thunderbet.site/fullchain.pem": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/letsencrypt/live/thunderbet.site/fullchain.pem, r) error:10000080:BIO routines::no such file)
+nginx: configuration file /etc/nginx/nginx.conf test failed
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html# sudo systemctl restart nginx
+Job for nginx.service failed because the control process exited with error code.
+See "systemctl status nginx.service" and "journalctl -xeu nginx.service" for details.
+root@ubuntu-s-2vcpu-2gb-90gb-intel-nyc1-01:/var/www/html#
