@@ -101,7 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           email: data.user.email,
           full_name: fullName,
           account_mode: 'nacional',
-          balance: 1000.00,
+          balance: 0.00,
           phone: phoneToSave,
           created_at: new Date().toISOString()
         });
@@ -116,7 +116,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
               full_name: fullName,
               phone: phoneToSave,
               account_mode: 'nacional',
-              balance: 1000.00
+              balance: 0.00
             })
             .eq('id', data.user.id);
             

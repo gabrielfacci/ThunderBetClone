@@ -96,6 +96,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       toast({
         title: "Conta criada com sucesso!",
         description: "Bem-vindo ao ThunderBet.",
+        duration: 3000,
       });
       
       onClose();

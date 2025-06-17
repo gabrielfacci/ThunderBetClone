@@ -175,6 +175,11 @@ Changelog:
   - FIXED user registration to save phone number in users.phone column
   - Updated signUp function to accept phone parameter and store in database
   - Ensured phone numbers are saved with +55 prefix during registration
+  - IMPLEMENTED 100% real balance system based on Supabase data
+  - Corrected user registration to start with R$ 0,00 instead of fake R$ 1.000,00
+  - Updated existing users to have real balance values from database
+  - Created fallback API endpoint /api/users/update-phone for guaranteed phone storage
+  - Fixed toast notifications to auto-dismiss after 3 seconds for better UX
 ```
 
 ## User Preferences
