@@ -91,7 +91,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
     setIsLoading(true);
     try {
       const cleanPhone = `+55${phoneNumbers}`;
-      await signUp(cleanEmail, password, fullName.trim());
+      await signUp(cleanEmail, password, fullName.trim(), cleanPhone);
       
       toast({
         title: "Conta criada com sucesso!",

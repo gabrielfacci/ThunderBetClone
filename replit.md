@@ -169,6 +169,12 @@ Changelog:
   - Deposit transactions now properly stored in Supabase and appear in user history
   - Enhanced transaction search logic to handle UUID-based user identification
   - All deposit transactions now correctly linked to user accounts via metadata
+  - CONFIGURED São Paulo timezone (UTC-3) for all transaction timestamps
+  - Fixed timezone display showing correct Brazilian time instead of UTC
+  - Corrected transaction storage to save with São Paulo timezone offset
+  - FIXED user registration to save phone number in users.phone column
+  - Updated signUp function to accept phone parameter and store in database
+  - Ensured phone numbers are saved with +55 prefix during registration
 ```
 
 ## User Preferences

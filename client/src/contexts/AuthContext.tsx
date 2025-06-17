@@ -7,7 +7,7 @@ interface AuthContextType {
   user: SupabaseUser | null;
   profile: UserProfile | null;
   isLoading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, phone?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => subscription?.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone?: string) => {
     if (!email || !password) {
       throw new Error('Email e senha são obrigatórios');
     }
@@ -60,7 +60,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       password,
       options: {
         data: {
-          full_name: fullName
+          full_name: fullName,
+          phone: phone || ''
         }
       }
     });
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           full_name: fullName,
           account_mode: 'nacional',
           balance: 1000.00,
-          phone: data.user.user_metadata?.phone || '',
+          phone: phone || data.user.user_metadata?.phone || '',
           created_at: new Date().toISOString()
         });
         console.log('Usuário criado na tabela users');
