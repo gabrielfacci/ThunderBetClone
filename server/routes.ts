@@ -276,7 +276,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(transaction);
     } catch (error) {
-      console.error('Error creating ZyonPay transaction:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -284,8 +283,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Store PIX transaction directly in Supabase (new endpoint)
   app.post("/api/supabase/store-transaction", async (req, res) => {
     try {
-      console.log('Store transaction request body:', req.body);
-      
       const { 
         userId, 
         userEmail,
@@ -301,7 +298,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.body;
       
       const depositAmount = parseFloat(amount);
-      console.log(`Storing PIX transaction in Supabase for ${userEmail} - R$ ${depositAmount.toFixed(2)}`);
 
       const transaction = await storeTransactionInSupabase({
         userId: userId || 'unknown',
@@ -321,10 +317,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       });
 
-      console.log(`Transaction ${transaction.id} stored in Supabase for user ${userEmail}`);
       res.json(transaction);
     } catch (error) {
-      console.error('Error storing transaction in Supabase:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -847,13 +841,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching withdrawals:', error);
         return res.status(500).json({ error: "Failed to fetch withdrawals" });
       }
 
       res.json(withdrawals || []);
     } catch (error) {
-      console.error('Error fetching user withdrawals:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -957,7 +949,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(chatMessage);
     } catch (error) {
-      console.error('Error creating chat message:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -968,7 +959,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messages = await storage.getChatMessages(conversationId);
       res.json(messages);
     } catch (error) {
-      console.error('Error getting chat messages:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -980,8 +970,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const connectedClients = new Map<string, { ws: WebSocket, conversationId: number, userId: string }>();
 
   wss.on('connection', (ws: WebSocket) => {
-    console.log('New WebSocket connection established');
-
     ws.on('message', async (data: Buffer) => {
       try {
         const message = JSON.parse(data.toString());
@@ -994,8 +982,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             conversationId: message.conversationId,
             userId: message.userId
           });
-          
-          console.log(`Client ${message.userId} joined conversation ${message.conversationId}`);
           
         } else if (message.type === 'message') {
           // Broadcasting message to all clients in the same conversation
@@ -1043,7 +1029,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       } catch (error) {
-        console.error('Error handling WebSocket message:', error);
+        // Silent error handling
       }
     });
 
@@ -1052,13 +1038,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       connectedClients.forEach((client, clientId) => {
         if (client.ws === ws) {
           connectedClients.delete(clientId);
-          console.log(`Client ${clientId} disconnected`);
         }
       });
     });
 
     ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
+      // Silent error handling
     });
   });
 
