@@ -54,7 +54,26 @@ export function getNowBrazil(): Date {
 }
 
 export function getNowBrazilISO(): string {
+  // Criar data atual em São Paulo
   const now = new Date();
-  const brazilTime = new Date(now.toLocaleString('en-US', { timeZone: SAO_PAULO_TIMEZONE }));
-  return brazilTime.toISOString();
+  
+  // Converter para o horário de São Paulo usando Intl.DateTimeFormat
+  const spFormatter = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: SAO_PAULO_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  
+  const spTime = spFormatter.format(now);
+  const [datePart, timePart] = spTime.split(', ');
+  const [day, month, year] = datePart.split('/');
+  const [hour, minute, second] = timePart.split(':');
+  
+  // Formato ISO com offset de São Paulo (UTC-3)
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}-03:00`;
 }

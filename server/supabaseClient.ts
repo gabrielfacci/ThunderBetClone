@@ -57,7 +57,9 @@ export async function storeTransactionInSupabase(transactionData: {
       zyonpay_secure_url: transactionData.zyonPaySecureUrl,
       zyonpay_pix_qrcode: transactionData.zyonPayPixQrCode || '',
       zyonpay_status: transactionData.zyonPayStatus,
-      metadata: JSON.stringify(metadata)
+      metadata: JSON.stringify(metadata),
+      created_at: getNowBrazilISO(),
+      updated_at: getNowBrazilISO()
     };
 
     const { data, error } = await supabase
