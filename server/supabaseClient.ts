@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { getNowBrazilISO } from '../shared/timezone';
 
 const supabaseUrl = 'https://kgpmvqfehzkeyrtexdkb.supabase.co';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -41,7 +42,7 @@ export async function storeTransactionInSupabase(transactionData: {
       supabaseUserId: transactionData.userId,
       userEmail: transactionData.userEmail,
       zyonPayId: transactionData.zyonPayTransactionId,
-      transactionDate: new Date().toISOString()
+      transactionDate: getNowBrazilISO()
     };
 
     // Use simple insert without problematic field mappings
