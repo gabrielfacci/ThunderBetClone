@@ -327,13 +327,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/transactions/all", async (req, res) => {
     try {
       const transactions = await getAllTransactionsFromSupabase();
-      console.log(`Found ${transactions.length} total transactions in Supabase`);
       res.json({
         count: transactions.length,
         transactions: transactions
       });
     } catch (error) {
-      console.error('Error fetching all transactions:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
