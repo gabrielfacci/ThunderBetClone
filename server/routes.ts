@@ -459,20 +459,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Clean phone number for ZyonPay API (remove +55 prefix and format correctly)
       let phone = userPhone || generatePhone();
-      console.log('Original phone:', userPhone, 'Generated phone:', phone);
       
       if (phone.startsWith('+55')) {
         phone = phone.substring(3); // Remove +55 prefix
-        console.log('Phone after removing +55:', phone);
       }
       
       // Check if phone is the test number (all zeros) or invalid
       if (phone === '00000000000' || phone.length < 11 || !/^\d{11}$/.test(phone)) {
         phone = generatePhone(); // Use generated phone if user phone is invalid
-        console.log('Using generated phone due to invalid format:', phone);
       }
-      
-      console.log('Final phone for ZyonPay:', phone);
 
       const transactionData = {
         paymentMethod: "pix",
@@ -526,13 +521,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       if (!response.ok) {
-        const errorData = await response.text();
-        console.error('ZyonPay API Error:', response.status, errorData);
         return res.status(500).json({ error: "Failed to create PIX transaction" });
       }
 
       const result = await response.json();
-      console.log(`🚀 Fast PIX created - Transaction ${result.id} for ${userEmail}`);
 
       // Store in database directly
       try {
@@ -555,11 +547,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         });
         
-        if (storedTransaction) {
-          console.log(`💾 Fast PIX transaction ${result.id} stored directly in database`);
-        }
       } catch (dbError) {
-        console.error('Database storage error:', dbError);
+        // Silent error handling - transaction still proceeds
       }
 
       // Return transaction with immediate PIX code (if available)
@@ -573,7 +562,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error) {
-      console.error('Fast PIX error:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -585,9 +573,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/webhook/zyonpay", async (req, res) => {
     try {
       const webhookData = req.body;
-      const timestamp = formatDateBrazil(new Date());
-      console.log(`🔔 [${timestamp}] ZyonPay webhook received:`, JSON.stringify(webhookData, null, 2));
-      
       const transactionData = webhookData.data;
       const transactionId = transactionData.id.toString();
       const pixCode = transactionData.pix?.qrcode;
@@ -602,11 +587,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: new Date()
       });
 
-      console.log(`📦 [${formatDateBrazil(new Date())}] Stored PIX code for transaction ${transactionId}:`, pixCode);
-
       // Process payment if status is "paid"
       if (paymentStatus === 'paid') {
-        console.log(`💰 [${formatDateBrazil(new Date())}] Processing payment for transaction ${transactionId}`);
         
         // Find transaction in Supabase by ZyonPay ID
         const { data: transactions, error: findError } = await supabase
@@ -615,9 +597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .eq('zyonpay_transaction_id', transactionId)
           .limit(1);
 
-        if (findError) {
-          console.error('❌ Error finding transaction:', findError);
-        } else if (transactions && transactions.length > 0) {
+        if (!findError && transactions && transactions.length > 0) {
           const transaction = transactions[0];
           const depositAmount = parseFloat(transactionData.amount) / 100; // Convert centavos to reais
           
@@ -629,7 +609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               supabaseUserId = metadata.supabaseUserId;
             }
           } catch (e) {
-            console.log('📝 No metadata found, searching by email');
+            // No metadata found, searching by email
           }
 
           // If no UUID in metadata, find user by email
@@ -646,11 +626,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           if (!supabaseUserId) {
-            console.error('❌ Could not find Supabase user ID');
             return;
           }
-          
-          console.log(`🔍 Found transaction: ID=${transaction.id}, Supabase User=${supabaseUserId}, Amount=R$${depositAmount}`);
 
           // Get current user balance
           const { data: user, error: userError } = await supabase
