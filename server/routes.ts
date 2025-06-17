@@ -456,7 +456,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const amountInCentavos = Math.round(amount * 100);
       const cpf = generateValidCPF();
-      const phone = userPhone || generatePhone();
+      
+      // Clean phone number for ZyonPay API (remove +55 prefix and format correctly)
+      let phone = userPhone || generatePhone();
+      console.log('Original phone:', userPhone, 'Generated phone:', phone);
+      
+      if (phone.startsWith('+55')) {
+        phone = phone.substring(3); // Remove +55 prefix
+        console.log('Phone after removing +55:', phone);
+      }
+      // Ensure phone has exactly 11 digits (2 area code + 9 number)
+      if (phone.length < 11) {
+        phone = generatePhone(); // Use generated phone if user phone is invalid
+        console.log('Using generated phone due to invalid length:', phone);
+      }
+      
+      console.log('Final phone for ZyonPay:', phone);
 
       const transactionData = {
         paymentMethod: "pix",
