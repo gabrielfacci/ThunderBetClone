@@ -76,7 +76,7 @@ export async function storeTransactionInSupabase(transactionData: {
         amount: transactionData.amount,
         zyonpay_transaction_id: transactionData.zyonPayTransactionId,
         status: 'pending',
-        created_at: new Date().toISOString()
+        created_at: getNowBrazilISO()
       };
       
       console.log('Returning mock response to maintain app functionality');

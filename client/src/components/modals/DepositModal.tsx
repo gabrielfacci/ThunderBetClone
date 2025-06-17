@@ -769,7 +769,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                                 <path d="M3 10h18"></path>
                               </svg>
                               <span className="text-xs truncate">
-                                {formatDateTimeBrazil(transaction.created_at || transaction.createdAt)}
+                                {formatDateTimeBrazil(transaction.created_at || transaction.createdAt || new Date().toISOString())}
                               </span>
                             </div>
                             <div className="flex items-center space-x-1 text-gray-400 flex-shrink-0">
