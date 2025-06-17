@@ -156,6 +156,19 @@ Changelog:
   - Added ultra-fast PIX endpoint `/api/zyonpay/fast-pix` for instant generation
   - Improved deposit modal UX by moving action buttons above instructions section
   - Updated minimum deposit amount back to R$ 35,00 with corresponding quick amount buttons
+- June 17, 2025. Critical bug fixes and deposit history resolution
+  - Fixed critical currency parsing inconsistency causing incorrect payment amounts
+  - Resolved memory leak from polling intervals not being properly cleaned up
+  - Fixed hardcoded balance display in header to show real user balance from database
+  - Corrected withdrawal amount being sent as formatted string instead of numeric value
+  - Moved ZyonPay secret key to environment variables for security compliance
+  - Fixed TypeScript compilation errors in server route user object creation
+  - RESOLVED deposit history not functioning - fixed transaction storage endpoint
+  - Corrected parameter mapping between fast-pix endpoint and store-transaction endpoint
+  - Added proper error handling and fallbacks for undefined transaction data
+  - Deposit transactions now properly stored in Supabase and appear in user history
+  - Enhanced transaction search logic to handle UUID-based user identification
+  - All deposit transactions now correctly linked to user accounts via metadata
 ```
 
 ## User Preferences
