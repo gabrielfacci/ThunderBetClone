@@ -452,7 +452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Call ZyonPay API directly
-      const secretKey = 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
+      const secretKey = process.env.ZYONPAY_SECRET_KEY || 'sk_live_v2UNcCWtzQAKrVaQZ8mvJKzQGr8fwvebUyCrCLCdAG';
       const authString = `${secretKey}:x`;
       const authHeader = 'Basic ' + Buffer.from(authString).toString('base64');
 

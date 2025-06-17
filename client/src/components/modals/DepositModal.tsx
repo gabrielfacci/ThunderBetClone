@@ -211,6 +211,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     setPixError(null);
     setShowPixPayment(false);
     setIsCopied(false);
+    setPaymentStage("waiting");
+    setPaymentCompleted(false);
   };
 
   const loadTransactions = async () => {
@@ -257,7 +259,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
             setPaymentCompleted(true);
             
             // Calculate deposit amount from the original transaction
-            const depositAmount = parseFloat(amount.replace(/[^\d]/g, '')) || 1;
+            const depositAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.')) || 1;
             
             // Dispatch payment success event for balance animation
             window.dispatchEvent(new CustomEvent('paymentSuccess', {
@@ -292,7 +294,14 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     }, 10000); // Check every 10 seconds as requested
 
     return () => clearInterval(interval);
-  }, [showPixPayment, pixData?.transactionId, onClose]);
+  }, [showPixPayment, pixData?.transactionId, onClose, amount, language, toast, refreshProfile]);
+
+  // Clean up when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      resetPixPayment();
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
