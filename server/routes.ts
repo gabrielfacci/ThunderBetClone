@@ -486,27 +486,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await response.json();
       console.log(`🚀 Fast PIX created - Transaction ${result.id} for ${userEmail}`);
 
-      // Store in database
+      // Store in database directly
       try {
-        const storeResponse = await fetch(`${req.protocol}://${req.get('host')}/api/supabase/store-transaction`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            zyonPayTransactionId: result.id,
-            amount: amount,
+        const storedTransaction = await storeTransactionInSupabase({
+          userId: userId,
+          userEmail: userEmail,
+          amount: amount,
+          zyonPayTransactionId: String(result.id),
+          zyonPaySecureId: result.secureId,
+          zyonPaySecureUrl: result.secureUrl,
+          zyonPayPixQrCode: result.pix?.qrcode || null,
+          zyonPayPixUrl: result.pix?.qrcode || null,
+          zyonPayPixExpiration: result.pix?.expirationDate || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          zyonPayStatus: result.status || 'waiting_payment',
+          metadata: JSON.stringify({
+            supabaseUserId: userId,
             userEmail: userEmail,
-            userId: userId,
-            zyonPaySecureId: result.secureId,
-            zyonPaySecureUrl: result.secureUrl,
-            zyonPayPixQrCode: result.pix?.qrcode || null,
-            zyonPayPixUrl: result.pix?.qrcode || null,
-            zyonPayPixExpiration: result.pix?.expirationDate || null,
-            zyonPayStatus: result.status || 'waiting_payment'
+            zyonPayId: String(result.id),
+            transactionDate: new Date().toISOString()
           })
         });
         
-        if (storeResponse.ok) {
-          console.log(`💾 Fast PIX transaction ${result.id} stored in database`);
+        if (storedTransaction) {
+          console.log(`💾 Fast PIX transaction ${result.id} stored directly in database`);
         }
       } catch (dbError) {
         console.error('Database storage error:', dbError);

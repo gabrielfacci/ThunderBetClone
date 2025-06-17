@@ -117,6 +117,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         });
         setIsGeneratingPix(false);
         
+        // Atualizar lista de transações imediatamente
+        await loadTransactions();
+        
         toast({
           title: language === 'en' ? "PIX Ready!" : "PIX Pronto!",
           description: language === 'en' ? "Your PIX code is ready for payment" : "Seu código PIX está pronto para pagamento",
