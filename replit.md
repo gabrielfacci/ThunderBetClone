@@ -180,8 +180,10 @@ Changelog:
   - Updated existing users to have real balance values from database
   - Created fallback API endpoint /api/users/update-phone for guaranteed phone storage
   - Fixed toast notifications to auto-dismiss after 3 seconds for better UX
-  - Changed minimum deposit amount from R$ 35,00 to R$ 1,00 for improved accessibility
-  - Updated quick deposit amount buttons to reflect new minimum: R$ 1, 5, 10, 25, 50, 100
+  - Restored minimum deposit amount to R$ 35,00 with quick buttons: R$ 35, 50, 100, 200, 500, 1000
+  - Fixed PIX generation error with phone number validation and fallback system
+  - Implemented automatic phone number generation for invalid test numbers
+  - Payment processing system confirmed working with real transactions
 ```
 
 ## User Preferences

@@ -39,7 +39,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [paymentStage, setPaymentStage] = useState<"waiting" | "processing" | "completed">("waiting");
   const [paymentCompleted, setPaymentCompleted] = useState(false);
 
-  const quickAmounts = [1, 5, 10, 25, 50, 100];
+  const quickAmounts = [35, 50, 100, 200, 500, 1000];
 
   const handleQuickAmount = (value: number) => {
     setAmount(`R$ ${value},00`);
@@ -60,10 +60,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     if (!user || !amount) return;
     
     const numericAmount = parseFloat(amount.replace(/[^\d,]/g, '').replace(',', '.'));
-    if (numericAmount < 1) {
+    if (numericAmount < 35) {
       toast({
         title: "Valor mínimo",
-        description: "O valor mínimo para depósito é R$ 1,00",
+        description: "O valor mínimo para depósito é R$ 35,00",
         variant: "destructive",
       });
       return;
