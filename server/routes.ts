@@ -252,6 +252,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Store PIX transaction directly in Supabase (new endpoint)
   app.post("/api/supabase/store-transaction", async (req, res) => {
     try {
+      console.log('Store transaction request body:', req.body);
+      
       const { 
         userId, 
         userEmail,
@@ -270,16 +272,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Storing PIX transaction in Supabase for ${userEmail} - R$ ${depositAmount.toFixed(2)}`);
 
       const transaction = await storeTransactionInSupabase({
-        userId: userId,
-        userEmail: userEmail,
+        userId: userId || 'unknown',
+        userEmail: userEmail || 'unknown',
         amount: depositAmount,
-        zyonPayTransactionId: zyonPayTransactionId.toString(),
-        zyonPaySecureId,
-        zyonPaySecureUrl,
-        zyonPayPixQrCode,
-        zyonPayPixUrl,
+        zyonPayTransactionId: String(zyonPayTransactionId || 'unknown'),
+        zyonPaySecureId: zyonPaySecureId || '',
+        zyonPaySecureUrl: zyonPaySecureUrl || '',
+        zyonPayPixQrCode: zyonPayPixQrCode || null,
+        zyonPayPixUrl: zyonPayPixUrl || null,
         zyonPayPixExpiration: zyonPayPixExpiration || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        zyonPayStatus,
+        zyonPayStatus: zyonPayStatus || 'pending',
         metadata: metadata || JSON.stringify({
           userEmail,
           supabaseUserId: userId,
@@ -490,10 +492,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            zyonPayId: result.id,
+            zyonPayTransactionId: result.id,
             amount: amount,
             userEmail: userEmail,
-            userId: userId
+            userId: userId,
+            zyonPaySecureId: result.secureId,
+            zyonPaySecureUrl: result.secureUrl,
+            zyonPayPixQrCode: result.pix?.qrcode || null,
+            zyonPayPixUrl: result.pix?.qrcode || null,
+            zyonPayPixExpiration: result.pix?.expirationDate || null,
+            zyonPayStatus: result.status || 'waiting_payment'
           })
         });
         
