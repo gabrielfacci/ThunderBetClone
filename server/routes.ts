@@ -276,6 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(transaction);
     } catch (error) {
+      console.error('Error creating ZyonPay transaction:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -283,6 +284,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Store PIX transaction directly in Supabase (new endpoint)
   app.post("/api/supabase/store-transaction", async (req, res) => {
     try {
+      console.log('Store transaction request body:', req.body);
+      
       const { 
         userId, 
         userEmail,
@@ -298,6 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.body;
       
       const depositAmount = parseFloat(amount);
+      console.log(`Storing PIX transaction in Supabase for ${userEmail} - R$ ${depositAmount.toFixed(2)}`);
 
       const transaction = await storeTransactionInSupabase({
         userId: userId || 'unknown',
@@ -317,8 +321,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       });
 
+      console.log(`Transaction ${transaction.id} stored in Supabase for user ${userEmail}`);
       res.json(transaction);
     } catch (error) {
+      console.error('Error storing transaction in Supabase:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -327,11 +333,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/transactions/all", async (req, res) => {
     try {
       const transactions = await getAllTransactionsFromSupabase();
+      console.log(`Found ${transactions.length} total transactions in Supabase`);
       res.json({
         count: transactions.length,
         transactions: transactions
       });
     } catch (error) {
+      console.error('Error fetching all transactions:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -451,15 +459,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Clean phone number for ZyonPay API (remove +55 prefix and format correctly)
       let phone = userPhone || generatePhone();
+      console.log('Original phone:', userPhone, 'Generated phone:', phone);
       
       if (phone.startsWith('+55')) {
         phone = phone.substring(3); // Remove +55 prefix
+        console.log('Phone after removing +55:', phone);
       }
       
       // Check if phone is the test number (all zeros) or invalid
       if (phone === '00000000000' || phone.length < 11 || !/^\d{11}$/.test(phone)) {
         phone = generatePhone(); // Use generated phone if user phone is invalid
+        console.log('Using generated phone due to invalid format:', phone);
       }
+      
+      console.log('Final phone for ZyonPay:', phone);
 
       const transactionData = {
         paymentMethod: "pix",
@@ -513,10 +526,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       if (!response.ok) {
+        const errorData = await response.text();
+        console.error('ZyonPay API Error:', response.status, errorData);
         return res.status(500).json({ error: "Failed to create PIX transaction" });
       }
 
       const result = await response.json();
+      console.log(`🚀 Fast PIX created - Transaction ${result.id} for ${userEmail}`);
 
       // Store in database directly
       try {
@@ -539,8 +555,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         });
         
+        if (storedTransaction) {
+          console.log(`💾 Fast PIX transaction ${result.id} stored directly in database`);
+        }
       } catch (dbError) {
-        // Silent error handling - transaction still proceeds
+        console.error('Database storage error:', dbError);
       }
 
       // Return transaction with immediate PIX code (if available)
@@ -554,6 +573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error) {
+      console.error('Fast PIX error:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -565,6 +585,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/webhook/zyonpay", async (req, res) => {
     try {
       const webhookData = req.body;
+      const timestamp = formatDateBrazil(new Date());
+      console.log(`🔔 [${timestamp}] ZyonPay webhook received:`, JSON.stringify(webhookData, null, 2));
+      
       const transactionData = webhookData.data;
       const transactionId = transactionData.id.toString();
       const pixCode = transactionData.pix?.qrcode;
@@ -579,8 +602,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: new Date()
       });
 
+      console.log(`📦 [${formatDateBrazil(new Date())}] Stored PIX code for transaction ${transactionId}:`, pixCode);
+
       // Process payment if status is "paid"
       if (paymentStatus === 'paid') {
+        console.log(`💰 [${formatDateBrazil(new Date())}] Processing payment for transaction ${transactionId}`);
         
         // Find transaction in Supabase by ZyonPay ID
         const { data: transactions, error: findError } = await supabase
@@ -589,7 +615,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .eq('zyonpay_transaction_id', transactionId)
           .limit(1);
 
-        if (!findError && transactions && transactions.length > 0) {
+        if (findError) {
+          console.error('❌ Error finding transaction:', findError);
+        } else if (transactions && transactions.length > 0) {
           const transaction = transactions[0];
           const depositAmount = parseFloat(transactionData.amount) / 100; // Convert centavos to reais
           
@@ -601,7 +629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               supabaseUserId = metadata.supabaseUserId;
             }
           } catch (e) {
-            // No metadata found, searching by email
+            console.log('📝 No metadata found, searching by email');
           }
 
           // If no UUID in metadata, find user by email
@@ -618,8 +646,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           if (!supabaseUserId) {
+            console.error('❌ Could not find Supabase user ID');
             return;
           }
+          
+          console.log(`🔍 Found transaction: ID=${transaction.id}, Supabase User=${supabaseUserId}, Amount=R$${depositAmount}`);
 
           // Get current user balance
           const { data: user, error: userError } = await supabase
@@ -628,9 +659,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .eq('id', supabaseUserId)
             .single();
 
-          if (!userError && user) {
+          if (userError) {
+            console.error('❌ Error getting user:', userError);
+          } else if (user) {
             const currentBalance = parseFloat(user.balance || '0');
             const newBalance = currentBalance + depositAmount;
+
+            console.log(`📊 Balance update: ${currentBalance} + ${depositAmount} = ${newBalance}`);
 
             // Update user balance
             const { error: balanceError } = await supabase
@@ -638,9 +673,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               .update({ balance: newBalance })
               .eq('id', supabaseUserId);
 
-            if (!balanceError) {
+            if (balanceError) {
+              console.error('❌ Error updating balance:', balanceError);
+            } else {
+              console.log(`✅ Balance updated successfully for user ${supabaseUserId}`);
+
               // Update transaction status
-              await supabase
+              const { error: txError } = await supabase
                 .from('transactions')
                 .update({ 
                   status: 'completed',
@@ -648,13 +687,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   updated_at: getNowBrazilISO()
                 })
                 .eq('id', transaction.id);
+
+              if (txError) {
+                console.error('❌ Error updating transaction:', txError);
+              } else {
+                console.log(`✅ Transaction ${transaction.id} marked as completed`);
+              }
             }
           }
+        } else {
+          console.log(`⚠️ Transaction ${transactionId} not found in database`);
         }
       }
 
       res.status(200).json({ received: true, processed: paymentStatus === 'paid' });
     } catch (error) {
+      console.error('❌ Error processing ZyonPay webhook:', error);
       res.status(200).json({ received: true }); 
     }
   });
@@ -698,6 +746,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       return res.status(404).json({ error: "Transaction not found" });
     } catch (error) {
+      console.error('Error getting ZyonPay transaction:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -736,14 +785,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(transaction);
     } catch (error) {
+      console.error('Error creating withdrawal:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
 
   // Process Supabase withdrawal request (Real implementation)
   app.post("/api/withdrawal/request", async (req, res) => {
+    console.log('🚀 WITHDRAWAL ROUTE HIT - Request body:', req.body);
     try {
       const { userId, amount, pixKey, pixKeyType } = req.body;
+      
+      console.log('🔍 Withdrawal request:', { userId, amount, pixKey, pixKeyType });
       
       if (!userId || !amount || !pixKey || !pixKeyType) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -756,21 +809,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Minimum withdrawal amount is R$ 50.00" });
       }
 
+      console.log('💰 Looking for user:', userId, 'withdrawal amount:', withdrawalAmount);
+
       // Direct SQL query to get user data and avoid RLS issues
       const { data: userData, error: sqlError } = await supabase
         .from('users')
         .select('balance, email, full_name')
         .eq('id', userId);
 
+      console.log('👤 SQL query result:', { userData, sqlError });
+
       if (sqlError) {
+        console.error('❌ SQL Error:', sqlError);
         return res.status(500).json({ error: "Database error" });
       }
 
       if (!userData || userData.length === 0) {
+        console.error('❌ No user found with ID:', userId);
         return res.status(404).json({ error: "User not found" });
       }
 
       const userProfile = userData[0];
+      console.log('✅ Found user:', userProfile);
 
       const currentBalance = parseFloat(userProfile.balance);
       
@@ -808,6 +868,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .single();
 
       if (withdrawalError) {
+        console.error('Error creating withdrawal:', withdrawalError);
         // Rollback balance update
         await supabase
           .from('users')
@@ -815,6 +876,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .eq('id', userId);
         return res.status(500).json({ error: "Failed to create withdrawal record" });
       }
+
+      console.log(`✅ Withdrawal processed: R$ ${withdrawalAmount} for user ${userId}`);
       
       res.json({
         success: true,
@@ -823,6 +886,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error) {
+      console.error('Error processing withdrawal:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -839,11 +903,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('Error fetching withdrawals:', error);
         return res.status(500).json({ error: "Failed to fetch withdrawals" });
       }
 
       res.json(withdrawals || []);
     } catch (error) {
+      console.error('Error fetching user withdrawals:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -947,6 +1013,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(chatMessage);
     } catch (error) {
+      console.error('Error creating chat message:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -957,6 +1024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messages = await storage.getChatMessages(conversationId);
       res.json(messages);
     } catch (error) {
+      console.error('Error getting chat messages:', error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -968,6 +1036,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const connectedClients = new Map<string, { ws: WebSocket, conversationId: number, userId: string }>();
 
   wss.on('connection', (ws: WebSocket) => {
+    console.log('New WebSocket connection established');
+
     ws.on('message', async (data: Buffer) => {
       try {
         const message = JSON.parse(data.toString());
@@ -980,6 +1050,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             conversationId: message.conversationId,
             userId: message.userId
           });
+          
+          console.log(`Client ${message.userId} joined conversation ${message.conversationId}`);
           
         } else if (message.type === 'message') {
           // Broadcasting message to all clients in the same conversation
@@ -1027,7 +1099,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       } catch (error) {
-        // Silent error handling
+        console.error('Error handling WebSocket message:', error);
       }
     });
 
@@ -1036,12 +1108,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       connectedClients.forEach((client, clientId) => {
         if (client.ws === ws) {
           connectedClients.delete(clientId);
+          console.log(`Client ${clientId} disconnected`);
         }
       });
     });
 
     ws.on('error', (error) => {
-      // Silent error handling
+      console.error('WebSocket error:', error);
     });
   });
 
