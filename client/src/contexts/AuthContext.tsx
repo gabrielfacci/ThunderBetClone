@@ -95,7 +95,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           fullName: fullName
         });
         
-        await supabase.from('users').insert({
+        // Primeiro, tentar inserir na tabela users
+        const { data: insertData, error: insertError } = await supabase.from('users').insert({
           id: data.user.id,
           email: data.user.email,
           full_name: fullName,
@@ -104,7 +105,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
           phone: phoneToSave,
           created_at: new Date().toISOString()
         });
-        console.log('Usuário criado na tabela users com telefone:', phoneToSave);
+        
+        if (insertError) {
+          console.error('Erro ao inserir na tabela users:', insertError);
+          
+          // Se falhar, tentar atualizar em vez de inserir (caso o usuário já exista)
+          const { data: updateData, error: updateError } = await supabase
+            .from('users')
+            .update({
+              full_name: fullName,
+              phone: phoneToSave,
+              account_mode: 'nacional',
+              balance: 1000.00
+            })
+            .eq('id', data.user.id);
+            
+          if (updateError) {
+            console.error('Erro ao atualizar usuário:', updateError);
+          } else {
+            console.log('Usuário atualizado com telefone:', phoneToSave);
+          }
+        } else {
+          console.log('Usuário criado na tabela users com telefone:', phoneToSave);
+        }
+
+        // Garantir que o telefone seja salvo usando endpoint do backend
+        if (phoneToSave) {
+          try {
+            const phoneResponse = await fetch('/api/users/update-phone', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: data.user.id,
+                phone: phoneToSave
+              })
+            });
+            
+            if (phoneResponse.ok) {
+              console.log('Telefone salvo com sucesso via API backend');
+            } else {
+              console.error('Erro ao salvar telefone via API backend');
+            }
+          } catch (phoneError) {
+            console.error('Erro na chamada API para salvar telefone:', phoneError);
+          }
+        }
       } catch (userCreateError: any) {
         console.log('Erro ao criar usuário na tabela users:', userCreateError.message);
         // Continue with authentication even if user table creation fails

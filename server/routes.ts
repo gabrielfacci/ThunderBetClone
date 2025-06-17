@@ -160,6 +160,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user phone in Supabase
+  app.post("/api/users/update-phone", async (req, res) => {
+    try {
+      const { userId, phone } = req.body;
+      
+      if (!userId || !phone) {
+        return res.status(400).json({ error: "userId and phone are required" });
+      }
+
+      const { data, error } = await supabase
+        .from('users')
+        .update({ phone: phone })
+        .eq('id', userId)
+        .select();
+
+      if (error) {
+        console.error('Error updating user phone:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      if (!data || data.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      console.log(`User phone updated successfully: ${userId} -> ${phone}`);
+      res.json({ success: true, data: data[0] });
+    } catch (error) {
+      console.error('Error in update-phone endpoint:', error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Create ZyonPay PIX transaction with Supabase user integration
   app.post("/api/zyonpay/create-transaction", async (req, res) => {
     try {
